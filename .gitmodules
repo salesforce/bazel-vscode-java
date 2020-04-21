@@ -1,0 +1,3 @@
+[submodule "bazel-ls-eclipse"]
+	path = bazel-ls-eclipse
+	url = https://github.com/salesforce/bazel-ls-eclipse
