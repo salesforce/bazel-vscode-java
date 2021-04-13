@@ -11,7 +11,7 @@ Installation
     ```
 2. Clone the repository
     ```bash
-    git clone --recurse-submodules git@github.com:salesforce/bazel-ls-vscode.git
+    git clone git@github.com:salesforce/bazel-ls-vscode.git
     ```
 3. Install the dependencies:
     ```bash
