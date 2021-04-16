@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Bazel project wizard</title>
+</head>
+
+<body>
+    <div>
+        <input type="text" id="workspaceLocation" name="workspaceLocation" style="width: 50%; height: 1.5em;">
+        <button id="browseWorkspace" name="browseWorkspace" onclick="onBrowseHandler('browseWorkspace')"
+            style="height: 1.5em;">Browse...</button>
+    </div>
+
+    <button id="loadModulesBtn" onclick="loadModules()" style="height: 1.5em;">Load modules</button>
+    <button id="importProjectBtn" onclick="importProject()" style="height: 1.5em;" disabled>Start import</button>
+
+    <div id="moduleList" style="width: 100%; height: 50%; overflow-y: scroll;">
+    </div>
+
+    <script>
+        const vscode = acquireVsCodeApi();
+        const moduleListDivId = 'moduleList';
+
+        window.addEventListener('message', event => {
+
+            const message = event.data; // The JSON data our extension sent
+
+            switch (message.command) {
+                case 'setworkspace': {
+                    setLocation("workspaceLocation", message);
+                    break;
+                }
+                case 'listModules': {
+                    const modules = message.data;
+                    if (modules != null) {
+                        if (modules.length > 0) {
+                            document.getElementById('importProjectBtn').disabled = false;
+                        }
+                        for (i = 0; i < modules.length; i++) {
+                            const moduleName = modules[i];
+                            const moduleId = moduleListDivId + moduleName;
+                            const divSection = document.getElementById(moduleListDivId);
+                            const cbNode = document.createElement('input');
+                            cbNode.type = 'checkbox';
+                            cbNode.name = moduleId;
+                            cbNode.value = moduleName;
+                            cbNode.id = moduleId;
+                            cbNode.setAttribute('type', 'checkbox');
+
+                            const labelNode = document.createElement('label');
+                            labelNode.htmlFor = moduleId;
+                            labelNode.appendChild(document.createTextNode(moduleName));
+
+                            divSection.appendChild(cbNode);
+                            divSection.appendChild(labelNode);
+                            divSection.appendChild(document.createElement('br'));
+
+                        }
+                    }
+                    break;
+                }
+            }
+        });
+
+        function setLocation(elementId, message) {
+            if (message.data != null) {
+                document.getElementById(elementId).value = message.data
+            } else {
+                document.getElementById(elementId).value = ''
+            }
+        }
+
+        function onBrowseHandler(cmd) {
+            vscode.postMessage({
+                command: cmd
+            })
+        }
+
+        function importProject() {
+            const sourceLocation = document.getElementById("workspaceLocation").value;
+            let modules = [];
+            const divNode = document.getElementById(moduleListDivId);
+            const divModuleNodes = divNode.getElementsByTagName('input');
+            for (i = 0; i < divModuleNodes.length; i++) {
+                if (divModuleNodes[i].checked) {
+                    const moduleName = divModuleNodes[i].value;
+                    modules.push(moduleName);
+                }
+            }
+            vscode.postMessage({
+                command: 'importProject',
+                source: sourceLocation,
+                modules: modules
+            })
+        }
+
+        function loadModules() {
+            const sourceLocation = document.getElementById("workspaceLocation").value;
+            vscode.postMessage({
+                command: 'loadModules',
+                source: sourceLocation
+            })
+        }
+    </script>
+</body>
+
+</html>
