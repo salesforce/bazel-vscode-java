@@ -1,15 +1,15 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as bazelImporter from './bazel';
+import * as bazelproject from './bazelproject';
+import * as bazelmodule from './bazelmodule';
+
 
 export function handleMessages(extCtx: vscode.ExtensionContext, webPanel: vscode.WebviewPanel, message: any) {
     switch (message.command) {
-        case 'loadModuleList':
-            return;
         case 'importProject': {
             console.log('importProject');
-            const bi: bazelImporter.BazelStructure = new bazelImporter.BazelStructure(message.source, message.target);
+            const bi: bazelproject.BazelProject = new bazelproject.BazelProject(message.source, message.target);
             bi.openProject(message.modules);
             return;
         }
@@ -22,9 +22,18 @@ export function handleMessages(extCtx: vscode.ExtensionContext, webPanel: vscode
                 'openLabel': 'Select'
             }).then((fileUri) => postLocation(fileUri, webPanel, 'setworkspace'));
             return;
+        case 'browseTarget':
+            vscode.window.showOpenDialog({
+                'title': 'Select target folder',
+                'canSelectFolders': true,
+                'canSelectFiles': false,
+                'canSelectMany': false,
+                'openLabel': 'Select'
+            }).then((fileUri) => postLocation(fileUri, webPanel, 'settarget'));
+            return;
         case 'loadModules': {
-            const bi: bazelImporter.BazelStructure = new bazelImporter.BazelStructure(message.source, message.target);
-            const modules: string[] = bi.lookupModules();
+           const bi: bazelproject.BazelProject = new bazelproject.BazelProject(message.source, message.target);
+            const modules: bazelmodule.BazelModule[] = bi.lookupModules();
             webPanel.webview.postMessage({
                 command: 'listModules',
                 data: modules

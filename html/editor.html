@@ -9,10 +9,20 @@
 
 <body>
     <div>
+        <label for="workspaceLocation">Project WORKSPACE location</label>
         <input type="text" id="workspaceLocation" name="workspaceLocation" style="width: 50%; height: 1.5em;">
         <button id="browseWorkspace" name="browseWorkspace" onclick="onBrowseHandler('browseWorkspace')"
             style="height: 1.5em;">Browse...</button>
     </div>
+
+<!--
+    <div>
+        <label for="targetLocation">Target folder</label>
+        <input type="text" id="targetLocation" name="targetLocation" style="width: 50%; height: 1.5em;">
+        <button id="browseTarget" name="browseTarget" onclick="onBrowseHandler('browseTarget')"
+            style="height: 1.5em;">Browse...</button>
+    </div>
+-->
 
     <button id="loadModulesBtn" onclick="loadModules()" style="height: 1.5em;">Load modules</button>
     <button id="importProjectBtn" onclick="importProject()" style="height: 1.5em;" disabled>Start import</button>
@@ -33,6 +43,10 @@
                     setLocation("workspaceLocation", message);
                     break;
                 }
+                case 'settarget': {
+                    setLocation("targetLocation", message);
+                    break;
+                }
                 case 'listModules': {
                     const modules = message.data;
                     if (modules != null) {
@@ -40,7 +54,7 @@
                             document.getElementById('importProjectBtn').disabled = false;
                         }
                         for (i = 0; i < modules.length; i++) {
-                            const moduleName = modules[i];
+                            const moduleName = modules[i].name;
                             const moduleId = moduleListDivId + moduleName;
                             const divSection = document.getElementById(moduleListDivId);
                             const cbNode = document.createElement('input');
@@ -48,7 +62,9 @@
                             cbNode.name = moduleId;
                             cbNode.value = moduleName;
                             cbNode.id = moduleId;
-                            cbNode.setAttribute('type', 'checkbox');
+                            if (modules[i].selected) {
+                                cbNode.checked = true;
+                            }
 
                             const labelNode = document.createElement('label');
                             labelNode.htmlFor = moduleId;
@@ -81,6 +97,7 @@
 
         function importProject() {
             const sourceLocation = document.getElementById("workspaceLocation").value;
+            // const targetLocation = document.getElementById("targetLocation").value;
             let modules = [];
             const divNode = document.getElementById(moduleListDivId);
             const divModuleNodes = divNode.getElementsByTagName('input');
@@ -93,6 +110,7 @@
             vscode.postMessage({
                 command: 'importProject',
                 source: sourceLocation,
+                // target: targetLocation,
                 modules: modules
             })
         }

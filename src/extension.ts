@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import * as piEditor from './editor';
+import * as pieditor from './editor';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -39,11 +39,11 @@ export function activate(context: vscode.ExtensionContext) {
 				retainContextWhenHidden: true
 			}
 		);
-		panel.webview.html = piEditor.getWebviewContent(context);
+		panel.webview.html = pieditor.getWebviewContent(context);
 
 		// Handle messages from the webview
 		panel.webview.onDidReceiveMessage(
-			message => piEditor.handleMessages(context, panel, message),
+			message => pieditor.handleMessages(context, panel, message),
 			undefined,
 			context.subscriptions
 		);

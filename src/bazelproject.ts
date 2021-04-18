@@ -1,8 +1,11 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as bazelmodule from './bazelmodule';
+import * as projectparser from './bazelprojectparser';
 
-export class BazelStructure {
+
+export class BazelProject {
     sourceWorkspace: string;
     sourceFolder: string;
     targetFolder: string;
@@ -16,17 +19,29 @@ export class BazelStructure {
 
     openProject(modules: string[]) {
         this.buildBazelProject(modules);
-        this.openFolder();
+        // this.makeTargetFolder();
+        // this.buildSymlinks(modules);
+        // this.openFolder(this.targetFolder);
+        this.openFolder(this.sourceFolder);
     }
 
-    lookupModules(): string[] {
-        let modules: string[] = [];
+    lookupModules(): bazelmodule.BazelModule[] {
+        const parser: projectparser.BazelProjectParser = new projectparser.BazelProjectParser();
+        parser.readBazelProject(this.sourceFolder);
+        const selectedModules: string[] = parser.getModules();
+        let modules: bazelmodule.BazelModule[] = [];
         if (fs.existsSync(this.sourceFolder)) {
             const files: string[] = fs.readdirSync(this.sourceFolder, { withFileTypes: true }).//
                 filter(file => ((!file.name.startsWith('.')) && file.isDirectory())).//
                 map(file => file.name);
             files.forEach(file => {
-                modules.push(file);
+                const selected = selectedModules.find((name) => name === file);
+                let exist: boolean = false;
+                if (selected) {
+                    exist = true;
+                }
+                const module: bazelmodule.BazelModule = new bazelmodule.BazelModule(file, exist);
+                modules.push(module);
             });
         }
         return modules;
@@ -36,30 +51,29 @@ export class BazelStructure {
         const bazelprojectFile = path.join(this.sourceFolder, '.bazelproject');
         if (modules && modules.length > 0) {
             if (fs.existsSync(bazelprojectFile)) {
-                fs.truncateSync(bazelprojectFile);
+                fs.renameSync(bazelprojectFile, bazelprojectFile + '.' + Date.now());
             }
             let fileContent = 'directories:\n';
-            modules.forEach((moduleName) => { fileContent = fileContent + '  ' + moduleName + '\n' });
+            modules.forEach((moduleName) => { fileContent = fileContent + '  ' + moduleName + '\n'; });
             fs.writeFileSync(bazelprojectFile, fileContent);
         } else if (fs.existsSync(bazelprojectFile)) {
             fs.unlinkSync(bazelprojectFile);
         }
     }
 
-    private openFolder() {
-        const uri: vscode.Uri = vscode.Uri.file(this.sourceFolder);
+    private openFolder(folder: string) {
+        const uri: vscode.Uri = vscode.Uri.file(folder);
         vscode.commands.executeCommand('vscode.openFolder', uri);
     }
 
     private makeTargetFolder() {
         const targetPath = path.resolve(this.targetFolder);
         if (!fs.existsSync(targetPath)) {
-            fs.vmkdirSync(targetPath);
+            fs.mkdirSync(targetPath);
         }
     }
 
-    private buildSymlinks() {
-        const modules: string[] = this.lookupModules();
+    private buildSymlinks(modules: string[]) {
         if (modules && modules.length > 0) {
             modules.forEach((sourceModule) => {
                 const moduleName: string = path.basename(sourceModule);
@@ -67,8 +81,8 @@ export class BazelStructure {
                 const sourceModulePath = path.join(this.sourceFolder, moduleName);
                 fs.symlinkSync(sourceModulePath, targetModulePath);
             });
-            const targetWorkspaceFile = path.join(this.targetFolder, 'WORKSPACE');
-            fs.symlinkSync(this.sourceWorkspace, targetWorkspaceFile);
+            // const targetWorkspaceFile = path.join(this.targetFolder, 'WORKSPACE');
+            // fs.symlinkSync(this.sourceWorkspace, targetWorkspaceFile);
         }
     }
 }
