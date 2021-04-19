@@ -15,7 +15,7 @@
             style="height: 1.5em;">Browse...</button>
     </div>
 
-<!--
+    <!--
     <div>
         <label for="targetLocation">Target folder</label>
         <input type="text" id="targetLocation" name="targetLocation" style="width: 50%; height: 1.5em;">
@@ -102,9 +102,11 @@
             const divNode = document.getElementById(moduleListDivId);
             const divModuleNodes = divNode.getElementsByTagName('input');
             for (i = 0; i < divModuleNodes.length; i++) {
+                const moduleName = divModuleNodes[i].value;
                 if (divModuleNodes[i].checked) {
-                    const moduleName = divModuleNodes[i].value;
-                    modules.push(moduleName);
+                    modules.push({ name: moduleName, selected: true });
+                } else {
+                    modules.push({ name: moduleName, selected: false });
                 }
             }
             vscode.postMessage({

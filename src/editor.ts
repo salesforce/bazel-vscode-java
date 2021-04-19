@@ -8,7 +8,6 @@ import * as bazelmodule from './bazelmodule';
 export function handleMessages(extCtx: vscode.ExtensionContext, webPanel: vscode.WebviewPanel, message: any) {
     switch (message.command) {
         case 'importProject': {
-            console.log('importProject');
             const bi: bazelproject.BazelProject = new bazelproject.BazelProject(message.source, message.target);
             bi.openProject(message.modules);
             return;

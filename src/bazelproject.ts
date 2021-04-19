@@ -3,9 +3,12 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as bazelmodule from './bazelmodule';
 import * as projectparser from './bazelprojectparser';
-
+import * as vscodeworkspace from './workspace';
 
 export class BazelProject {
+    private readonly codeWorkspaceExt: string = '.code-workspace';
+    private readonly codeWorkspaceFile: string = 'workspace' + this.codeWorkspaceExt;
+
     sourceWorkspace: string;
     sourceFolder: string;
     targetFolder: string;
@@ -17,12 +20,14 @@ export class BazelProject {
 
     }
 
-    openProject(modules: string[]) {
-        this.buildBazelProject(modules);
+    openProject(modules: bazelmodule.BazelModule[]) {
         // this.makeTargetFolder();
+        // this.buildBazelProject(modules, this.targetFolder);
         // this.buildSymlinks(modules);
         // this.openFolder(this.targetFolder);
-        this.openFolder(this.sourceFolder);
+        this.buildBazelProject(modules, this.sourceFolder);
+        this.buildCodeWorkspace(modules, this.sourceFolder);
+        this.openFolder(path.join(this.sourceFolder, this.codeWorkspaceFile));
     }
 
     lookupModules(): bazelmodule.BazelModule[] {
@@ -47,14 +52,27 @@ export class BazelProject {
         return modules;
     }
 
-    private buildBazelProject(modules: string[]) {
-        const bazelprojectFile = path.join(this.sourceFolder, '.bazelproject');
+    private buildCodeWorkspace(modules: bazelmodule.BazelModule[], folder: string) {
+        const codeWorkspaceFile: vscodeworkspace.VsCodeWorkspace = new vscodeworkspace.VsCodeWorkspace(modules);
+        const vscodeWorkspace = path.join(folder, this.codeWorkspaceFile);
+        const content: string = JSON.stringify(codeWorkspaceFile, null, 2);
+
+        fs.writeFileSync(vscodeWorkspace, content);
+    }
+
+    private buildBazelProject(modules: bazelmodule.BazelModule[], folder: string) {
+        const bazelprojectFile = path.join(folder, '.bazelproject');
         if (modules && modules.length > 0) {
             if (fs.existsSync(bazelprojectFile)) {
                 fs.renameSync(bazelprojectFile, bazelprojectFile + '.' + Date.now());
             }
             let fileContent = 'directories:\n';
-            modules.forEach((moduleName) => { fileContent = fileContent + '  ' + moduleName + '\n'; });
+            modules.//
+                filter((module) => true === module.selected).//
+                forEach((module) => {
+                    const name: string = module.name;
+                    fileContent = fileContent + '  ' + name + '\n';
+                });
             fs.writeFileSync(bazelprojectFile, fileContent);
         } else if (fs.existsSync(bazelprojectFile)) {
             fs.unlinkSync(bazelprojectFile);
@@ -81,8 +99,8 @@ export class BazelProject {
                 const sourceModulePath = path.join(this.sourceFolder, moduleName);
                 fs.symlinkSync(sourceModulePath, targetModulePath);
             });
-            // const targetWorkspaceFile = path.join(this.targetFolder, 'WORKSPACE');
-            // fs.symlinkSync(this.sourceWorkspace, targetWorkspaceFile);
+            const targetWorkspaceFile = path.join(this.targetFolder, 'WORKSPACE');
+            fs.symlinkSync(this.sourceWorkspace, targetWorkspaceFile);
         }
     }
 }
