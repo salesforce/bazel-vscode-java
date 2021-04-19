@@ -40,6 +40,7 @@
 
             switch (message.command) {
                 case 'setworkspace': {
+                    clearModules();
                     setLocation("workspaceLocation", message);
                     break;
                 }
@@ -48,38 +49,51 @@
                     break;
                 }
                 case 'listModules': {
-                    const modules = message.data;
-                    if (modules != null) {
-                        if (modules.length > 0) {
-                            document.getElementById('importProjectBtn').disabled = false;
-                        }
-                        for (i = 0; i < modules.length; i++) {
-                            const moduleName = modules[i].name;
-                            const moduleId = moduleListDivId + moduleName;
-                            const divSection = document.getElementById(moduleListDivId);
-                            const cbNode = document.createElement('input');
-                            cbNode.type = 'checkbox';
-                            cbNode.name = moduleId;
-                            cbNode.value = moduleName;
-                            cbNode.id = moduleId;
-                            if (modules[i].selected) {
-                                cbNode.checked = true;
-                            }
-
-                            const labelNode = document.createElement('label');
-                            labelNode.htmlFor = moduleId;
-                            labelNode.appendChild(document.createTextNode(moduleName));
-
-                            divSection.appendChild(cbNode);
-                            divSection.appendChild(labelNode);
-                            divSection.appendChild(document.createElement('br'));
-
-                        }
-                    }
+                    clearModules();
+                    listModules(message);
                     break;
                 }
             }
         });
+
+        function clearModules() {
+            const divSection = document.getElementById(moduleListDivId);
+            while (divSection.firstChild) {
+                divSection.removeChild(divSection.firstChild);
+            }
+            document.getElementById('importProjectBtn').disabled = true;
+        }
+
+        function listModules(message) {
+            const modules = message.data;
+            if (modules != null) {
+                if (modules.length > 0) {
+                    document.getElementById('importProjectBtn').disabled = false;
+                }
+                for (i = 0; i < modules.length; i++) {
+                    const moduleName = modules[i].name;
+                    const moduleId = moduleListDivId + moduleName;
+                    const divSection = document.getElementById(moduleListDivId);
+                    const cbNode = document.createElement('input');
+                    cbNode.type = 'checkbox';
+                    cbNode.name = moduleId;
+                    cbNode.value = moduleName;
+                    cbNode.id = moduleId;
+                    if (modules[i].selected) {
+                        cbNode.checked = true;
+                    }
+
+                    const labelNode = document.createElement('label');
+                    labelNode.htmlFor = moduleId;
+                    labelNode.appendChild(document.createTextNode(moduleName));
+
+                    divSection.appendChild(cbNode);
+                    divSection.appendChild(labelNode);
+                    divSection.appendChild(document.createElement('br'));
+
+                }
+            }
+        }
 
         function setLocation(elementId, message) {
             if (message.data != null) {
