@@ -1,16 +1,13 @@
 import * as bazelmodule from './bazelmodule';
 
 export class VsCodeWorkspace {
-    private readonly filesExclude: string = 'files.exclude';
-    private readonly currentFolder: string = '.';
-
     folders: VsCodePath[];
     settings: any;
     constructor(modules: bazelmodule.BazelModule[]) {
         this.folders = [];
-        this.folders.push({ path: this.currentFolder });
+        this.folders.push({ path: '.' });
         this.settings = {};
-        this.settings[this.filesExclude] = this.buildExcludes(modules);
+        this.settings['files.exclude'] = this.buildExcludes(modules);
     }
 
     private buildExcludes(modules: bazelmodule.BazelModule[]): {} {
