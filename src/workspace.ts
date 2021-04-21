@@ -3,9 +3,9 @@ import * as bazelmodule from './bazelmodule';
 export class VsCodeWorkspace {
     folders: VsCodePath[];
     settings: any;
-    constructor(modules: bazelmodule.BazelModule[]) {
+    constructor(folder: string, modules: bazelmodule.BazelModule[]) {
         this.folders = [];
-        this.folders.push({ path: '.' });
+        this.folders.push({ path: folder });
         this.settings = {};
         this.settings['files.exclude'] = this.buildExcludes(modules);
     }

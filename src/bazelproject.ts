@@ -53,7 +53,7 @@ export class BazelProject {
     }
 
     private buildCodeWorkspace(modules: bazelmodule.BazelModule[], folder: string) {
-        const codeWorkspaceFile: vscodeworkspace.VsCodeWorkspace = new vscodeworkspace.VsCodeWorkspace(modules);
+        const codeWorkspaceFile: vscodeworkspace.VsCodeWorkspace = new vscodeworkspace.VsCodeWorkspace(folder, modules);
         const vscodeWorkspace = path.join(folder, this.codeWorkspaceFile);
         const content: string = JSON.stringify(codeWorkspaceFile, null, 2);
 
