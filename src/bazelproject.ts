@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as bazelmodule from './bazelmodule';
 import * as projectparser from './bazelprojectparser';
 import * as vscodeworkspace from './workspace';
@@ -66,12 +67,12 @@ export class BazelProject {
             if (fs.existsSync(bazelprojectFile)) {
                 fs.renameSync(bazelprojectFile, bazelprojectFile + '.' + Date.now());
             }
-            let fileContent = 'directories:\n';
+            let fileContent = 'directories:' + os.EOL;
             modules.//
                 filter((module) => true === module.selected).//
                 forEach((module) => {
                     const name: string = module.name;
-                    fileContent = fileContent + '  ' + name + '\n';
+                    fileContent = fileContent + '  ' + name + os.EOL;
                 });
             fs.writeFileSync(bazelprojectFile, fileContent);
         } else if (fs.existsSync(bazelprojectFile)) {
