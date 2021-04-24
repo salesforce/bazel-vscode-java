@@ -1,8 +1,15 @@
+import * as path from 'path';
 export class BazelModule {
+    path: any;
     name: string;
     selected: boolean;
-    constructor(name: string, selected: boolean) {
-        this.name = name;
-        this.selected = selected;
+    nested: BazelModule[];
+
+    constructor() {
+        this.path = undefined;
+        this.name = '';
+        this.selected = false;
+        this.nested = [];
     }
+
 }

@@ -16,7 +16,7 @@ export class VsCodeWorkspace {
             modules.//
                 filter((module) => false === module.selected).//
                 forEach((module) => {
-                    exclude[module.name] = true;
+                    exclude[module.path] = true;
                 });
         }
         return exclude;
