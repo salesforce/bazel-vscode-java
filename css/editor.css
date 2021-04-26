@@ -48,6 +48,10 @@ ul {
   transform: rotate(90deg);
 }
 
+.filtered-out {
+  display: none;
+}
+
 .loading {
   animation: loadingAnimation 5s infinite;
 }

@@ -6,6 +6,8 @@ $(document).ready(function () {
     $("#browseWorkspace").click(onBrowseWorkspaceHandler);
     $("#loadModulesBtn").click(onLoadModulesHandler);
     $("#importProjectBtn").click(onImportProjectHandler);
+    $("input#filterModules").on("input", onFilterChange);
+    $("#resetFilter").click(onResetFilter);
 });
 
 function onWindowMessageHandler (event) {
@@ -60,7 +62,29 @@ function onImportProjectHandler () {
         modules: modules
     });
 }
+
+function onFilterChange () {
+    const topLevel = $("div#moduleList > ul");
+    let filter = $("input#filterModules").val().toLowerCase().trim();
+    if (filter && filter.length > 0) {
+        filterModules(topLevel, filter);
+    } else {
+        resetFilteredModules();
+    }
+}
+
+function onResetFilter () {
+    clearFilter();
+    resetFilteredModules();
+}
 //-----------------------------------------
+
+function resetFilteredModules () {
+    const topLevel = $("div#moduleList > ul");
+    topLevel.find("li").each(function () {
+        $(this).removeClass("filtered-out");
+    });
+}
 
 function onSetWorkspaceHandler (message) {
     console.log('on set workspace');
@@ -72,9 +96,20 @@ function disableImportBtn (enabled) {
     $("#importProjectBtn").attr("disabled", enabled);
 }
 
+function disableFilterTxt (enabled) {
+    $("input#filterModules").attr("disabled", enabled);
+    $("#resetFilter").attr("disabled", enabled);
+}
+
+function clearFilter () {
+    $("input#filterModules").val("");
+}
+
 function clearModules () {
     $("#moduleList").empty();
     disableImportBtn(true);
+    disableFilterTxt(true);
+    clearFilter();
 }
 
 function setLocation (elementId, message) {
@@ -98,10 +133,11 @@ function listModules (message) {
     if (modules !== null) {
         if (modules.length > 0) {
             disableImportBtn(false);
-        }
-        const topList = $("<ul></ul>").appendTo("div#moduleList");
-        for (i = 0; i < modules.length; i++) {
-            addNode(modules[i], topList);
+            disableFilterTxt(false);
+            const topList = $("<ul></ul>").appendTo("div#moduleList");
+            for (i = 0; i < modules.length; i++) {
+                addNode(modules[i], topList);
+            }
         }
     }
 }
@@ -141,6 +177,27 @@ function addNode (module, parentNode) {
             }
         }
     }
+}
+
+function filterModules (parentNode, filter) {
+    let filtered = false;
+    parentNode.children("li").each(function () {
+        const cbNode = $(this).children("input").first();
+        let filteredModule = cbNode.attr("name").toLowerCase().includes(filter);
+        const nested = $(this).children("ul").first();
+        if (nested && nested.length) {
+            const nestedFiltered = filterModules(nested, filter);
+            filteredModule = (filteredModule || nestedFiltered);
+        }
+        filtered = (filtered || filteredModule);
+        if (true === filteredModule) {
+            $(this).removeClass("filtered-out");
+        } else {
+            $(this).addClass("filtered-out");
+        }
+
+    });
+    return filtered;
 }
 
 function collectModules (parentNode, modules) {

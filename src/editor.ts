@@ -78,12 +78,18 @@ export function getWebviewContent(panel: vscode.WebviewPanel, extCtx: vscode.Ext
         <div>
             <label for="workspaceLocation">Project WORKSPACE location</label>
             <input type="text" id="workspaceLocation" name="workspaceLocation" style="width: 50%; height: 1.5em;">
-            <button id="browseWorkspace" name="browseWorkspace"
-                style="height: 1.5em;">Browse...</button>
+            <button id="browseWorkspace" name="browseWorkspace" style="height: 1.5em;">Browse...</button>
         </div>
-    
-        <button id="loadModulesBtn" style="height: 1.5em;">Load modules</button>
-        <button id="importProjectBtn" style="height: 1.5em;" disabled>Start import</button>
+        <div>
+            <button id="loadModulesBtn" style="height: 1.5em;">Load modules</button>
+            <button id="importProjectBtn" style="height: 1.5em;" disabled>Start import</button>
+        </div>
+        <br><br>
+        <div>
+            <label for="filterModules">Filter modules:</label>
+            <input type="text" id="filterModules" name="filterModules" style="width: 50%; height: 1.5em;" disabled>
+            <button id="resetFilter" name="resetFilter" style="height: 1.5em;" disabled>Reset filter</button>
+        </div>
     
         <div id="moduleList" style="width: 100%; height: 50%; overflow-y: scroll;">
         </div>
