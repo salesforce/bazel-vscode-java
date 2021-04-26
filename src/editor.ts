@@ -84,12 +84,19 @@ export function getWebviewContent(panel: vscode.WebviewPanel, extCtx: vscode.Ext
             <button id="loadModulesBtn" style="height: 1.5em;">Load modules</button>
             <button id="importProjectBtn" style="height: 1.5em;" disabled>Start import</button>
         </div>
-        <br><br>
+        <br>
         <div>
-            <label for="filterModules">Filter modules:</label>
-            <input type="text" id="filterModules" name="filterModules" style="width: 50%; height: 1.5em;" disabled>
-            <button id="resetFilter" name="resetFilter" style="height: 1.5em;" disabled>Reset filter</button>
+            <div>
+                <label for="filterModules">Filter modules:</label>
+                <input type="text" id="filterModules" name="filterModules" style="width: 50%; height: 1.5em;" disabled>
+                <button id="resetFilter" name="resetFilter" style="height: 1.5em;" disabled>Reset filter</button>
+            </div>
+            <div>
+                <input type="checkbox" id="useSelected" />
+                <label for="useSelected">Filter selected modules</label>
+            </div>
         </div>
+        <hr>
     
         <div id="moduleList" style="width: 100%; height: 50%; overflow-y: scroll;">
         </div>

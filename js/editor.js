@@ -6,6 +6,7 @@ $(document).ready(function () {
     $("#browseWorkspace").click(onBrowseWorkspaceHandler);
     $("#loadModulesBtn").click(onLoadModulesHandler);
     $("#importProjectBtn").click(onImportProjectHandler);
+    $("input#useSelected").click(onFilterChange);
     $("input#filterModules").on("input", onFilterChange);
     $("#resetFilter").click(onResetFilter);
 });
@@ -66,8 +67,9 @@ function onImportProjectHandler () {
 function onFilterChange () {
     const topLevel = $("div#moduleList > ul");
     let filter = $("input#filterModules").val().toLowerCase().trim();
-    if (filter && filter.length > 0) {
-        filterModules(topLevel, filter);
+    const useSelected = $("input#useSelected").prop("checked");
+    if ((filter && filter.length > 0) || (true === useSelected)) {
+        filterModules(topLevel, filter, useSelected);
     } else {
         resetFilteredModules();
     }
@@ -96,19 +98,21 @@ function disableImportBtn (enabled) {
     $("#importProjectBtn").attr("disabled", enabled);
 }
 
-function disableFilterTxt (enabled) {
+function disableFilterSet (enabled) {
     $("input#filterModules").attr("disabled", enabled);
     $("#resetFilter").attr("disabled", enabled);
+    $("input#useSelected").attr("disabled", enabled);
 }
 
 function clearFilter () {
     $("input#filterModules").val("");
+    $("input#useSelected").prop("checked", false);
 }
 
 function clearModules () {
     $("#moduleList").empty();
     disableImportBtn(true);
-    disableFilterTxt(true);
+    disableFilterSet(true);
     clearFilter();
 }
 
@@ -133,7 +137,7 @@ function listModules (message) {
     if (modules !== null) {
         if (modules.length > 0) {
             disableImportBtn(false);
-            disableFilterTxt(false);
+            disableFilterSet(false);
             const topList = $("<ul></ul>").appendTo("div#moduleList");
             for (i = 0; i < modules.length; i++) {
                 addNode(modules[i], topList);
@@ -179,14 +183,17 @@ function addNode (module, parentNode) {
     }
 }
 
-function filterModules (parentNode, filter) {
+function filterModules (parentNode, filter, useSelected) {
     let filtered = false;
     parentNode.children("li").each(function () {
         const cbNode = $(this).children("input").first();
         let filteredModule = cbNode.attr("name").toLowerCase().includes(filter);
+        if (true === useSelected) {
+            filteredModule = filteredModule && cbNode.prop("checked");
+        }
         const nested = $(this).children("ul").first();
         if (nested && nested.length) {
-            const nestedFiltered = filterModules(nested, filter);
+            const nestedFiltered = filterModules(nested, filter, useSelected);
             filteredModule = (filteredModule || nestedFiltered);
         }
         filtered = (filtered || filteredModule);
