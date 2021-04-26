@@ -23,6 +23,7 @@ function onWindowMessageHandler (event) {
         }
         case 'listModules': {
             clearModules();
+            loadingOff();
             listModules(message);
             break;
         }
@@ -41,6 +42,7 @@ function onBrowseWorkspaceHandler () {
 
 function onLoadModulesHandler () {
     const sourceLocation = document.getElementById("workspaceLocation").value;
+    loadingOn();
     vscode.postMessage({
         command: 'loadModules',
         source: sourceLocation
@@ -185,4 +187,13 @@ function buildNode (cboxNode) {
         path: modulePath
     };
     return module;
+}
+
+function loadingOn () {
+    $("div#moduleList").before('<div id="loadingWindow"><span class="loading">Loading modules ...</span></div>');
+}
+
+function loadingOff () {
+    $("div#loadingWindow").remove();
+
 }

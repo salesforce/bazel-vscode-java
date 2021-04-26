@@ -1,48 +1,75 @@
 ul {
-    list-style-type: none;
-    padding-inline-start: 2em;
+  list-style-type: none;
+  padding-inline-start: 2em;
 }
 
 .collapsed-list {
-    display: none;
+  display: none;
 }
+
 .single::before {
-    user-select: none;
-    content: "\25B6";
-    color: transparent;
-    display: inline-block;
-    margin-right: 6px;
+  user-select: none;
+  content: "\25B6";
+  color: transparent;
+  display: inline-block;
+  margin-right: 6px;
 }
 
 .collapsed::before {
-    cursor: pointer;
-    -webkit-user-select: none;
-    /* Safari 3.1+ */
-    -moz-user-select: none;
-    /* Firefox 2+ */
-    -ms-user-select: none;
-    /* IE 10+ */
-    user-select: none;
-    content: "\25B6";
-    display: inline-block;
-    margin-right: 6px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  /* Safari 3.1+ */
+  -moz-user-select: none;
+  /* Firefox 2+ */
+  -ms-user-select: none;
+  /* IE 10+ */
+  user-select: none;
+  content: "\25B6";
+  display: inline-block;
+  margin-right: 6px;
 }
 
 .expanded::before {
-    cursor: pointer;
-    content: "\25B6";
-    -webkit-user-select: none;
-    /* Safari 3.1+ */
-    -moz-user-select: none;
-    /* Firefox 2+ */
-    -ms-user-select: none;
-    /* IE 10+ */
-    user-select: none;
-    display: inline-block;
-    margin-right: 6px;
-    -ms-transform: rotate(90deg);
-    /* IE 9 */
-    -webkit-transform: rotate(90deg);
-    /* Safari */
-    transform: rotate(90deg);
+  cursor: pointer;
+  content: "\25B6";
+  -webkit-user-select: none;
+  /* Safari 3.1+ */
+  -moz-user-select: none;
+  /* Firefox 2+ */
+  -ms-user-select: none;
+  /* IE 10+ */
+  user-select: none;
+  display: inline-block;
+  margin-right: 6px;
+  -ms-transform: rotate(90deg);
+  /* IE 9 */
+  -webkit-transform: rotate(90deg);
+  /* Safari */
+  transform: rotate(90deg);
+}
+
+.loading {
+  animation: loadingAnimation 5s infinite;
+}
+
+@keyframes loadingAnimation {
+  0% {
+    color: inherit;
+  }
+
+  25% {
+    color: transparent;
+  }
+
+  50% {
+    color: inherit;
+  }
+
+  75% {
+    color: transparent;
+  }
+
+  100% {
+    color: inherit;
+  }
 }

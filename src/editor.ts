@@ -42,6 +42,16 @@ export function handleMessages(extCtx: vscode.ExtensionContext, webPanel: vscode
     }
 }
 
+function postLocation(fileUri: vscode.Uri[] | undefined, webPanel: vscode.WebviewPanel, command: string) {
+    if (fileUri && fileUri[0]) {
+        // vscode.window.showInformationMessage('Selected root ' + fileUri[0].fsPath);
+        webPanel.webview.postMessage({
+            command: command,
+            data: fileUri[0].fsPath
+        });
+    }
+}
+
 export function getWebviewContent(panel: vscode.WebviewPanel, extCtx: vscode.ExtensionContext): string {
     const jQueryOnDiskPath = vscode.Uri.file(path.join(extCtx.extensionPath, '/js/jquery.js'));
     const jQuerySrc: vscode.Uri = panel.webview.asWebviewUri(jQueryOnDiskPath);
@@ -83,14 +93,4 @@ export function getWebviewContent(panel: vscode.WebviewPanel, extCtx: vscode.Ext
     
     </html>
     `;
-}
-
-function postLocation(fileUri: vscode.Uri[] | undefined, webPanel: vscode.WebviewPanel, command: string) {
-    if (fileUri && fileUri[0]) {
-        // vscode.window.showInformationMessage('Selected root ' + fileUri[0].fsPath);
-        webPanel.webview.postMessage({
-            command: command,
-            data: fileUri[0].fsPath
-        });
-    }
 }
