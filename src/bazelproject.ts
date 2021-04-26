@@ -122,7 +122,7 @@ export class BazelProject {
             isBuild = true;
         }
 
-        const selected = preselected.find((name) => name === module.path);
+        const selected = preselected.find((name) => name === parent.path);
         if (selected) {
             isBuild = true;
             parent.selected = true;
