@@ -5,39 +5,41 @@ import * as bazelproject from './bazelproject';
 import * as bazelmodule from './bazelmodule';
 
 
-export function handleMessages(extCtx: vscode.ExtensionContext, webPanel: vscode.WebviewPanel, message: any) {
-    switch (message.command) {
-        case 'importProject': {
-            const bi: bazelproject.BazelProject = new bazelproject.BazelProject(message.source, message.target);
-            bi.openProject(message.modules);
-            return;
-        }
-        case 'browseWorkspace':
-            vscode.window.showOpenDialog({
-                'title': 'Select WORKSPACE location',
-                'canSelectFolders': false,
-                'canSelectFiles': true,
-                'canSelectMany': false,
-                'openLabel': 'Select'
-            }).then((fileUri) => postLocation(fileUri, webPanel, 'setworkspace'));
-            return;
-        case 'browseTarget':
-            vscode.window.showOpenDialog({
-                'title': 'Select target folder',
-                'canSelectFolders': true,
-                'canSelectFiles': false,
-                'canSelectMany': false,
-                'openLabel': 'Select'
-            }).then((fileUri) => postLocation(fileUri, webPanel, 'settarget'));
-            return;
-        case 'loadModules': {
-            const bi: bazelproject.BazelProject = new bazelproject.BazelProject(message.source, message.target);
-            const modules: bazelmodule.BazelModule[] = bi.lookupModules();
-            webPanel.webview.postMessage({
-                command: 'listModules',
-                data: modules
-            });
-            return;
+export function handleMessages(extCtx: vscode.ExtensionContext, webPanel: vscode.WebviewPanel | undefined, message: any) {
+    if (webPanel) {
+        switch (message.command) {
+            case 'importProject': {
+                const bi: bazelproject.BazelProject = new bazelproject.BazelProject(message.source, message.target);
+                bi.openProject(message.modules);
+                return;
+            }
+            case 'browseWorkspace':
+                vscode.window.showOpenDialog({
+                    'title': 'Select WORKSPACE location',
+                    'canSelectFolders': false,
+                    'canSelectFiles': true,
+                    'canSelectMany': false,
+                    'openLabel': 'Select'
+                }).then((fileUri) => postLocation(fileUri, webPanel, 'setworkspace'));
+                return;
+            case 'browseTarget':
+                vscode.window.showOpenDialog({
+                    'title': 'Select target folder',
+                    'canSelectFolders': true,
+                    'canSelectFiles': false,
+                    'canSelectMany': false,
+                    'openLabel': 'Select'
+                }).then((fileUri) => postLocation(fileUri, webPanel, 'settarget'));
+                return;
+            case 'loadModules': {
+                const bi: bazelproject.BazelProject = new bazelproject.BazelProject(message.source, message.target);
+                const modules: bazelmodule.BazelModule[] = bi.lookupModules();
+                webPanel.webview.postMessage({
+                    command: 'listModules',
+                    data: modules
+                });
+                return;
+            }
         }
     }
 }
@@ -87,7 +89,7 @@ export function getWebviewContent(panel: vscode.WebviewPanel, extCtx: vscode.Ext
         <br>
         <div>
             <div>
-                <label for="filterModules">Filter modules:</label>
+                <label for="filterModules">Filter modules by name:</label>
                 <input type="text" id="filterModules" name="filterModules" style="width: 50%; height: 1.5em;" disabled>
                 <button id="resetFilter" name="resetFilter" style="height: 1.5em;" disabled>Reset filter</button>
             </div>
@@ -96,6 +98,7 @@ export function getWebviewContent(panel: vscode.WebviewPanel, extCtx: vscode.Ext
                 <label for="useSelected">Filter selected modules</label>
             </div>
         </div>
+        <br>
         <hr>
     
         <div id="moduleList" style="width: 100%; height: 50%; overflow-y: scroll;">
