@@ -8,6 +8,7 @@ export class VsCodeWorkspace {
         this.folders.push({ path: folder });
         this.settings = {};
         this.settings['files.exclude'] = this.buildExcludes(modules);
+        this.settings['java.configuration.updateBuildConfiguration'] = 'automatic';
     }
 
     private buildExcludes(modules: bazelmodule.BazelModule[]): {} {

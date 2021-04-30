@@ -49,7 +49,6 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(viewTitleDisp);
-
 }
 
 // this method is called when your extension is deactivated

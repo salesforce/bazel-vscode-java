@@ -34,10 +34,6 @@ export class BazelProject {
     }
 
     public openProject(modules: bazelmodule.BazelModule[]) {
-        // this.makeTargetFolder();
-        // this.buildBazelProject(modules, this.targetFolder);
-        // this.buildSymlinks(modules);
-        // this.openFolder(this.targetFolder);
         this.buildBazelProject(modules, this._sourceFolder);
         this.buildCodeWorkspace(modules, this._sourceFolder);
         this.openFolder(path.join(this._sourceFolder, this.codeWorkspaceFile));
