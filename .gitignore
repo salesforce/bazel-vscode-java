@@ -1,3 +1,6 @@
 node_modules
+bazel-ls-eclipse
+out
+dist
 .vscode-test/
 *.vsix
