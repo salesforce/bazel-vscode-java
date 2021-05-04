@@ -23,3 +23,37 @@ jobs:
       - run: npm install
       - run: npm run compile
       - run: vsce package
+      - name: Create tag
+        if: contains(github.ref, 'master')
+        id: create_tag
+        run: |
+          tag=builds-$(date +%Y%m%d-%H%M%S)
+          echo "::set-output name=tag::$tag"
+      - name: Create Release
+        if: contains(github.ref, 'master')
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.create_tag.outputs.tag }}
+          release_name: ${{ steps.create_tag.outputs.tag }}
+          draft: true
+          prerelease: false
+      - name: Upload Artifact
+        if: contains(github.ref, 'master')
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./bazel-ls-vscode-0.0.1.vsix
+          asset_name: bazel-ls-vscode-0.0.1.vsix
+          asset_content_type: application/octet-stream
+      - name: Publish Release
+        if: contains(github.ref, 'master')
+        uses: eregon/publish-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.create_release.outputs.id }}
