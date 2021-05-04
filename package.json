@@ -22,7 +22,7 @@
 			"./bazel-ls-eclipse/com.salesforce.b2eclipse.jdt.ls/target/com.salesforce.b2eclipse.jdt.ls-0.1.0-SNAPSHOT.jar"
 		],
 		"javaBuildFilePatterns": [
-			"^WORKSPACE$", "^BUILD$", ".*\\.bazelproject$"
+			"^WORKSPACE(\\.bazel)?$", "^BUILD(\\.bazel)?$", ".*\\.bazelproject$"
 		],
 		"commands": [
 			{
