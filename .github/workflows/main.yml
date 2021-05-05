@@ -1,6 +1,12 @@
-name: build
+name: main
 
-on: [push]
+on: 
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build:
@@ -23,6 +29,20 @@ jobs:
       - run: npm install
       - run: npm run compile
       - run: vsce package
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ./bazel-ls-vscode-0.0.1.vsix 
+          key: ${{ env.cache-name }}-${{ github.run_id }}
+  publish:
+    needs: [build]
+    if: ${{ success() && contains(github.ref, 'master') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/cache@v2
+        with:
+          path: ./bazel-ls-vscode-0.0.1.vsix 
+          key: ${{ env.cache-name }}-${{ github.run_id }}
       - name: Create tag
         if: contains(github.ref, 'master')
         id: create_tag
