@@ -1,4 +1,4 @@
-![GitHub Actions](https://github.com/salesforce/bazel-eclipse-ls/workflows/build/badge.svg)
+![GitHub Actions](https://github.com/salesforce/bazel-ls-vscode/workflows/main/badge.svg)
 [![](https://img.shields.io/badge/license-BSD%203-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 Bazel for Java
