@@ -17,3 +17,4 @@ gulpfile.js
 node_modules
 bazel-ls-eclipse/**
 !bazel-ls-eclipse/com.salesforce.b2eclipse.jdt.ls/target/com.salesforce.b2eclipse.jdt.ls-*.jar
+README.md
