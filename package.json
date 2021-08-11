@@ -51,6 +51,7 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"extensionDependencies": [
+		"redhat.java",
 		"vscjava.vscode-java-debug",
 		"vscjava.vscode-java-test"
 	],
