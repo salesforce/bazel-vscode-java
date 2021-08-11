@@ -50,6 +50,10 @@
 		"lint": "eslint src --ext ts",
 		"test": "node ./out/test/runTest.js"
 	},
+	"extensionDependencies": [
+		"vscjava.vscode-java-debug",
+		"vscjava.vscode-java-test"
+	],
 	"devDependencies": {
 		"@types/vscode": "^1.46.0",
 		"@types/glob": "^7.1.3",
