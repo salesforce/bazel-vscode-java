@@ -4,6 +4,7 @@ out/test/**
 src/**
 test/**
 .gitignore
+.github/**
 **/jsconfig.json
 **/*.map
 **/.eslintrc.json

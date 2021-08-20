@@ -1,5 +1,5 @@
 node_modules
-bazel-ls-eclipse
+bazel-eclipse
 out
 dist
 .vscode-test/
