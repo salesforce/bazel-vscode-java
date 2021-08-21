@@ -14,12 +14,11 @@ gulp.task('build-plugin', (done) => {
     }
   });
 
-  removeFolder(bazelEclipseDir);
+ removeFolder(bazelEclipseDir);
 
-  cp.execSync('git clone https://github.com/salesforce/bazel-eclipse.git', { cwd: __dirname, stdio: [0, 1, 2] });
-  cp.execSync('git checkout --track origin/r-n-d/jdtls', { cwd: bazelEclipseDir, stdio: [0, 1, 2] });
-  cp.execSync(`mvn clean package`, { cwd: bazelEclipseDir, stdio: [0, 1, 2] });
-  done();
+ cp.execSync('git clone https://github.com/salesforce/bazel-eclipse.git', { cwd: __dirname, stdio: [0, 1, 2] });
+ cp.execSync(`mvn clean package`, { cwd: bazelEclipseDir, stdio: [0, 1, 2] });
+ done();
 });
 
 function isWin() {
