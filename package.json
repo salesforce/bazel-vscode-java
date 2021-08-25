@@ -19,7 +19,8 @@
 	"main": "./out/extension.js",
 	"contributes": {
 		"javaExtensions": [
-			"./bazel-ls-eclipse/com.salesforce.b2eclipse.jdt.ls/target/com.salesforce.b2eclipse.jdt.ls-0.1.0-SNAPSHOT.jar"
+			"./bazel-eclipse/bundles/com.salesforce.b2eclipse.jdt.ls/target/com.salesforce.b2eclipse.jdt.ls-1.5.0-SNAPSHOT.jar",
+			"./bazel-eclipse/bundles/com.salesforce.bazel-java-sdk/target/com.salesforce.bazel-java-sdk-1.5.0-SNAPSHOT.jar"
 		],
 		"javaBuildFilePatterns": [
 			"^WORKSPACE(\\.bazel)?$",
