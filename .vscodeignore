@@ -5,6 +5,7 @@ src/**
 test/**
 .gitignore
 .github/**
+.git/**
 **/jsconfig.json
 **/*.map
 **/.eslintrc.json
@@ -16,8 +17,6 @@ vsc-extension-quickstart.md
 **/*.ts
 gulpfile.js
 node_modules
-bazel-ls-eclipse/**
-!bazel-ls-eclipse/com.salesforce.b2eclipse.jdt.ls/target/com.salesforce.b2eclipse.jdt.ls-*.jar
 bazel-eclipse/**
 !bazel-eclipse/bundles/com.salesforce.b2eclipse.jdt.ls/target/com.salesforce.b2eclipse.jdt.ls-*SNAPSHOT.jar
 !bazel-eclipse/bundles/com.salesforce.bazel-java-sdk/target/com.salesforce.bazel-java-sdk-*SNAPSHOT.jar
