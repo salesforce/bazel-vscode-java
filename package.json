@@ -1,9 +1,9 @@
 {
-	"name": "bazel-ls-vscode",
-	"displayName": "bazel-ls-vscode",
+	"name": "bazel-vscode",
+	"displayName": "bazel-vscode",
 	"publisher": "salesforce",
-	"repository": "https://github.com/salesforce/bazel-ls-vscode",
-	"description": "bazel-ls-vscode",
+	"repository": "https://github.com/salesforce/bazel-vscode",
+	"description": "bazel-vscode",
 	"version": "0.0.2",
 	"engines": {
 		"vscode": "^1.46.0"

@@ -1,4 +1,4 @@
-![GitHub Actions](https://github.com/salesforce/bazel-ls-vscode/workflows/main/badge.svg)
+![GitHub Actions](https://github.com/salesforce/bazel-vscode/workflows/main/badge.svg)
 [![](https://img.shields.io/badge/license-BSD%203-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 Bazel for Java
@@ -6,18 +6,18 @@ Bazel for Java
 
 Installation
 --------------------
-You can download the latest build from the [Releases](https://github.com/salesforce/bazel-ls-vscode/releases) or package the extension by yourself:
+You can download the latest build from the [Releases](https://github.com/salesforce/bazel-vscode/releases) or package the extension by yourself:
 1. [Install](https://code.visualstudio.com/api/working-with-extensions/publishing-extension#installation) `vsce` CLI tool:
     ```bash
     npm install -g vsce
     ```
 2. Clone the repository
     ```bash
-    git clone git@github.com:salesforce/bazel-ls-vscode.git
+    git clone git@github.com:salesforce/bazel-vscode.git
     ```
 3. Install the dependencies:
     ```bash
-    cd bazel-ls-vscode
+    cd bazel-vscode
     npm install
     ```
 4. Compile source code:

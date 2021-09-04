@@ -9,7 +9,7 @@ const bazelEclipseDir = path.join(__dirname, 'bazel-eclipse');
 
 gulp.task('build-plugin', (done) => {
   fs.readdirSync(__dirname).forEach((file, index) => {
-    if (file.match('.*bazel-ls-vscode-.*\\.vsix')) {
+    if (file.match('.*bazel-vscode-.*\\.vsix')) {
       fs.unlinkSync(file);
     }
   });
