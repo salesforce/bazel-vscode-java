@@ -4,7 +4,7 @@
 	"publisher": "salesforce",
 	"repository": "https://github.com/salesforce/bazel-vscode",
 	"description": "bazel-vscode",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"engines": {
 		"vscode": "^1.46.0"
 	},
@@ -20,7 +20,8 @@
 	"contributes": {
 		"javaExtensions": [
 			"./bazel-eclipse/bundles/com.salesforce.b2eclipse.jdt.ls/target/com.salesforce.b2eclipse.jdt.ls-1.5.0-SNAPSHOT.jar",
-			"./bazel-eclipse/bundles/com.salesforce.bazel-java-sdk/target/com.salesforce.bazel-java-sdk-1.5.0-SNAPSHOT.jar"
+			"./bazel-eclipse/bundles/com.salesforce.bazel-java-sdk/target/com.salesforce.bazel-java-sdk-1.5.0-SNAPSHOT.jar",
+			"./bazel-eclipse/bundles/com.salesforce.bazel.eclipse.common/target/com.salesforce.bazel.eclipse.common-1.5.0-SNAPSHOT.jar"
 		],
 		"javaBuildFilePatterns": [
 			"^WORKSPACE(\\.bazel)?$",
