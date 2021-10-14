@@ -30,7 +30,7 @@ You can download the latest build from the [Releases](https://github.com/salesfo
     ```
 6. Open the _Extensions_ tab in VS Code
 7. Select _Install from VSIX..._ and choose file built in the fourth step
-8. Disable Maven imported (it can cause issues)
+8. Disable Maven import in VS Code settings (it can cause issues)
     ```
     {
         "java.import.maven.enabled": false
