@@ -6,6 +6,18 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"args": [
+				"build-plugin"
+			],
+			"name": "Gulp Build Plugin",
+			"program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"type": "pwa-node"
+		},
+		{
 			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",
@@ -29,18 +41,7 @@
 				"${workspaceFolder}/out/test/**/*.js"
 			],
 			"preLaunchTask": "${defaultBuildTask}"
-		},
-        {
-            "name": "GulpTester",
-            "type": "node",
-            "request": "launch",
-            "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
-            "stopOnEntry": false,
-            "args": [],
-            "cwd": "${workspaceRoot}",
-            "runtimeArgs": [
-                "--nolazy"
-            ],
-            "console": "internalConsole",
-        }	]
+		}
+		
+	]
 }

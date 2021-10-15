@@ -18,7 +18,7 @@ vsc-extension-quickstart.md
 gulpfile.js
 node_modules
 bazel-eclipse/**
-!bazel-eclipse/bundles/com.salesforce.bazel.eclipse.common/target/com.salesforce.bazel.eclipse.common-*SNAPSHOT.jar
-!bazel-eclipse/bundles/com.salesforce.b2eclipse.jdt.ls/target/com.salesforce.b2eclipse.jdt.ls-*SNAPSHOT.jar
-!bazel-eclipse/bundles/com.salesforce.bazel-java-sdk/target/com.salesforce.bazel-java-sdk-*SNAPSHOT.jar
+!bazel-eclipse/bundles/com.salesforce.bazel.eclipse.common/target/com.salesforce.bazel.eclipse.common.jar
+!bazel-eclipse/bundles/com.salesforce.b2eclipse.jdt.ls/target/com.salesforce.b2eclipse.jdt.ls.jar
+!bazel-eclipse/bundles/com.salesforce.bazel-java-sdk/target/com.salesforce.bazel-java-sdk.jar
 README.md
