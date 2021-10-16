@@ -14,11 +14,15 @@ gulp.task('build-plugin', (done) => {
     }
   });
 
- removeFolder(bazelEclipseDir);
+  // del.sync(bazelEclipseDir + '/**', { force: true });
+  fs.rmdirSync(bazelEclipseDir, {recursive: true});
 
- cp.execSync('git clone https://github.com/salesforce/bazel-eclipse.git', { cwd: __dirname, stdio: [0, 1, 2] });
- cp.execSync(`mvn clean package`, { cwd: bazelEclipseDir, stdio: [0, 1, 2] });
- done();
+  cp.execSync('git clone https://github.com/salesforce/bazel-eclipse.git', { cwd: __dirname, stdio: [0, 1, 2] });
+  cp.execSync(`mvn clean package`, { cwd: bazelEclipseDir, stdio: [0, 1, 2] });
+  renameTarget('com.salesforce.b2eclipse.jdt.ls');
+  renameTarget('com.salesforce.bazel.eclipse.common');
+  renameTarget('com.salesforce.bazel-java-sdk');
+  done();
 });
 
 function isWin() {
@@ -29,16 +33,13 @@ function mvnw() {
   return isWin() ? 'mvnw.cmd' : './mvnw';
 }
 
-function removeFolder(folder) {
-  if (fs.existsSync(folder)) {
-    fs.readdirSync(folder).forEach((file, index) => {
-      var child = path.join(folder, file);
-      if (fs.statSync(child).isDirectory()) {
-        removeFolder(child);
-      } else {
-        fs.unlinkSync(child);
-      }
-    });
-    fs.rmdirSync(folder);
-  }
+function renameTarget(plugin) {
+  bundlesPath = path.join(bazelEclipseDir, 'bundles');
+  pluginPath = path.join(bundlesPath, plugin);
+  targetPath = path.join(pluginPath, 'target');
+  sourceFileName = fs.readdirSync(targetPath).find(file => file.match(plugin + '-.*-SNAPSHOT\\.jar'));
+  sourceFile = path.join(targetPath, sourceFileName);
+  targetFile = path.join(targetPath, plugin + '.jar');
+  fs.renameSync(sourceFile, targetFile);
 }
+
