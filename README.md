@@ -30,10 +30,25 @@ You can download the latest build from the [Releases](https://github.com/salesfo
     ```
 6. Open the _Extensions_ tab in VS Code
 7. Select _Install from VSIX..._ and choose file built in the fourth step
-8. Disable Maven import in VS Code settings (it can cause issues)
+8. Enable Bazel import and disable Maven import in VS Code settings (it can cause issues)
     ```
     {
+        "java.import.bazel.enabled": true,
         "java.import.maven.enabled": false
+    }
+    ```
+9. Check source and test paths on the project. By default, source path is ```/src/main/java``` and test path is ```/src/test/java```. If source and/or test paths differ from the default, then add actual path in VS Code settings
+    ```
+    {
+        "java.import.bazel.src.path": "<path-to-source>",
+        "java.import.bazel.test.path": "<path-to-test>"
+    }
+    ```
+    e.g.:
+    ```
+    {
+        "java.import.bazel.src.path": "/src/java",
+        "java.import.bazel.test.path": "/src/tests"
     }
     ```
 10. Once installed, restart VS Code
