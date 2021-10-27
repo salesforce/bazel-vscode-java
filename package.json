@@ -42,7 +42,12 @@
 					"group": "MenuViewTitle"
 				}
 			]
-		}
+		},
+		"taskDefinitions": [
+			{
+				"type": "bazel"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "gulp build-plugin",

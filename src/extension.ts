@@ -1,6 +1,9 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as pieditor from './editor';
+import { BazelTaskProvider } from './bazelTaskProvider';
+
+let bazelTaskProvider: vscode.Disposable | undefined;
 
 export function activate(context: vscode.ExtensionContext) {
 	let panel: vscode.WebviewPanel | undefined = undefined;
@@ -49,7 +52,14 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(viewTitleDisp);
+
+	bazelTaskProvider = vscode.tasks.registerTaskProvider(BazelTaskProvider.BazelType, new BazelTaskProvider());
+
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() { }
+export function deactivate() { 
+	if (bazelTaskProvider) {
+		bazelTaskProvider.dispose();
+	}
+}
