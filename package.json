@@ -45,7 +45,21 @@
 		},
 		"taskDefinitions": [
 			{
-				"type": "bazel"
+				"type": "bazel",
+				"required": [
+					"name",
+					"task"
+				],
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "The task name"
+					},
+					"task": {
+						"type": "string",
+						"description": "The task command"
+					}
+				}
 			}
 		]
 	},
