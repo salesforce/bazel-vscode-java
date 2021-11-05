@@ -52,3 +52,27 @@ You can download the latest build from the [Releases](https://github.com/salesfo
     }
     ```
 10. Once installed, restart VS Code
+
+
+Task Provider
+--------------------
+
+You can use the example from the bazelTaskProvider.ts to create VSCode tasks.
+
+The example provides tasks:
+
+* Run 'Build' and 'Test' to run bazel build an test for all targets.
+
+* Run 'Dependencies' query to creat all targets dependency graph.
+
+* Run 'Formatting' to formatt all BUILD and WORKSPACE files. 
+
+* Run 'Unused deps' to check unused dependencies.
+
+NOTE! Tasks 'Formatting' and 'Unused deps' require [buildifier](https://github.com/bazelbuild/buildtools/blob/master/buildifier/README.md) and [unused deps](https://github.com/bazelbuild/buildtools/blob/master/unused_deps/README.md) installed respectively.
+
+
+Remote Development
+--------------------
+
+If you are using Visual Studio Code Remote Development for work, please note that 'Basel' and other additional tools must be installed on the server. 
