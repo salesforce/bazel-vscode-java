@@ -75,4 +75,4 @@ NOTE! Tasks 'Formatting' and 'Unused deps' require [buildifier](https://github.c
 Remote Development
 --------------------
 
-If you are using Visual Studio Code Remote Development for work, please note that 'Basel' and other additional tools must be installed on the server. 
+If you are using Visual Studio Code Remote Development for work, please note that 'Bazel' and other additional tools must be installed on the server. 
