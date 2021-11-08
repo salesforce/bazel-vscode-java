@@ -42,7 +42,26 @@
 					"group": "MenuViewTitle"
 				}
 			]
-		}
+		},
+		"taskDefinitions": [
+			{
+				"type": "bazel",
+				"required": [
+					"name",
+					"task"
+				],
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "The task name"
+					},
+					"task": {
+						"type": "string",
+						"description": "The task command"
+					}
+				}
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "gulp build-plugin",
