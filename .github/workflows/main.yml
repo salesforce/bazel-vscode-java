@@ -32,7 +32,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: |
-            ./bazel-vscode-0.0.4.vsix 
+            ./bazel-vscode-0.0.5.vsix 
           key: ${{ env.cache-name }}-${{ github.run_id }}
   publish:
     needs: [build]
@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/cache@v2
         with:
-          path: ./bazel-vscode-0.0.4.vsix 
+          path: ./bazel-vscode-0.0.5.vsix 
           key: ${{ env.cache-name }}-${{ github.run_id }}
       - name: Create tag
         if: contains(github.ref, 'master')
@@ -67,8 +67,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bazel-vscode-0.0.4.vsix
-          asset_name: bazel-vscode-0.0.4.vsix
+          asset_path: ./bazel-vscode-0.0.5.vsix
+          asset_name: bazel-vscode-0.0.5.vsix
           asset_content_type: application/octet-stream
       - name: Publish Release
         if: contains(github.ref, 'master')

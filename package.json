@@ -4,7 +4,7 @@
 	"publisher": "salesforce",
 	"repository": "https://github.com/salesforce/bazel-vscode",
 	"description": "bazel-vscode",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"engines": {
 		"vscode": "^1.46.0"
 	},
@@ -29,6 +29,30 @@
 			".*\\.bazelproject$",
 			".*\\.java$"
 		],
+		"configuration": {
+			"title": "BJLS",
+			"properties": {
+				"java.import.bazel.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable/disable the Bazel importer.",
+					"scope": "window"
+				},
+				"java.bjls.log.level": {
+					"type": "string",
+					"enum": ["debug", "warn", "info", "error"],
+					"default": "info",
+					"description": "The severity of logging messages (debug, warn, info, error)",
+					"scope": "window"
+				},
+				"java.bjls.log.extended": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable/disable the extended logging into <user_home>/bef.log file.",
+					"scope": "window"
+				}
+			}
+		},
 		"commands": [
 			{
 				"command": "bazelimport.menus.viewtitle",
