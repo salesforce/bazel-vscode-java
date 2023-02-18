@@ -16,12 +16,16 @@ gulp.task('build-plugin', (done) => {
 
   if (!fs.existsSync(bazelEclipseDir)) {
     fs.mkdirSync(bazelEclipseDir);
+
+    // del.sync(bazelEclipseDir + '/**', { force: true });
+    fs.rmdirSync(bazelEclipseDir, { recursive: true });
+
+    cp.execSync('git clone https://github.com/salesforce/bazel-eclipse.git', {
+      cwd: __dirname,
+      stdio: [0, 1, 2],
+    });
   }
 
-  // del.sync(bazelEclipseDir + '/**', { force: true });
-  fs.rmdirSync(bazelEclipseDir, {recursive: true});
-
-  cp.execSync('git clone https://github.com/salesforce/bazel-eclipse.git', { cwd: __dirname, stdio: [0, 1, 2] });
   cp.execSync(`mvn clean package`, { cwd: bazelEclipseDir, stdio: [0, 1, 2] });
   renameTarget('com.salesforce.b2eclipse.jdt.ls');
   renameTarget('com.salesforce.bazel.eclipse.common');
