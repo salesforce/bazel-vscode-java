@@ -26,7 +26,7 @@ gulp.task('build-plugin', (done) => {
     });
   }
 
-  cp.execSync(`mvn clean package`, { cwd: bazelEclipseDir, stdio: [0, 1, 2] });
+  cp.execSync(mvnw() + ' clean package', { cwd: bazelEclipseDir, stdio: [0, 1, 2] });
   renameTarget('com.salesforce.b2eclipse.jdt.ls');
   renameTarget('com.salesforce.bazel.eclipse.common');
   renameTarget('com.salesforce.bazel-java-sdk');
