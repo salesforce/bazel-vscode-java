@@ -15,11 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
-          distribution: 'zulu' # See 'Supported distributions' for available options
-          java-version: '11'
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
 
       - name: Build VSCode extension
         uses: actions/setup-node@v2
@@ -34,9 +35,10 @@ jobs:
           path: |
             ./bazel-vscode-0.0.5.vsix 
           key: ${{ env.cache-name }}-${{ github.run_id }}
+          
   publish:
     needs: [build]
-    if: ${{ success() && contains(github.ref, 'master') }}
+    if: ${{ success() && contains(github.ref, 'main') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/cache@v2
@@ -44,13 +46,13 @@ jobs:
           path: ./bazel-vscode-0.0.5.vsix 
           key: ${{ env.cache-name }}-${{ github.run_id }}
       - name: Create tag
-        if: contains(github.ref, 'master')
+        if: contains(github.ref, 'main')
         id: create_tag
         run: |
           tag=builds-$(date +%Y%m%d-%H%M%S)
-          echo "::set-output name=tag::$tag"
+          echo "tag=$tag" >> $GITHUB_OUTPUT
       - name: Create Release
-        if: contains(github.ref, 'master')
+        if: contains(github.ref, 'main')
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -61,7 +63,7 @@ jobs:
           draft: true
           prerelease: false
       - name: Upload Artifact
-        if: contains(github.ref, 'master')
+        if: contains(github.ref, 'main')
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -71,7 +73,7 @@ jobs:
           asset_name: bazel-vscode-0.0.5.vsix
           asset_content_type: application/octet-stream
       - name: Publish Release
-        if: contains(github.ref, 'master')
+        if: contains(github.ref, 'main')
         uses: eregon/publish-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
