@@ -9,7 +9,7 @@ Installation
 You can download the latest build from the [Releases](https://github.com/salesforce/bazel-vscode/releases) or package the extension by yourself:
 1. [Install](https://code.visualstudio.com/api/working-with-extensions/publishing-extension#installation) `vsce` CLI tool:
     ```bash
-    npm install -g vsce
+    npm install -g @vscode/vsce
     ```
 2. Clone the repository
     ```bash
