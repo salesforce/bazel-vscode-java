@@ -14,6 +14,10 @@ gulp.task('build-plugin', (done) => {
     }
   });
 
+  if (!fs.existsSync(bazelEclipseDir)) {
+    fs.mkdirSync(bazelEclipseDir);
+  }
+
   // del.sync(bazelEclipseDir + '/**', { force: true });
   fs.rmdirSync(bazelEclipseDir, {recursive: true});
 
