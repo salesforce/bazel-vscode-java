@@ -1,8 +1,7 @@
 ![GitHub Actions](https://github.com/salesforce/bazel-vscode/workflows/main/badge.svg)
 [![](https://img.shields.io/badge/license-BSD%203-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
-Bazel for Java
-===========================
+# Bazel support for Java for Visual Studio Code
 
 Installation
 --------------------
