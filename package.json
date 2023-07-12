@@ -1,15 +1,29 @@
 {
 	"name": "bazel-vscode-java",
 	"displayName": "Bazel extension for Java(TM) Language Support by Salesforce Engineering",
-	"publisher": "sfdc",
-	"repository": "https://github.com/salesforce/bazel-vscode-java",
 	"description": "Bazel support for Java Linting, Intellisense, formatting, refactoring and more...",
+	"author": "Salesforce Engineering",
+	"license": "BSD-3-Clause",
 	"version": "1.0.0",
+	"publisher": "sfdc",
+	"bugs": "https://github.com/salesforce/bazel-vscode-java/issues",
+	"preview": true,
 	"engines": {
 		"vscode": "^1.80.0"
 	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/salesforce/bazel-vscode-java"
+	},
 	"categories": [
+		"Programming Languages",
+		"Linters",
+		"Formatters",
+		"Snippets",
 		"Other"
+	],
+	"keywords": [
+		"multi-root ready"
 	],
 	"activationEvents": [
 		"onLanguage:java"
