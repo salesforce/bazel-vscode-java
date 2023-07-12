@@ -66,7 +66,7 @@ gulp.task('prepare_pre_release', function (done) {
 	const insiderPackageJson = Object.assign(packageJson, {
 		version: `${major}.${minor}.${patch}`,
 	});
-	fse.writeFileSync("./package.json", JSON.stringify(insiderPackageJson, null, 2));
+	fse.writeFileSync("./package.json", JSON.stringify(insiderPackageJson, null, "\t"));
 	done();
 });
 
