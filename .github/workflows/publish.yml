@@ -66,6 +66,7 @@ jobs:
         with:
             preRelease: true
             pat: ${{ secrets.VSC_MKTP_TOKEN }}
+            registryUrl: https://marketplace.visualstudio.com
 
       - name: 🚀 Publish pre-release to Open VSX Registry
         uses: HaaLeo/publish-vscode-extension@v1
