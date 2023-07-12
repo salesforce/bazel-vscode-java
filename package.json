@@ -1,6 +1,6 @@
 {
 	"name": "bazel-vscode-java",
-	"displayName": "Bazel extension for Java(TM) Language Supportby Salesforce Engineering",
+	"displayName": "Bazel extension for Java(TM) Language Support by Salesforce Engineering",
 	"publisher": "sfdc",
 	"repository": "https://github.com/salesforce/bazel-vscode-java",
 	"description": "Bazel support for Java Linting, Intellisense, formatting, refactoring and more...",
