@@ -15,5 +15,9 @@ Allthough steps 3 and 4 are optional, they are highly recommended for a full set
 All repositories must be cloned into the same parent directory, i.e. they all must be siblings and use the default directory name.
 
 
+## Best Practices
+
+* Always run `npm run test` before pushing/creating a PR
+
 ## Release
 
