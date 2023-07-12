@@ -1,9 +1,9 @@
 {
-	"name": "bazel-vscode",
-	"displayName": "bazel-vscode",
-	"publisher": "salesforce",
-	"repository": "https://github.com/salesforce/bazel-vscode",
-	"description": "bazel-vscode",
+	"name": "bazel-vscode-java",
+	"displayName": "Bazel extension for Java(TM) Language Supportby Salesforce Engineering",
+	"publisher": "sfdc",
+	"repository": "https://github.com/salesforce/bazel-vscode-java",
+	"description": "Bazel support for Java Linting, Intellisense, formatting, refactoring and more...",
 	"version": "1.0.0",
 	"engines": {
 		"vscode": "^1.80.0"
@@ -13,8 +13,6 @@
 	],
 	"activationEvents": [
 		"onLanguage:java",
-		"onCommand:bazelimport.menus.viewtitle",
-		"onCommand:bazelimport.menus.explorercontext"
 	],
 	"main": "./dist/extension",
 	"contributes": {
@@ -58,38 +56,9 @@
 			}
 		},
 		"commands": [
-			{
-				"command": "bazelimport.menus.viewtitle",
-				"title": "Import Bazel Project"
-			}
 		],
 		"menus": {
-			"view/title": [
-				{
-					"command": "bazelimport.menus.viewtitle",
-					"group": "MenuViewTitle"
-				}
-			]
 		},
-		"taskDefinitions": [
-			{
-				"type": "bazel",
-				"required": [
-					"name",
-					"task"
-				],
-				"properties": {
-					"name": {
-						"type": "string",
-						"description": "The task name"
-					},
-					"task": {
-						"type": "string",
-						"description": "The task command"
-					}
-				}
-			}
-		]
 	},
 	"scripts": {
 		"build": "run-s build:server build:dev",
