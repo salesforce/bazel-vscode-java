@@ -7,19 +7,19 @@ on:
       - completed
     branches:
       - main
-      
+
 permissions: {}
 
 jobs:
   publish-latest-update-site:
     name: Publish Latest Extension # (from main branch only)
     runs-on: ubuntu-latest
-    
+
     # we are very restrictive when this runs, i.e. only on main, only on success and only with the bazel-eclipse repository (not on forks)
     if: >
-      github.event.workflow_run.conclusion == 'success' && 
+      github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event != 'pull_request' &&
-      github.repository == 'salesforce/bazel-eclipse' && 
+      github.repository == 'salesforce/bazel-vscode-java' &&
       github.ref == 'refs/heads/main'
 
     permissions:
@@ -48,27 +48,27 @@ jobs:
 
       - name: 📦 Install dependencies
         run: npm ci
-          
+
       - name: Download Bazel JDT Language Server extension
         uses: dawidd6/action-download-artifact@v2
         with:
           run_id: ${{ github.event.workflow_run.id }}
           name: server
           path: server
-        
+
       - name: 🏗 Build project
         env:
           BUILD_ID: "${{ steps.time.outputs.time }}"
           BUILD_TYPE: "S"
           BUILD_LABEL: "CI ${{ steps.time.outputs.time }} (${{ steps.branch_name.outputs.branch }})"
         run: npm run build:prod
-          
+
       - name: 📦 Prepare packaging of pre-release extension
         run: |
           npm install -g vsce
           npx gulp prepare_pre_release
 
-      - name: 🚀 Publish pre-release to Visual Studio Marketplace 
+      - name: 🚀 Publish pre-release to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
         id: publishToVscMktp
         with:
