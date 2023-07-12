@@ -1,0 +1,76 @@
+name: Manual Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseChannel:
+        description: "Release Channel"
+        required: true
+        type: choice
+        default: stable
+        options:
+          - stable
+          - edge
+
+permissions: {}
+
+jobs:
+  publish-latest-update-site:
+    name: Publish Latest Extension
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get Time for BUILD_ID
+        id: time
+        uses: nanzm/get-time-action@v2.0
+        with:
+          format: "YYYYMMDD_HHmm"
+
+      - name: Get Branch name for BUILD_LABEL
+        id: branch_name
+        shell: bash
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+
+      - name: Setup Node version
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: |
+          npm ci
+          npm install -g vsce
+
+      - name: Download Bazel JDT Language Server extension
+        run: npx gulp download_server
+
+      - name: 🏗 Build project
+        env:
+          BUILD_ID: "${{ steps.time.outputs.time }}"
+          BUILD_TYPE: "S"
+          BUILD_LABEL: "CI ${{ steps.time.outputs.time }} (${{ steps.branch_name.outputs.branch }})"
+        run: npm run build:prod
+
+      - name: 📦 Prepare packaging of pre-release extension
+        if: ${{ github.event.inputs.releaseChannel == 'edge' }}
+        run: npx gulp prepare_pre_release
+
+      - name: 🚀 Publish pre-release to Visual Studio Marketplace
+        uses: HaaLeo/publish-vscode-extension@v1
+        if: ${{ github.event.inputs.releaseChannel == 'edge' }}
+        id: publishToVscMktp
+        with:
+            preRelease: true
+            pat: ${{ secrets.VSC_MKTP_TOKEN }}
+
+      - name: 🚀 Publish pre-release to Open VSX Registry
+        uses: HaaLeo/publish-vscode-extension@v1
+        if: ${{ github.event.inputs.releaseChannel == 'edge' }}
+        with:
+          preRelease: true
+          pat: ${{ secrets.OPEN_VSX_TOKEN }}
+          extensionFile: ${{ steps.publishToVscMktp.outputs.vsixPath }}
