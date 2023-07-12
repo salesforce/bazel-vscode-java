@@ -12,7 +12,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onLanguage:java",
+		"onLanguage:java"
 	],
 	"main": "./dist/extension",
 	"contributes": {
@@ -55,10 +55,8 @@
 				}
 			}
 		},
-		"commands": [
-		],
-		"menus": {
-		},
+		"commands": [],
+		"menus": {}
 	},
 	"scripts": {
 		"build": "run-s build:server build:dev",
