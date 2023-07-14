@@ -9,7 +9,7 @@
 	"bugs": "https://github.com/salesforce/bazel-vscode-java/issues",
 	"preview": true,
 	"engines": {
-		"vscode": "^1.80.0"
+		"vscode": "^1.77.0"
 	},
 	"repository": {
 		"type": "git",
