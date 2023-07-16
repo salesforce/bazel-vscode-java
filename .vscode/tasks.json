@@ -4,9 +4,10 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "npm: watch",
 			"type": "npm",
 			"script": "watch",
-			"problemMatcher": "$tsc-watch",
+			"problemMatcher": ["$ts-webpack-watch", "$eslint-stylish"],
 			"isBackground": true,
 			"presentation": {
 				"reveal": "never"

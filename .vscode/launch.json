@@ -24,29 +24,24 @@
 			],
 		},
 		{
-			"name": "Run Extension",
+			"name": "Launch Bazel VSCode Java Extension - JDTLS Client",
 			"type": "extensionHost",
 			"request": "launch",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}"
-			],
-			"outFiles": [
-				"${workspaceFolder}/out/**/*.js"
-			],
-			"preLaunchTask": "${defaultBuildTask}"
-		},
-		{
-			"name": "Extension Tests",
-			"type": "extensionHost",
-			"request": "launch",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
-			],
-			"outFiles": [
-				"${workspaceFolder}/out/test/**/*.js"
-			],
-			"preLaunchTask": "${defaultBuildTask}"
+			"runtimeExecutable": "${execPath}",
+			"debugWebviews": true,
+			"args": ["--extensionDevelopmentPath=${workspaceRoot}" ],
+			"sourceMaps": true,
+			"outFiles": [ "${workspaceRoot}/dist/**/*.js" ],
+			"env": {
+				"JDTLS_CLIENT_PORT": "5036",
+				"DEBUG_VSCODE_JAVA":"true",
+				"VSCODE_REDHAT_TELEMETRY_DEBUG":"true"
+			},
+			"preLaunchTask": "npm: watch",
+			"rendererDebugOptions": {
+				"urlFilter": "*redhat.java*",
+				"sourceMaps": true,
+			}
 		}
 	]
 }
