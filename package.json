@@ -114,7 +114,7 @@
 		"gulp": "^4.0.0",
 		"gulp-decompress": "^3.0.0",
 		"gulp-download": "^0.0.1",
-		"gulp-filter": "^6.0.0",
+		"gulp-filter": "^7.0.0",
 		"gulp-regex-rename": "^0.1.0",
 		"gulp-rename": "^2.0.0",
 		"gulp-util": "^3.0.8",
