@@ -14,6 +14,6 @@ Once installed, open VSCode in any Bazel Workspace with Java targets.
 The extension will look for a `WORKSPACE` (`WORKSPACE.bazel`) file to identify a Bazel workspace.
 Next it will look for a `.bazelproject` file to look for directories and targets to resolve.
 If no `.bazelproject` file can be found a default one will be created.
-For details of the lookup sequence please have a look at the latest implementation of [`BazelProjectImporter.java`` in the language server](https://github.com/salesforce/bazel-eclipse/blob/0f526c8bd9cf970c4720240314b898218447ddc1/bundles/com.salesforce.bazel.eclipse.jdtls/src/main/java/com/salesforce/bazel/eclipse/jdtls/managers/BazelProjectImporter.java#L108).
+For details of the lookup sequence please have a look at the latest implementation of [BazelProjectImporter.java in the language server](https://github.com/salesforce/bazel-eclipse/blob/0f526c8bd9cf970c4720240314b898218447ddc1/bundles/com.salesforce.bazel.eclipse.jdtls/src/main/java/com/salesforce/bazel/eclipse/jdtls/managers/BazelProjectImporter.java#L108).
 
 
