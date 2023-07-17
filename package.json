@@ -23,7 +23,9 @@
 		"Other"
 	],
 	"keywords": [
-		"multi-root ready"
+		"multi-root ready",
+		"Bazel",
+		"Java"
 	],
 	"activationEvents": [
 		"onLanguage:java"
