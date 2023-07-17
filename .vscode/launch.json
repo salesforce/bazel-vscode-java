@@ -35,7 +35,24 @@
 			"env": {
 				"JDTLS_CLIENT_PORT": "5036",
 				"DEBUG_VSCODE_JAVA":"true",
-				"VSCODE_REDHAT_TELEMETRY_DEBUG":"true"
+			},
+			"preLaunchTask": "npm: watch",
+			"rendererDebugOptions": {
+				"urlFilter": "*redhat.java*",
+				"sourceMaps": true,
+			}
+		},
+		{
+			"name": "Launch Bazel VSCode Java Extension",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"debugWebviews": true,
+			"args": ["--extensionDevelopmentPath=${workspaceRoot}" ],
+			"sourceMaps": true,
+			"outFiles": [ "${workspaceRoot}/dist/**/*.js" ],
+			"env": {
+				"DEBUG_VSCODE_JAVA":"true",
 			},
 			"preLaunchTask": "npm: watch",
 			"rendererDebugOptions": {

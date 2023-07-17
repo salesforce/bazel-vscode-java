@@ -40,7 +40,8 @@
 			"./server/com.salesforce.bazel.sdk.jar",
 			"./server/com.github.ben-manes.caffeine.guava.jar",
 			"./server/com.github.ben-manes.caffeine.jar",
-			"./server/com.google.guava.jar"
+			"./server/com.google.guava.jar",
+			"./server/com.google.guava.failureaccess.jar"
 		],
 		"javaBuildFilePatterns": [
 			"^WORKSPACE(\\.bazel)?$",
