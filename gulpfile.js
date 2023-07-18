@@ -62,7 +62,8 @@ gulp.task('prepare_pre_release', function (done) {
 	const month = date.getMonth() + 1;
 	const day = date.getDate();
 	const hours = date.getHours();
-	const patch = `${date.getFullYear()}${prependZero(month)}${prependZero(day)}${prependZero(hours)}`;
+	const minutes = date.getMinutes();
+	const patch = `${date.getFullYear()}${prependZero(month)}${prependZero(day)}${prependZero(hours)}${prependZero(minutes)}`;
 	const insiderPackageJson = Object.assign(packageJson, {
 		version: `${major}.${minor}.${patch}`,
 	});
