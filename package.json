@@ -4,7 +4,7 @@
 	"description": "Bazel support for Java Linting, Intellisense, formatting, refactoring and more...",
 	"author": "Salesforce Engineering",
 	"license": "BSD-3-Clause",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"publisher": "sfdc",
 	"bugs": "https://github.com/salesforce/bazel-vscode-java/issues",
 	"preview": true,

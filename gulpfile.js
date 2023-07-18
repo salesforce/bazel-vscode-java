@@ -55,17 +55,19 @@ gulp.task('build_or_download', function (done) {
 });
 
 gulp.task('prepare_pre_release', function (done) {
-	const stableVersion = packageJson.version.match(/(\d+)\.(\d+)\.(\d+)/);
+	// parse existing version (using ECMA script regex from https://semver.org/)
+	const stableVersion = packageJson.version.match(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/);
 	const major = stableVersion[1];
 	const minor = stableVersion[2];
+	const patch = stableVersion[3];
 	const date = new Date();
 	const month = date.getMonth() + 1;
 	const day = date.getDate();
 	const hours = date.getHours();
 	const minutes = date.getMinutes();
-	const patch = `${date.getFullYear()}${prependZero(month)}${prependZero(day)}${prependZero(hours)}${prependZero(minutes)}`;
+	const prerelease = `preview${date.getFullYear()}${prependZero(month)}${prependZero(day)}${prependZero(hours)}${prependZero(minutes)}`;
 	const insiderPackageJson = Object.assign(packageJson, {
-		version: `${major}.${minor}.${patch}`,
+		version: `${major}.${minor}.${patch}-${prerelease}`,
 	});
 	fse.writeFileSync("./package.json", JSON.stringify(insiderPackageJson, null, "\t"));
 	done();
