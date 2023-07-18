@@ -114,6 +114,7 @@
 		"cross-env": "^7.0.3",
 		"eslint": "^8.45.0",
 		"eslint-webpack-plugin": "^4.0.1",
+		"fancy-log": "^2.0.0",
 		"fs-extra": "^11.1.1",
 		"glob": "^10.3.3",
 		"gulp": "^4.0.0",

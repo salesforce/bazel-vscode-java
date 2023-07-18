@@ -13,6 +13,7 @@ const glob = require('glob');
 const fse = require('fs-extra');
 const path = require('path');
 const url = require("url");
+const log = require('fancy-log');
 const argv = require('minimist')(process.argv.slice(2));
 const BAZEL_ECLIPSE_DIR = '../bazel-eclipse';
 const BAZEL_ECLIPSE_LATEST_URL = "https://opensource.salesforce.com/bazel-eclipse/latest/p2-repository.zip";
@@ -72,6 +73,7 @@ gulp.task('prepare_pre_release', function (done) {
 	const insiderPackageJson = Object.assign(packageJson, {
 		version: `${major}.${year}.${patch}`,
 	});
+	log.info(`Applying pre-release version '${major}.${year}.${patch}'...`);
 	fse.writeFileSync("./package.json", JSON.stringify(insiderPackageJson, null, "\t"));
 	done();
 });
