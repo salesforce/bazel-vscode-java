@@ -41,7 +41,8 @@
 			"./server/com.github.ben-manes.caffeine.guava.jar",
 			"./server/com.github.ben-manes.caffeine.jar",
 			"./server/com.google.guava.jar",
-			"./server/com.google.guava.failureaccess.jar"
+			"./server/com.google.guava.failureaccess.jar",
+			"./server/org.jsr-305.jar"
 		],
 		"javaBuildFilePatterns": [
 			"^WORKSPACE(\\.bazel)?$",
