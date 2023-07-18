@@ -58,18 +58,19 @@ gulp.task('prepare_pre_release', function (done) {
 	// parse existing version (using ECMA script regex from https://semver.org/)
 	const stableVersion = packageJson.version.match(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/);
 	const major = stableVersion[1];
-	const minor = stableVersion[2];
 	// unfortunately, VS Code Marketplace does not support full semver
-	// thus, we use a patch that is based on year up to the minute
+	// also, the limit is < 2147483647 on VS Code Marketplace
+	// thus, we use year (just the last two digits) as minor
+	// and patch that is based starting with the month up to the minute (for granularity)
 	const date = new Date();
-	const year = date.getUTCFullYear() - 2000;
+	const year = date.getUTCFullYear()-2000;
 	const month = date.getUTCMonth() + 1;
 	const day = date.getUTCDate();
 	const hours = date.getUTCHours();
 	const minutes = date.getUTCMinutes();
-	const patch = `${year}${prependZero(month)}${prependZero(day)}${prependZero(hours)}${prependZero(minutes)}`;
+	const patch = `1${prependZero(month)}${prependZero(day)}${prependZero(hours)}${prependZero(minutes)}`;
 	const insiderPackageJson = Object.assign(packageJson, {
-		version: `${major}.${minor}.${patch}`,
+		version: `${major}.${year}.${patch}`,
 	});
 	fse.writeFileSync("./package.json", JSON.stringify(insiderPackageJson, null, "\t"));
 	done();
