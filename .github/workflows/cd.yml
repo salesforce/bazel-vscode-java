@@ -23,7 +23,7 @@ jobs:
       github.ref == 'refs/heads/main'
 
     permissions:
-      contents: write
+      actions: write
 
     steps:
       - name: Checkout
@@ -63,22 +63,17 @@ jobs:
           BUILD_LABEL: "CI ${{ steps.time.outputs.time }} (${{ steps.branch_name.outputs.branch }})"
         run: npm run build:prod
 
-      - name: 📦 Prepare packaging of pre-release extension
-        run: |
-          npm install -g vsce
-          npx gulp prepare_pre_release
-
-      - name: 🚀 Publish pre-release to Visual Studio Marketplace
-        uses: HaaLeo/publish-vscode-extension@v1
-        id: publishToVscMktp
+      - name: Trigger VS Code Extension publish workflow to edge channel
+        uses: actions/github-script@v6
         with:
-            preRelease: true
-            pat: ${{ secrets.VSC_MKTP_TOKEN }}
-            registryUrl: https://marketplace.visualstudio.com
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'publish.yml',
+              ref: 'main',
+              inputs: {
+                releaseChannel: 'edge'
+              }
+            });
 
-      - name: 🚀 Publish pre-release to Open VSX Registry
-        uses: HaaLeo/publish-vscode-extension@v1
-        with:
-          preRelease: true
-          pat: ${{ secrets.OPEN_VSX_TOKEN }}
-          extensionFile: ${{ steps.publishToVscMktp.outputs.vsixPath }}
