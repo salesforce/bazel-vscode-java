@@ -99,6 +99,7 @@
 	"extensionDependencies": [
 		"redhat.java",
 		"vscjava.vscode-java-debug",
+		"vscjava.vscode-java-dependency",
 		"vscjava.vscode-java-test",
 		"BazelBuild.vscode-bazel"
 	],
