@@ -74,8 +74,34 @@
 				}
 			}
 		},
-		"commands": [],
-		"menus": {}
+		"commands": [
+			{
+				"command": "java.bazel.syncProjects.command",
+				"when": "javaLSReady",
+				"title": "Synchronize Projects with Bazel Project View",
+				"category": "Java"
+			},
+			{
+				"command": "java.bazel.updateClasspaths.command",
+				"when": "javaLSReady && isFileSystemResource",
+				"title": "Refresh classpath from Bazel BUILD file",
+				"category": "Java"
+			}
+		],
+		"menus": {
+			"explorer/context": [
+				{
+					"command": "java.bazel.syncProjects.command",
+					"when": "javaLSReady",
+					"group": "1_javaactions@10"
+				},
+				{
+					"command": "java.bazel.updateClasspaths.command",
+					"when": "javaLSReady && isFileSystemResource",
+					"group": "1_javaactions@11"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"build": "run-s build:server build:dev",
