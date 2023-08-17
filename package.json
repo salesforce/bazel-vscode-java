@@ -28,23 +28,29 @@
 		"Java"
 	],
 	"activationEvents": [
-		"onLanguage:java"
+		"onLanguage:java",
+		"workspaceContains:**/.bazelproject",
+		"workspaceContains:**/WORKSPACE",
+		"workspaceContains:**/BUILD"
 	],
 	"main": "./dist/extension",
 	"contributes": {
 		"javaExtensions": [
-			"./server/com.github.ben-manes.caffeine.jar",
+			"./server/com.salesforce.bazel.eclipse.core.jar",
+			"./server/com.salesforce.bazel.eclipse.jdtls.jar",
+			"./server/com.salesforce.bazel.importedsource.jar",
+			"./server/com.salesforce.bazel.logback.jar",
+			"./server/com.salesforce.bazel.sdk.jar",
 			"./server/com.github.ben-manes.caffeine.guava.jar",
+			"./server/com.github.ben-manes.caffeine.jar",
 			"./server/com.google.guava.jar",
 			"./server/com.google.guava.failureaccess.jar",
+			"./server/slf4j.api.jar",
+			"./server/ch.qos.logback.core.jar",
+			"./server/ch.qos.logback.classic.jar",
 			"./server/org.jsr-305.jar",
 			"./server/org.fusesource.jansi.jar",
-			"./server/wrapped.com.google.protobuf.protobuf-java.jar",
-			"./server/com.salesforce.bazel.logback.jar",
-			"./server/com.salesforce.bazel.importedsource.jar",
-			"./server/com.salesforce.bazel.sdk.jar",
-			"./server/com.salesforce.bazel.eclipse.core.jar",
-			"./server/com.salesforce.bazel.eclipse.jdtls.jar"
+			"./server/wrapped.com.google.protobuf.protobuf-java.jar"
 		],
 		"javaBuildFilePatterns": [
 			"^WORKSPACE(\\.bazel)?$",
@@ -124,11 +130,7 @@
 		"watch:webpack": "cross-env NODE_ENV=development webpack --mode development --watch"
 	},
 	"extensionDependencies": [
-		"redhat.java",
-		"vscjava.vscode-java-debug",
-		"vscjava.vscode-java-dependency",
-		"vscjava.vscode-java-test",
-		"BazelBuild.vscode-bazel"
+		"redhat.java"
 	],
 	"devDependencies": {
 		"@types/glob": "^8.1.0",
