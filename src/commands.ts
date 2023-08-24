@@ -20,4 +20,7 @@ export namespace Commands {
 	 * Execute Workspace Command (copied form vscode-java)
 	 */
 	export const EXECUTE_WORKSPACE_COMMAND = 'java.execute.workspaceCommand';
+
+	export const CONNECT_BAZEL_CONSOLE = 'java.bazel.connectConsole';
+
 }
