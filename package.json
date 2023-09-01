@@ -42,7 +42,11 @@
 			"./server/com.github.ben-manes.caffeine.jar",
 			"./server/com.google.guava.jar",
 			"./server/com.google.guava.failureaccess.jar",
+			"./server/slf4j.api.jar",
+			"./server/ch.qos.logback.core.jar",
+			"./server/ch.qos.logback.classic.jar",
 			"./server/org.jsr-305.jar",
+			"./server/org.fusesource.jansi.jar",
 			"./server/wrapped.com.google.protobuf.protobuf-java.jar"
 		],
 		"javaBuildFilePatterns": [
