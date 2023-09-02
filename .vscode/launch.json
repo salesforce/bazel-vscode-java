@@ -59,6 +59,27 @@
 				"urlFilter": "*redhat.java*",
 				"sourceMaps": true,
 			}
+		},
+		{
+			"name": "Launch Bazel VSCode WITH RedHat Java Extension",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"debugWebviews": true,
+			"args": [
+				"--extensionDevelopmentPath=${workspaceRoot}",
+				"--extensionDevelopmentPath=${workspaceRoot}/../vscode-java"
+			],
+			"sourceMaps": true,
+			"outFiles": [ "${workspaceRoot}/dist/**/*.js" ],
+			"env": {
+				"DEBUG_VSCODE_JAVA":"true",
+			},
+			"preLaunchTask": "npm: watch",
+			"rendererDebugOptions": {
+				"urlFilter": "*redhat.java*",
+				"sourceMaps": true,
+			}
 		}
 	]
 }
