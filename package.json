@@ -29,9 +29,10 @@
 	],
 	"activationEvents": [
 		"onLanguage:java",
-		"workspaceContains:**/.bazelproject",
+		"workspaceContains:**/*.bazelproject",
 		"workspaceContains:**/WORKSPACE",
-		"workspaceContains:**/BUILD"
+		"workspaceContains:**/BUILD",
+		"workspaceContains:**/*.bazel"
 	],
 	"main": "./dist/extension",
 	"contributes": {

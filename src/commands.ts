@@ -23,5 +23,5 @@ export namespace Commands {
 
 	export const LIST_SOURCEPATHS = 'java.project.listSourcePaths';
 
-	export const REGISTER_BAZEL_SERVER_WS = 'java.bazel.connectProcessStreamSocket';
+	export const REGISTER_BAZEL_TCP_SERVER_PORT = 'java.bazel.connectProcessStreamSocket';
 }

@@ -26,18 +26,23 @@ export function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand(Commands.SYNC_PROJECTS_CMD, async () => {
         commands.executeCommand(Commands.EXECUTE_WORKSPACE_COMMAND, Commands.SYNC_PROJECTS)
-		.then(() => syncBazelProjectView(), (err: Error) => Log.error(err.message))
-		.then(() => commands.executeCommand<UpdateClasspathResponse>(Commands.EXECUTE_WORKSPACE_COMMAND, Commands.LIST_SOURCEPATHS)
-			.then((resp) => {
-				const projects = new Set(resp.data.map(p => p.projectName));
-				Log.info(`${projects.size} projects synced`);
-				projects.forEach(project => {Log.trace(`${project} synced`);});
-			}), (err: Error) => {Log.error(err.message);});
+		.then(() => {
+			Promise.allSettled([
+				syncBazelProjectView(),
+				commands.executeCommand<UpdateClasspathResponse>(Commands.EXECUTE_WORKSPACE_COMMAND, Commands.LIST_SOURCEPATHS)
+					.then((resp) => {
+						const projects = new Set(resp.data.map(p => p.projectName));
+						Log.info(`${projects.size} projects in classpath`);
+						projects.forEach(project => {Log.trace(`${project} synced`);});
+					}, (err: Error) => Promise.reject)
+			])
+			.catch(e => {Log.error(e.message);});
+		});
     }));
 	context.subscriptions.push(commands.registerCommand(Commands.UPDATE_CLASSPATHS_CMD, async () => {
 		outOfDateClasspaths.forEach(uri => {
 			Log.info(`Updating classpath for ${uri.fsPath}`);
-			commands.executeCommand(Commands.EXECUTE_WORKSPACE_COMMAND, Commands.UPDATE_CLASSPATHS, uri)
+			commands.executeCommand(Commands.EXECUTE_WORKSPACE_COMMAND, Commands.UPDATE_CLASSPATHS, uri.toString())
 				.then(() => outOfDateClasspaths.delete(uri), (err: Error) => {Log.error(`${err.message}\n${err.stack}`);})
 				.then(() => Log.info(`Classpath for ${uri.fsPath} updated`));
 		});

@@ -11,7 +11,7 @@ export namespace Log {
 	export function trace(msg: string|Buffer) {write(msg, LogLevel.TRACE);}
 
 	export const stream = new Writable();
-	stream._write = (chunk: Buffer, _encoding, next) => {
+	stream._write = (chunk: Buffer, encoding, next) => {
 		bazelOutputChannel.append(chunk.toString());
 		next();
 	};
@@ -45,5 +45,5 @@ export namespace Log {
 }
 
 enum LogLevel {
-	INFO, WARN, ERROR, DEBUG, TRACE,
+	INFO, WARN, ERROR, DEBUG, TRACE
 }
