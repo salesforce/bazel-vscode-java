@@ -1,5 +1,5 @@
 import { dirname } from 'path';
-import { ConfigurationTarget, ExtensionContext, FileSystemWatcher, FileType, StatusBarAlignment, Uri, commands, window, workspace } from 'vscode';
+import { ConfigurationTarget, ExtensionContext, FileSystemWatcher, FileType, StatusBarAlignment, ThemeColor, Uri, commands, window, workspace } from 'vscode';
 import { BazelProjectView, readBazelProject } from './bazelprojectparser';
 import { Commands } from './commands';
 import { Log } from './log';
@@ -77,6 +77,7 @@ interface ExcludeConfig {
 function toggleBazelClasspathSyncStatus(uri: Uri){
 	classpathStatus.show();
 	classpathStatus.text = 'Sync bazel classpath';
+	classpathStatus.backgroundColor = new ThemeColor('statusBarItem.warningBackground');
 	outOfDateClasspaths.add(uri);
 }
 
