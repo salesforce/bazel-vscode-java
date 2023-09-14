@@ -5,11 +5,14 @@ import { Log } from './log';
 
 let server: Server|undefined;
 
-export function registerLSClient() {
+export function registerLSClient(attempts=0) {
 
 	// create tcp server
 	server = createServer((sock: Socket) => {
-		sock.on('connect', () => Log.info('Connected'));
+		sock.on('connect', () => {
+			Log.info('Connected');
+			attempts = 0;
+		});
 		sock.pipe(Log.stream);
 	});
 
@@ -25,7 +28,8 @@ export function registerLSClient() {
 
 		} else {
 			Log.error(`Failed to start bazel TCP server`);
-			registerLSClient();
+			attempts++;
+			setTimeout(() => registerLSClient(), 1000*attempts);
 		}
 
 	});
