@@ -1,18 +1,12 @@
 import { existsSync, readFileSync } from 'fs';
 import { workspace } from 'vscode';
 import { Log } from './log';
+import { BazelProjectView, ParseConfig, RawSection } from './types';
 
 const COMMENT_REGEX = /#(.)*(\n|\z)/gm;
 const HEADER_REGEX = /^[^:\-\/*\s]+[: ]/gm;
 const WHITESPACE_CHAR_REGEX = /\s+/;
 const EXCLUDED_ENTRY_PREFIX = "-";
-
-interface ParseConfig {
-	root: string,
-	imports: string[],
-	projectView: BazelProjectView,
-	processedImports: string[]
-}
 
 function parseProjectFile(config: ParseConfig): BazelProjectView {
 
@@ -126,26 +120,6 @@ function parseRawSections(projectFileContents: string): RawSection[] {
 
 function removeComments(bazelProjectFileContent: string): string {
   return bazelProjectFileContent.replace(COMMENT_REGEX, "\n");
-}
-
-export interface BazelProjectView {
-  directories: string[];
-  targets: string[];
-  deriveTargetsFromDirectories: boolean;
-  workspaceType?: string;
-  additionalLanguages?: string[];
-  javaLanguageLevel?: string;
-  tsConfigRules?: string[];
-  importRunConfigurations?: string[];
-  bazelBinary?: string;
-  projectMappings?: string[];
-  targetDiscoveryStrategy?: string;
-  targetProvisioningStrategy?: string;
-}
-
-interface RawSection {
-  name: string;
-  body: string;
 }
 
 export function readBazelProject(bazelProjectFile: string): BazelProjectView {

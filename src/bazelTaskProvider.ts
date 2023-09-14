@@ -13,12 +13,12 @@ export class BazelTaskProvider implements vscode.TaskProvider {
 		return this.bazelPromise;
 	}
 
-	public resolveTask(_task: vscode.Task): vscode.Task | undefined {
-		const task = _task.definition.task;
-		if (task) {
+	public resolveTask(task: vscode.Task): vscode.Task | undefined {
+		const taskDef = task.definition.task;
+		if (taskDef) {
 			// resolveTask requires that the same definition object be used.
-			const definition: BazelTaskDefinition = <any>_task.definition;
-			return new vscode.Task(definition, _task.scope ?? vscode.TaskScope.Workspace, definition.name, definition.type, new vscode.ShellExecution(`${definition.task}`));
+			const definition: BazelTaskDefinition = <any>task.definition;
+			return new vscode.Task(definition, task.scope ?? vscode.TaskScope.Workspace, definition.name, definition.type, new vscode.ShellExecution(`${definition.task}`));
 		}
 		return undefined;
 	}

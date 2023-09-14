@@ -1,9 +1,10 @@
 import { dirname } from 'path';
 import { ConfigurationTarget, ExtensionContext, FileSystemWatcher, FileType, StatusBarAlignment, ThemeColor, Uri, commands, window, workspace } from 'vscode';
-import { BazelProjectView, readBazelProject } from './bazelprojectparser';
+import { readBazelProject } from './bazelprojectparser';
 import { Commands } from './commands';
 import { Log } from './log';
 import { registerLSClient } from './loggingTCPServer';
+import { BazelProjectView, ExcludeConfig, UpdateClasspathResponse } from './types';
 
 let bazelBuildWatcher: FileSystemWatcher;
 let bazelProjectWatcher: FileSystemWatcher;
@@ -60,23 +61,6 @@ export function deactivate() {
 	if(bazelProjectWatcher){
 		bazelProjectWatcher.dispose();
 	}
-}
-
-interface UpdateClasspathResponse {
-	data: Array<ClasspathInfo>;
-	status: boolean
-}
-
-interface ClasspathInfo {
-	path: string;
-	displayPath: string;
-	classpathEntry: string;
-	projectName: string;
-	projectType: string;
-}
-
-interface ExcludeConfig {
-	[x:string]: boolean;
 }
 
 function toggleBazelClasspathSyncStatus(uri: Uri){
