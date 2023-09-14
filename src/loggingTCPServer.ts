@@ -21,7 +21,7 @@ export function registerLSClient(attempts=0) {
 			const address = server.address();
 			if(address){
 				const port = (address as AddressInfo).port;
-				Log.info(`Bazel server listening on port ${port}`);
+				Log.info(`Bazel log server listening on port ${port}`);
 				commands.executeCommand(Commands.EXECUTE_WORKSPACE_COMMAND, Commands.REGISTER_BAZEL_TCP_SERVER_PORT, port)
 					.then(() => Log.info('port registered with BLS'), (err: Error) => Log.error(`Failed to register port with BLS: ${err.message}`));
 			}

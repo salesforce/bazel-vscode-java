@@ -71,6 +71,7 @@ function toggleBazelClasspathSyncStatus(uri: Uri){
 }
 
 async function syncBazelProjectView() {
+	Log.debug('Syncing bazel project view');
 	try {
 		const workspaceRoot = getWorkspaceRoot();
 		let bazelProjectFile = await getBazelProjectFile(workspaceRoot);
