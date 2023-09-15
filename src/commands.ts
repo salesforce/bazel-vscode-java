@@ -20,4 +20,8 @@ export namespace Commands {
 	 * Execute Workspace Command (copied form vscode-java)
 	 */
 	export const EXECUTE_WORKSPACE_COMMAND = 'java.execute.workspaceCommand';
+
+	export const LIST_SOURCEPATHS = 'java.project.listSourcePaths';
+
+	export const REGISTER_BAZEL_TCP_SERVER_PORT = 'java.bazel.connectProcessStreamSocket';
 }

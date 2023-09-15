@@ -1,4 +1,4 @@
-import * as path from 'path';
+
 export class BazelModule {
     path: any;
     name: string;

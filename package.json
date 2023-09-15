@@ -28,7 +28,11 @@
 		"Java"
 	],
 	"activationEvents": [
-		"onLanguage:java"
+		"onLanguage:java",
+		"workspaceContains:**/*.bazelproject",
+		"workspaceContains:**/WORKSPACE",
+		"workspaceContains:**/BUILD",
+		"workspaceContains:**/*.bazel"
 	],
 	"main": "./dist/extension",
 	"contributes": {
@@ -124,11 +128,7 @@
 		"watch:webpack": "cross-env NODE_ENV=development webpack --mode development --watch"
 	},
 	"extensionDependencies": [
-		"redhat.java",
-		"vscjava.vscode-java-debug",
-		"vscjava.vscode-java-dependency",
-		"vscjava.vscode-java-test",
-		"BazelBuild.vscode-bazel"
+		"redhat.java"
 	],
 	"devDependencies": {
 		"@types/glob": "^8.1.0",
