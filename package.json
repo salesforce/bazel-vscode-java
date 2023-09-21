@@ -39,8 +39,6 @@
 		"javaExtensions": [
 			"./server/com.github.ben-manes.caffeine.jar",
 			"./server/com.github.ben-manes.caffeine.guava.jar",
-			"./server/com.google.guava.jar",
-			"./server/com.google.guava.failureaccess.jar",
 			"./server/org.jsr-305.jar",
 			"./server/org.fusesource.jansi.jar",
 			"./server/wrapped.com.google.protobuf.protobuf-java.jar",
