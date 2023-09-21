@@ -1,0 +1,18 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Bazel Package rules",
+        "type": "shell",
+        "command": "bazel query 'kind(rule, ${input:moduleName}:*)' --output label_kind",
+        "problemMatcher": []
+      }
+    ],
+    "inputs": [
+      {
+        "description": "Module name",
+        "id": "moduleName",
+        "type": "promptString"
+      }
+    ]
+  }

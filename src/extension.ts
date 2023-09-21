@@ -1,7 +1,7 @@
 import { dirname } from 'path';
 import { ConfigurationTarget, ExtensionContext, FileSystemWatcher, FileType, StatusBarAlignment, ThemeColor, Uri, commands, window, workspace } from 'vscode';
 import { readBazelProject } from './bazelprojectparser';
-import { Commands } from './commands';
+import { Commands, executeJavaLanguageServerCommand } from './commands';
 import { Log } from './log';
 import { registerLSClient } from './loggingTCPServer';
 import { BazelProjectView, ExcludeConfig, UpdateClasspathResponse } from './types';
@@ -26,11 +26,11 @@ export function activate(context: ExtensionContext) {
 	// Register commands
 
 	context.subscriptions.push(commands.registerCommand(Commands.SYNC_PROJECTS_CMD, async () => {
-        commands.executeCommand(Commands.EXECUTE_WORKSPACE_COMMAND, Commands.SYNC_PROJECTS)
+        executeJavaLanguageServerCommand(Commands.SYNC_PROJECTS)
 		.then(() => {
 			Promise.allSettled([
 				syncBazelProjectView(),
-				commands.executeCommand<UpdateClasspathResponse>(Commands.EXECUTE_WORKSPACE_COMMAND, Commands.LIST_SOURCEPATHS)
+				executeJavaLanguageServerCommand<UpdateClasspathResponse>(Commands.JAVA_LS_LIST_SOURCEPATHS)
 					.then((resp) => {
 						const projects = new Set(resp.data.map(p => p.projectName));
 						Log.info(`${projects.size} projects in classpath`);
@@ -43,7 +43,7 @@ export function activate(context: ExtensionContext) {
 	context.subscriptions.push(commands.registerCommand(Commands.UPDATE_CLASSPATHS_CMD, async () => {
 		outOfDateClasspaths.forEach(uri => {
 			Log.info(`Updating classpath for ${uri.fsPath}`);
-			commands.executeCommand(Commands.EXECUTE_WORKSPACE_COMMAND, Commands.UPDATE_CLASSPATHS, uri.toString())
+			executeJavaLanguageServerCommand(Commands.UPDATE_CLASSPATHS, uri.toString())
 				.then(() => outOfDateClasspaths.delete(uri), (err: Error) => {Log.error(`${err.message}\n${err.stack}`);})
 				.then(() => Log.info(`Classpath for ${uri.fsPath} updated`));
 		});

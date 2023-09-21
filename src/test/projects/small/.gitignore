@@ -1,0 +1,44 @@
+# local bazel config
+.bazelrc-local
+
+# bazel-* symlinks.
+bazel-*
+
+# Bazel JDTLS project view and .eclipse folder (because it's part of the test)
+.bazelproject
+.eclipse/
+
+# output folders
+bin/
+eclipse-bin/
+eclipse-testbin/
+*.class
+
+# binary files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+# log files
+*.log
+
+# Mac
+.DS_Store
+.Trashes
+
+# temp/backup files
+*~
+*.rej
+*.bak
+.*.swp
+
+# Eclipse
+.project
+.classpath

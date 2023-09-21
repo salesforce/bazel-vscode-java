@@ -28,11 +28,15 @@
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
-			"args": ["--extensionDevelopmentPath=${workspaceFolder}" ],
-			"outFiles": [ "${workspaceFolder}/out/**/*.js" ],
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}"
+			],
+			"outFiles": [
+				"${workspaceFolder}/out/**/*.js"
+			],
 			"env": {
 				"SERVER_PORT": "3333",
-				"DEBUG_VSCODE_JAVA":"true"
+				"DEBUG_VSCODE_JAVA": "true"
 			},
 			"preLaunchTask": "${defaultBuildTask}"
 		},
@@ -42,12 +46,16 @@
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"debugWebviews": true,
-			"args": ["--extensionDevelopmentPath=${workspaceRoot}" ],
+			"args": [
+				"--extensionDevelopmentPath=${workspaceRoot}"
+			],
 			"sourceMaps": true,
-			"outFiles": [ "${workspaceRoot}/dist/**/*.js" ],
+			"outFiles": [
+				"${workspaceRoot}/dist/**/*.js"
+			],
 			"env": {
 				"JDTLS_CLIENT_PORT": "5036",
-				"DEBUG_VSCODE_JAVA":"true",
+				"DEBUG_VSCODE_JAVA": "true",
 			},
 			"preLaunchTask": "npm: watch",
 			"rendererDebugOptions": {
@@ -61,11 +69,15 @@
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"debugWebviews": true,
-			"args": ["--extensionDevelopmentPath=${workspaceRoot}" ],
+			"args": [
+				"--extensionDevelopmentPath=${workspaceRoot}"
+			],
 			"sourceMaps": true,
-			"outFiles": [ "${workspaceRoot}/dist/**/*.js" ],
+			"outFiles": [
+				"${workspaceRoot}/dist/**/*.js"
+			],
 			"env": {
-				"DEBUG_VSCODE_JAVA":"true",
+				"DEBUG_VSCODE_JAVA": "true",
 			},
 			"preLaunchTask": "npm: watch",
 			"rendererDebugOptions": {
@@ -84,15 +96,31 @@
 				"--extensionDevelopmentPath=${workspaceRoot}/../vscode-java"
 			],
 			"sourceMaps": true,
-			"outFiles": [ "${workspaceRoot}/dist/**/*.js" ],
+			"outFiles": [
+				"${workspaceRoot}/dist/**/*.js"
+			],
 			"env": {
-				"DEBUG_VSCODE_JAVA":"true",
+				"DEBUG_VSCODE_JAVA": "true",
 			},
 			"preLaunchTask": "npm: watch",
 			"rendererDebugOptions": {
 				"urlFilter": "*redhat.java*",
 				"sourceMaps": true,
 			}
+		},
+		{
+			"name": "Run Bazel Extension Tests",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"--disable-workspace-trust",
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index",
+				"${workspaceFolder}/src/test/projects/small"
+			],
+			"outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+			"preLaunchTask": "npm: watch"
 		}
 	]
 }

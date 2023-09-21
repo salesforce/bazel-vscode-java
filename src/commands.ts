@@ -1,5 +1,7 @@
 'use strict';
 
+import { commands } from "vscode";
+
 /**
  * Commonly used commands
  */
@@ -17,11 +19,23 @@ export namespace Commands {
 	export const SYNC_PROJECTS_CMD = 'java.bazel.syncProjects.command';
 
 	/**
-	 * Execute Workspace Command (copied form vscode-java)
+	 * Connect our output window
 	 */
-	export const EXECUTE_WORKSPACE_COMMAND = 'java.execute.workspaceCommand';
-
-	export const LIST_SOURCEPATHS = 'java.project.listSourcePaths';
-
 	export const REGISTER_BAZEL_TCP_SERVER_PORT = 'java.bazel.connectProcessStreamSocket';
+
+	// commands copied from vscode-java for interaction with JDT LS
+	export const EXECUTE_WORKSPACE_COMMAND = 'java.execute.workspaceCommand';
+	export const JAVA_LS_LIST_SOURCEPATHS = 'java.project.listSourcePaths';
+
+	// commands copied from vscode-java for interaction with the extension
+	export const JAVA_BUILD_WORKSPACE = "java.workspace.compile";
+	export const JAVA_CLEAN_WORKSPACE = "java.clean.workspace";
+}
+
+export function executeJavaLanguageServerCommand<T = unknown>(...rest: any[]): Thenable<T> {
+	return executeJavaExtensionCommand(Commands.EXECUTE_WORKSPACE_COMMAND, ...rest);
+}
+
+export function executeJavaExtensionCommand<T = unknown>(commandName: string, ...rest: any[]): Thenable<T> {
+	return commands.executeCommand(commandName, ...rest);
 }
