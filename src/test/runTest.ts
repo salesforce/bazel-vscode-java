@@ -37,7 +37,7 @@ async function main() {
 
 		// ensrue the user data area is empty
 		if (fs.existsSync(testUserDataPath)) {
-			fs.rmdirSync(testUserDataPath, {recursive: true});
+			fs.rmdirSync(testUserDataPath, { recursive: true });
 		}
 
 		// run the integration test with spawned VS Code
@@ -61,10 +61,9 @@ async function main() {
 		console.log('\n\n\n');
 
 		// try to locate Java LS log
-		const lsLogs = await glob('**/*Java.log', { cwd: testUserDataPath, withFileTypes: true });
+		const lsLogs = await glob(['**/*Java.log', '**/redhat.java/jdt_ws/.metadata/.log'], { cwd: testUserDataPath, withFileTypes: true, dot: true });
 		if (lsLogs.length > 0) {
 			if (env['PRINT_JDTLS_LOGS'] === 'true') {
-				console.log('Output of JDTLS log below:');
 				lsLogs.forEach(log => {
 					console.log(`> cat ${log.fullpath()}`);
 					try {
@@ -73,7 +72,7 @@ async function main() {
 					} catch (err) {
 						console.error(err);
 					}
-					console.log(`\n\n`);
+					console.log('\n\n\n');
 				});
 			} else {
 				console.log('Set PRINT_JDTLS_LOGS=true to show the following JDTLS log automatically:');
