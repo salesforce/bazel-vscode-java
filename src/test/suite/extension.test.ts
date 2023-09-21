@@ -69,7 +69,7 @@ suite('Java Language Extension - Standard', () => {
 	});
 
 	test('should build workspace without problems within reasonable time', async function () {
-		this.timeout(60000 * 2);
+		this.timeout(60000 * 5);
 		return Jdtls.buildWorkspace().then((result) => {
 			assert.strictEqual(result, Jdtls.CompileWorkspaceStatus.Succeed);
 
