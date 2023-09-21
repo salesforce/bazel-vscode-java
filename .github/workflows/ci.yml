@@ -98,7 +98,6 @@ jobs:
           run: npm run test
           options: "-screen 0 1600x1200x24"
 
-
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
         if: always()
