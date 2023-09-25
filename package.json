@@ -54,6 +54,7 @@
 			".*\\.bazelproject$",
 			".*\\.java$"
 		],
+
 		"configuration": {
 			"title": "BJLS",
 			"properties": {
@@ -69,7 +70,8 @@
 						"debug",
 						"warn",
 						"info",
-						"error"
+						"error",
+						"trace"
 					],
 					"default": "info",
 					"description": "Configure detailed logging (debug, warn, info, error)",
@@ -137,8 +139,9 @@
 		"@types/vscode": "^1.77.0",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
-		"@vscode/test-electron": "^2.3.4",
 		"@vscode/vsce": "^2.19.0",
+		"@vscode/test-electron": "^2.3.4",
+		"vscode-languageclient": "^9.0.0",
 		"cross-env": "^7.0.3",
 		"eslint": "^8.45.0",
 		"eslint-webpack-plugin": "^4.0.1",
@@ -168,7 +171,6 @@
 		"ts-loader": "^9.4.2",
 		"ts-node": "^10.9.1",
 		"typescript": "^5.1.6",
-		"vscode-languageclient": "^9.0.0",
 		"webpack": "^5.75.0",
 		"webpack-bundle-analyzer": "^4.8.0",
 		"webpack-cli": "^5.0.1"

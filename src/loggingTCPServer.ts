@@ -9,11 +9,15 @@ export function registerLSClient(attempts=0) {
 
 	// create tcp server
 	server = createServer((sock: Socket) => {
-		sock.on('connect', () => {
-			Log.info('Connected');
-			attempts = 0;
+
+		Log.trace('socket connected');
+		attempts = 0;
+
+		sock.pipe(Log.stream());
+
+		sock.on('end', () => {
+			sock.unpipe(Log.stream());
 		});
-		sock.pipe(Log.stream);
 	});
 
 	server.listen(0, 'localhost', () => {
@@ -31,6 +35,9 @@ export function registerLSClient(attempts=0) {
 			attempts++;
 			setTimeout(() => registerLSClient(), 1000*attempts);
 		}
+	});
 
+	server.on('error', (err: Error) => {
+		Log.error(err.message);
 	});
 }

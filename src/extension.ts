@@ -17,6 +17,8 @@ export function activate(context: ExtensionContext) {
 	bazelBuildWatcher = workspace.createFileSystemWatcher('**/BUILD.bazel');
 	bazelProjectWatcher = workspace.createFileSystemWatcher('**/.bazelproject');
 
+	cleanOldProjectFiles();
+
 	bazelBuildWatcher.onDidChange(toggleBazelClasspathSyncStatus);
 	bazelBuildWatcher.onDidCreate(toggleBazelClasspathSyncStatus);
 	bazelBuildWatcher.onDidDelete(toggleBazelClasspathSyncStatus);
@@ -35,7 +37,7 @@ export function activate(context: ExtensionContext) {
 						const projects = new Set(resp.data.map(p => p.projectName));
 						Log.info(`${projects.size} projects in classpath`);
 						projects.forEach(project => {Log.trace(`${project} synced`);});
-					}, (err: Error) => Promise.reject)
+					}, (err: Error) => Log.error(err.message))
 			])
 			.catch(e => {Log.error(e.message);});
 		});
@@ -101,9 +103,20 @@ function getWorkspaceRoot(): string {
 // not sure we need this or not yet
 async function cleanOldProjectFiles() {
 	const workspaceRoot = getWorkspaceRoot();
-	workspace.findFiles('**/\.project').then(val => {
-		console.log(val);
+	const bazelProjectFile = await getBazelProjectFile(workspaceRoot);
+	const ignoreGlob = `**/core,{${Array.from(new Set(bazelProjectFile.directories.concat(bazelProjectFile.targets).map(i => i.replace('//','').replace('/...','')))).join(',')}}/**`;
+	Promise.all([
+		workspace.findFiles('**/\.project', ignoreGlob),
+		workspace.findFiles('**/\.settings', ignoreGlob),
+		workspace.findFiles('**/\.classpath', ignoreGlob),
+	]).then(projFiles => projFiles.flat(1))
+	.then(files => {
+		Log.info(`deleting ${files.length} eclipse project files/dirs`);
+		Log.trace(`deleted eclipse project files from: ${files.join(', ')}`);
+		files.forEach(file => workspace.fs.delete(file, { recursive: true }));
 	});
+
+	console.log('finished deleting old project files');
 }
 
 async function getBazelProjectFile(workspaceRoot: string): Promise<BazelProjectView> {

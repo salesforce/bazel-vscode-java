@@ -1,49 +1,60 @@
 import { Writable } from 'stream';
-import { window } from 'vscode';
+import { Terminal, window, workspace } from 'vscode';
+import { BazelTerminal } from './bazelTerminal';
 
-const bazelOutputChannel = window.createOutputChannel('Bazel', {log: true});
+const BAZEL_TERMINAL_NAME = 'Bazel Build Status';
 
 export namespace Log {
-	export function info(msg: string|Buffer) {write(msg, LogLevel.INFO);}
-	export function warn(msg: string|Buffer) {write(msg, LogLevel.WARN);}
-	export function error(msg: string|Buffer) {write(msg, LogLevel.ERROR);}
-	export function debug(msg: string|Buffer) {write(msg, LogLevel.DEBUG);}
-	export function trace(msg: string|Buffer) {write(msg, LogLevel.TRACE);}
 
-	export const stream = new Writable();
-	stream._write = (chunk: Buffer, encoding, next) => {
-		bazelOutputChannel.append(chunk.toString());
-		next();
-	};
+	export function stream(): Writable {
+		const s = new Writable();
+		s._write = (chunk: Buffer, encoding, next) => {
+			getBazelTerminal().sendText(chunk.toString());
+			next();
+		};
+		s.on('unpipe', () => s.end());
 
-	function write(msg: string|Buffer, level: LogLevel){
-		bazelOutputChannel.show();
-		if(msg instanceof Buffer){
-			msg = msg.toString();
-		}
-		switch(level){
-			case LogLevel.INFO:
-				bazelOutputChannel.info(msg);
-				break;
-			case LogLevel.WARN:
-				bazelOutputChannel.warn(msg);
-				break;
-			case LogLevel.ERROR:
-				bazelOutputChannel.error(msg);
-				break;
-			case LogLevel.DEBUG:
-				bazelOutputChannel.debug(msg);
-				break;
-			case LogLevel.TRACE:
-				bazelOutputChannel.trace(msg);
-				break;
-			default:
-				bazelOutputChannel.appendLine(msg);
-		}
+		return s;
 	}
+
+	// good reference if you want to change any colors https://misc.flogisoft.com/bash/tip_colors_and_formatting
+	export function info(msg: string){ getBazelTerminal().sendText(`\\e[32m${msg}\\e[0m`); } // green
+	export function warn(msg: string){ if(getLogLevel() >= LogLevel.WARN) {getBazelTerminal().sendText(`\\e[33m${msg}\\e[0m`);} } // yellow
+	export function debug(msg: string){ if(getLogLevel() >= LogLevel.WARN) {getBazelTerminal().sendText(`\\e[34m${msg}\\e[0m`);} } // blue
+	export function error(msg: string){ getBazelTerminal().sendText(`\\e[31m${msg}\\e[0m`); } // red
+	export function trace(msg: string){ if(getLogLevel() >= LogLevel.WARN) {getBazelTerminal().sendText(`\\e[37m${msg}\\e[0m`);} } // gray
 
 }
 
+function getBazelTerminal(): Terminal {
+	let term = window.terminals.find((term) => term.name === BAZEL_TERMINAL_NAME);
+	if(!term){
+		return window.createTerminal({
+			name: BAZEL_TERMINAL_NAME,
+			pty: new BazelTerminal
+		});
+	}
+	return term;
+}
+
 enum LogLevel {
-	INFO, WARN, ERROR, DEBUG, TRACE
+	INFO, ERROR = 0,
+	WARN = 1,
+	DEBUG = 2,
+	TRACE = 3
+}
+
+function getLogLevel(): LogLevel {
+	const levelVal = workspace.getConfiguration('java.bazel').get('log.level');
+
+	switch(levelVal) {
+		case 'debug':
+			return LogLevel.DEBUG;
+		case 'warn':
+			return LogLevel.WARN;
+		case 'trace':
+			return LogLevel.TRACE;
+		default:
+			return LogLevel.INFO;
+	}
 }
