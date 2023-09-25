@@ -9,7 +9,7 @@
 	"bugs": "https://github.com/salesforce/bazel-vscode-java/issues",
 	"preview": true,
 	"engines": {
-		"vscode": "^1.77.0"
+		"vscode": "^1.80.0"
 	},
 	"repository": {
 		"type": "git",
@@ -54,6 +54,42 @@
 			".*\\.bazelproject$",
 			".*\\.java$"
 		],
+		"languages": [
+			{
+				"id": "bazelproject",
+				"aliases": [
+					"bazelproject",
+					"bazelproject"
+				],
+				"extensions": [
+					".bazelproject"
+				],
+				"configuration": ".src/syntaxes/bazelproject-language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "bazelproject",
+				"scopeName": "source.bazelproject",
+				"path": "./syntaxes/bazelproject.tmLanguage.json"
+			}
+		],
+		"taskDefinitions": [
+			{
+				"type": "bazel",
+				"required": ["name", "task"],
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "User readable bazel run target name"
+					},
+					"task": {
+						"type": "string",
+						"description": "The full bazel command to be executed"
+					}
+				}
+			}
+		],
 		"configuration": {
 			"title": "BJLS",
 			"properties": {
@@ -90,6 +126,17 @@
 				"when": "javaLSReady && isFileSystemResource",
 				"title": "Refresh classpath from Bazel BUILD file",
 				"category": "Java"
+			},
+			{
+				"command": "java.bazel.debug.command",
+				"when": "javaLSReady && isFileSystemResource",
+				"title": "Debug LS",
+				"category": "Bazel"
+			},
+			{
+				"command": "java.bazel.showStatus",
+				"title": "Show Bazel Build Status",
+				"category": "Bazel"
 			}
 		],
 		"menus": {
@@ -108,12 +155,13 @@
 		}
 	},
 	"scripts": {
-		"build": "run-s build:server build:dev",
+		"build": "run-s build:server copy:resources build:dev",
 		"build:prod": "run-s compile bundle:prod",
 		"build:dev": "run-s compile bundle:dev",
 		"build:server": "gulp build_or_download",
 		"bundle:prod": "cross-env NODE_ENV=production webpack --mode production",
 		"bundle:dev": "cross-env NODE_ENV=development webpack --mode development",
+		"copy:resources": "gulp copy_resources",
 		"clean": "rimraf dist node_modules build out server",
 		"compile": "cross-env NODE_ENV=production run-s compile:*",
 		"compile:ts": "run-s compile:ts:*",
@@ -135,7 +183,7 @@
 		"@types/jsdom": "^21.1.1",
 		"@types/mocha": "^8.0.4",
 		"@types/node": "^20.7.1",
-		"@types/vscode": "^1.77.0",
+		"@types/vscode": "^1.80.0",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
 		"@vscode/test-electron": "^2.3.4",
@@ -173,5 +221,8 @@
 		"webpack": "^5.75.0",
 		"webpack-bundle-analyzer": "^4.8.0",
 		"webpack-cli": "^5.0.1"
+	},
+	"dependencies": {
+		"fast-xml-parser": "^4.3.2"
 	}
 }

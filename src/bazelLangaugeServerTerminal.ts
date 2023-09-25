@@ -4,7 +4,7 @@ import { BazelTerminal } from './bazelTerminal';
 
 const BAZEL_TERMINAL_NAME = 'Bazel Build Status';
 
-export namespace Log {
+export namespace BazelLanguageServerTerminal {
 
 	export function stream(): Writable {
 		const s = new Writable();
@@ -18,11 +18,11 @@ export namespace Log {
 	}
 
 	// good reference if you want to change any colors https://misc.flogisoft.com/bash/tip_colors_and_formatting
-	export function info(msg: string){ getBazelTerminal().sendText(`\\e[32m${msg}\\e[0m`); } // green
-	export function warn(msg: string){ if(getLogLevel() >= LogLevel.WARN) {getBazelTerminal().sendText(`\\e[33m${msg}\\e[0m`);} } // yellow
-	export function debug(msg: string){ if(getLogLevel() >= LogLevel.WARN) {getBazelTerminal().sendText(`\\e[34m${msg}\\e[0m`);} } // blue
-	export function error(msg: string){ getBazelTerminal().sendText(`\\e[31m${msg}\\e[0m`); } // red
-	export function trace(msg: string){ if(getLogLevel() >= LogLevel.WARN) {getBazelTerminal().sendText(`\\e[37m${msg}\\e[0m`);} } // gray
+	export function info(msg: string){ getBazelTerminal().sendText(`\u001b[32m${msg}\u001b[0m`); } // green
+	export function warn(msg: string){ if(getLogLevel() >= LogLevel.WARN) {getBazelTerminal().sendText(`\u001b[33m${msg}\u001b[0m`);} } // yellow
+	export function debug(msg: string){ if(getLogLevel() >= LogLevel.WARN) {getBazelTerminal().sendText(`\u001b[34m${msg}\u001b[0m`);} } // blue
+	export function error(msg: string){ getBazelTerminal().sendText(`\u001b[31m${msg}\u001b[0m`); } // red
+	export function trace(msg: string){ if(getLogLevel() >= LogLevel.WARN) {getBazelTerminal().sendText(`\u001b[37m${msg}\u001b[0m`);} } // gray
 
 }
 

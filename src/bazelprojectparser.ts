@@ -1,7 +1,8 @@
 import { existsSync, readFileSync } from 'fs';
-import { workspace } from 'vscode';
-import { Log } from './log';
+import { FileType, Uri, workspace } from 'vscode';
+import { BazelLanguageServerTerminal } from './bazelLangaugeServerTerminal';
 import { BazelProjectView, ParseConfig, RawSection } from './types';
+import { getWorkspaceRoot } from './util';
 
 const COMMENT_REGEX = /#(.)*(\n|\z)/gm;
 const HEADER_REGEX = /^[^:\-\/*\s]+[: ]/gm;
@@ -72,11 +73,11 @@ function parseProjectFile(config: ParseConfig): BazelProjectView {
 						config.projectView.targetProvisioningStrategy = section.body;
 						break;
 					default:
-						Log.warn(`unexpected section '${section.name}' while reading '${current}'`);
+						BazelLanguageServerTerminal.warn(`unexpected section '${section.name}' while reading '${current}'`);
 				}
 			});
 		} else {
-			Log.warn(`unable to resolve import ${current}`);
+			BazelLanguageServerTerminal.warn(`unable to resolve import ${current}`);
 		}
 	}
 
@@ -120,6 +121,19 @@ function parseRawSections(projectFileContents: string): RawSection[] {
 
 function removeComments(bazelProjectFileContent: string): string {
   return bazelProjectFileContent.replace(COMMENT_REGEX, "\n");
+}
+
+export async function getBazelProjectFile(): Promise<BazelProjectView> {
+	const workspaceRoot = getWorkspaceRoot();
+	try{
+		const bazelProjectFileStat = await workspace.fs.stat(Uri.parse(`${workspaceRoot}/.eclipse/.bazelproject`));
+		if(bazelProjectFileStat.type === FileType.File) {
+			return readBazelProject(`.eclipse/.bazelproject`);
+		}
+		throw new Error(`.eclipse/.bazelproject type is ${bazelProjectFileStat.type}, should be ${FileType.File}`);
+	} catch(err) {
+		throw new Error(`Could not read .eclipse/.bazelproject file: ${err}`);
+	}
 }
 
 export function readBazelProject(bazelProjectFile: string): BazelProjectView {
