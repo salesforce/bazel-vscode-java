@@ -26,7 +26,7 @@ export namespace Log {
 
 }
 
-function getBazelTerminal(): Terminal {
+export function getBazelTerminal(): Terminal {
 	let term = window.terminals.find((term) => term.name === BAZEL_TERMINAL_NAME);
 	if(!term){
 		return window.createTerminal({
