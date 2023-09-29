@@ -17,43 +17,39 @@ export function activate(context: ExtensionContext) {
 	bazelBuildWatcher = workspace.createFileSystemWatcher('**/BUILD.bazel');
 	bazelProjectWatcher = workspace.createFileSystemWatcher('**/.bazelproject');
 
-	cleanOldProjectFiles();
-
 	bazelBuildWatcher.onDidChange(toggleBazelClasspathSyncStatus);
 	bazelBuildWatcher.onDidCreate(toggleBazelClasspathSyncStatus);
 	bazelBuildWatcher.onDidDelete(toggleBazelClasspathSyncStatus);
 
 	bazelProjectWatcher.onDidChange(syncBazelProjectView);
 
-	// Register commands
-
-	context.subscriptions.push(commands.registerCommand(Commands.SYNC_PROJECTS_CMD, async () => {
-        executeJavaLanguageServerCommand(Commands.SYNC_PROJECTS)
-		.then(() => {
-			Promise.allSettled([
-				syncBazelProjectView(),
-				executeJavaLanguageServerCommand<UpdateClasspathResponse>(Commands.JAVA_LS_LIST_SOURCEPATHS)
-					.then((resp) => {
-						const projects = new Set(resp.data.map(p => p.projectName));
-						Log.info(`${projects.size} projects in classpath`);
-						projects.forEach(project => {Log.trace(`${project} synced`);});
-					}, (err: Error) => Log.error(err.message))
-			])
-			.catch(e => {Log.error(e.message);});
-		});
-    }));
-	context.subscriptions.push(commands.registerCommand(Commands.UPDATE_CLASSPATHS_CMD, async () => {
-		outOfDateClasspaths.forEach(uri => {
-			Log.info(`Updating classpath for ${uri.fsPath}`);
-			executeJavaLanguageServerCommand(Commands.UPDATE_CLASSPATHS, uri.toString())
-				.then(() => outOfDateClasspaths.delete(uri), (err: Error) => {Log.error(`${err.message}\n${err.stack}`);})
-				.then(() => Log.info(`Classpath for ${uri.fsPath} updated`));
-		});
-		classpathStatus.hide();
-    }));
-
-	registerLSClient();
-
+	registerLSClient().then(() => {
+		// Register commands
+		context.subscriptions.push(commands.registerCommand(Commands.SYNC_PROJECTS_CMD, async () => {
+			executeJavaLanguageServerCommand(Commands.SYNC_PROJECTS)
+			.then(() => {
+				Promise.allSettled([
+					syncBazelProjectView(),
+					executeJavaLanguageServerCommand<UpdateClasspathResponse>(Commands.JAVA_LS_LIST_SOURCEPATHS)
+						.then((resp) => {
+							const projects = new Set(resp.data.map(p => p.projectName));
+							Log.info(`${projects.size} projects in classpath`);
+							projects.forEach(project => {Log.trace(`${project} synced`);});
+						}, (err: Error) => Log.error(err.message))
+				])
+				.catch(e => {Log.error(e.message);});
+			});
+		}));
+		context.subscriptions.push(commands.registerCommand(Commands.UPDATE_CLASSPATHS_CMD, async () => {
+			outOfDateClasspaths.forEach(uri => {
+				Log.info(`Updating classpath for ${uri.fsPath}`);
+				executeJavaLanguageServerCommand(Commands.UPDATE_CLASSPATHS, uri.toString())
+					.then(() => outOfDateClasspaths.delete(uri), (err: Error) => {Log.error(`${err.message}\n${err.stack}`);})
+					.then(() => Log.info(`Classpath for ${uri.fsPath} updated`));
+			});
+			classpathStatus.hide();
+		}));
+	});
 }
 
 export function deactivate() {
@@ -64,6 +60,8 @@ export function deactivate() {
 		bazelProjectWatcher.dispose();
 	}
 }
+
+
 
 function toggleBazelClasspathSyncStatus(uri: Uri){
 	classpathStatus.show();
@@ -98,25 +96,6 @@ function getWorkspaceRoot(): string {
 		}
 	}
 	throw new Error('No workspace found');
-}
-
-// not sure we need this or not yet
-async function cleanOldProjectFiles() {
-	const workspaceRoot = getWorkspaceRoot();
-	const bazelProjectFile = await getBazelProjectFile(workspaceRoot);
-	const ignoreGlob = `**/core,{${Array.from(new Set(bazelProjectFile.directories.concat(bazelProjectFile.targets).map(i => i.replace('//','').replace('/...','')))).join(',')}}/**`;
-	Promise.all([
-		workspace.findFiles('**/\.project', ignoreGlob),
-		workspace.findFiles('**/\.settings', ignoreGlob),
-		workspace.findFiles('**/\.classpath', ignoreGlob),
-	]).then(projFiles => projFiles.flat(1))
-	.then(files => {
-		Log.info(`deleting ${files.length} eclipse project files/dirs`);
-		Log.trace(`deleted eclipse project files from: ${files.join(', ')}`);
-		files.forEach(file => workspace.fs.delete(file, { recursive: true }));
-	});
-
-	console.log('finished deleting old project files');
 }
 
 async function getBazelProjectFile(workspaceRoot: string): Promise<BazelProjectView> {

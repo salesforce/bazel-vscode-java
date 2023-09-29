@@ -1,8 +1,5 @@
-import { exec as cpExec } from "child_process";
-import { promisify } from "util";
+import { exec } from "child_process";
 import { Event, EventEmitter, Pseudoterminal, TerminalDimensions } from 'vscode';
-
-const exec = promisify(cpExec);
 
 export class BazelTerminal implements Pseudoterminal {
 
@@ -20,12 +17,20 @@ export class BazelTerminal implements Pseudoterminal {
 		this.writeEmitter.dispose();
 	}
 	async handleInput?(data: string): Promise<void> {
-		const {stdout, stderr} = await exec(`printf '${data.replace(/\r+/g, '\r\n')}'`);
-		if(stdout){
-			this.writeEmitter.fire(stdout);
-		}
-		if(stderr) {
-			this.writeEmitter.fire(stderr);
-		}
+		exec(`printf "${data
+			.replace(/\"/g, '\\"')
+			.replace(/\`/g, '\\`')
+			.replace(/\r+/g, '\r\n')}"`, (err, stdout, stderr) => {
+			if(stdout){
+				this.writeEmitter.fire(stdout);
+			}
+			if(stderr) {
+				this.writeEmitter.fire(stderr);
+			}
+			if(err) {
+				console.log(`failed to execute: ${err.cmd}`);
+				this.writeEmitter.fire(err.message);
+			}
+		});
 	}
 }
