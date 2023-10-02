@@ -54,6 +54,10 @@ export function registerLSClient(): Promise<void> {
 		.catch(err => Log.error(`Failed to register port with BLS: ${err.message}`));
 }
 
+export function connections(): number {
+	return server ? server.connections : 0;
+}
+
 function registerPortWithLanguageServer(port: number, attempts=0, maxRetries=50){
 	console.log(`register port attempt ${attempts}`);
 	commands.executeCommand(Commands.EXECUTE_WORKSPACE_COMMAND, Commands.REGISTER_BAZEL_TCP_SERVER_PORT, port)

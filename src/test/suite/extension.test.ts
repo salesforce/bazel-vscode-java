@@ -2,8 +2,9 @@ import * as assert from 'assert';
 import { env } from 'process';
 import * as vscode from 'vscode';
 import { Commands } from '../../commands';
+import { JavaExtensionAPI, ServerMode } from '../../jdtls.extension.api';
+import { connections } from '../../loggingTCPServer';
 import { Jdtls } from './Jdtls';
-import { JavaExtensionAPI, ServerMode } from './jdtls.extension.api';
 
 
 suite('Java Language Extension - Standard', () => {
@@ -77,6 +78,13 @@ suite('Java Language Extension - Standard', () => {
 				const projects = new Set(resp.data.map(p => p.projectName));
 				assert.ok(projects.size > 0);
 			});
+		});
+	});
+
+	test('should have connected TCP server', function () {
+		this.timeout(60000 * 1);
+		return vscode.extensions.getExtension('sfdc.bazel-vscode-java')!.activate().then(() => {
+			assert.ok(connections() > 0);
 		});
 	});
 
