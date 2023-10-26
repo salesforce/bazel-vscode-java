@@ -1,4 +1,5 @@
 import { dirname } from 'path';
+import { TextEncoder } from 'util';
 import { ConfigurationTarget, ExtensionContext, FileSystemWatcher, FileType, StatusBarAlignment, ThemeColor, Uri, commands, window, workspace } from 'vscode';
 import { readBazelProject } from './bazelprojectparser';
 import { Commands, executeJavaLanguageServerCommand } from './commands';
@@ -11,8 +12,11 @@ let bazelProjectWatcher: FileSystemWatcher;
 const classpathStatus = window.createStatusBarItem(StatusBarAlignment.Left, 1);
 const outOfDateClasspaths: Set<Uri> = new Set<Uri>();
 classpathStatus.command = Commands.UPDATE_CLASSPATHS_CMD;
+const projectViewRelativePath = '.eclipse/.bazelproject';
 
 export function activate(context: ExtensionContext) {
+
+	cloneTemplateProjectView(getWorkspaceRoot());
 
 	bazelBuildWatcher = workspace.createFileSystemWatcher('**/BUILD.bazel');
 	bazelProjectWatcher = workspace.createFileSystemWatcher('**/.bazelproject');
@@ -107,13 +111,61 @@ async function cleanOldProjectFiles() {
 }
 
 async function getBazelProjectFile(workspaceRoot: string): Promise<BazelProjectView> {
-	try{
-		const bazelProjectFileStat = await workspace.fs.stat(Uri.parse(`${workspaceRoot}/.eclipse/.bazelproject`));
-		if(bazelProjectFileStat.type === FileType.File) {
-			return readBazelProject(`.eclipse/.bazelproject`);
+	const bazelProjectExists = await bazelProjectFileExists(workspaceRoot);
+	if(bazelProjectExists) {
+		return readBazelProject(projectViewRelativePath);
+	}
+	throw new Error(`${projectViewRelativePath} does not exist`)
+}
+
+async function bazelProjectFileExists(workspaceRoot: string): Promise<boolean> {
+	try {
+	 	const bazelProjectFileStat = await workspace.fs.stat(Uri.parse(`${workspaceRoot}/${projectViewRelativePath}`));
+		if (bazelProjectFileStat.type === FileType.File) {
+			return true;
 		}
-		throw new Error(`.eclipse/.bazelproject type is ${bazelProjectFileStat.type}, should be ${FileType.File}`);
+		throw new Error(`${projectViewRelativePath} type is ${bazelProjectFileStat.type}, should be ${FileType.File}`);
+	} catch {
+		return false;
+	}
+}
+
+const eclipseManagedImport = new TextEncoder().encode("# import default settings (never remove this line 🙏)\n"+
+							 "import tools/eclipse/.managed-defaults.bazelproject\n");
+
+async function cloneTemplateProjectView(workspaceRoot: string) {
+	try {
+		const bazelProjectExists = await bazelProjectFileExists(workspaceRoot);
+		if (!bazelProjectExists) {
+			//Carry over from the IntelliJ bazel implementation
+			const managedProjectViewUri = Uri.parse(`${workspaceRoot}/tools/intellij/.managed.bazelproject`);
+			const eclipseManagedProjectViewUri = Uri.parse(`${workspaceRoot}/tools/eclipse/.managed-defaults.bazelproject`);
+			let managedProjectView;
+			try {
+				managedProjectView = await workspace.fs.stat(managedProjectViewUri);
+			} catch {
+				//If the managed project view does not exist, there is nothing for us to clone
+				return;
+			}
+			if (managedProjectView.type === FileType.File) {
+				var contents = await workspace.fs.readFile(managedProjectViewUri);
+				try {
+					const eclipseManagedProjectView = await workspace.fs.stat(eclipseManagedProjectViewUri);
+					if (eclipseManagedProjectView.type === FileType.File) {
+						contents = new Uint8Array([...eclipseManagedImport, ...contents]);
+					}
+				} catch {
+					//File does not exist, which is fine
+				}
+				try {
+					workspace.fs.writeFile(Uri.parse(`${workspaceRoot}/${projectViewRelativePath}`), contents);
+				} catch (err) {
+					Log.warn(`Unable to write managed project view content to ${projectViewRelativePath}: ${err}`);
+				}
+				
+			}
+		}
 	} catch(err) {
-		throw new Error(`Could not read .eclipse/.bazelproject file: ${err}`);
+		Log.warn(`Failed to clone managed template view: ${err}`);
 	}
 }
