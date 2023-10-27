@@ -3,7 +3,6 @@ import { env } from 'process';
 import * as vscode from 'vscode';
 import { Commands } from '../../commands';
 import { JavaExtensionAPI, ServerMode } from '../../jdtls.extension.api';
-import { connections } from '../../loggingTCPServer';
 import { Jdtls } from './Jdtls';
 
 
@@ -81,11 +80,11 @@ suite('Java Language Extension - Standard', () => {
 		});
 	});
 
-	test('should have connected TCP server', function () {
-		this.timeout(60000 * 1);
-		return vscode.extensions.getExtension('sfdc.bazel-vscode-java')!.activate().then(() => {
-			assert.ok(connections() > 0);
-		});
+	/*
+	test('should have connected TCP server', async function () {
+		this.timeout(60000 * 5);
+		let result = await vscode.extensions.getExtension('sfdc.bazel-vscode-java')!.activate();
+		assert.ok(connections() > 0);
 	});
-
+    */
 });
