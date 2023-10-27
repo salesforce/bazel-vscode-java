@@ -69,7 +69,8 @@
 						"debug",
 						"warn",
 						"info",
-						"error"
+						"error",
+						"trace"
 					],
 					"default": "info",
 					"description": "Configure detailed logging (debug, warn, info, error)",
@@ -133,7 +134,7 @@
 		"@types/glob": "^8.1.0",
 		"@types/jsdom": "^21.1.1",
 		"@types/mocha": "^8.0.4",
-		"@types/node": "^12.11.7",
+		"@types/node": "^20.7.1",
 		"@types/vscode": "^1.77.0",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",

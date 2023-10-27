@@ -2,15 +2,17 @@ import { dirname } from 'path';
 import { ConfigurationTarget, ExtensionContext, FileSystemWatcher, FileType, StatusBarAlignment, ThemeColor, Uri, commands, window, workspace } from 'vscode';
 import { readBazelProject } from './bazelprojectparser';
 import { Commands, executeJavaLanguageServerCommand } from './commands';
-import { Log } from './log';
+import { Log, getBazelTerminal } from './log';
 import { registerLSClient } from './loggingTCPServer';
 import { BazelProjectView, ExcludeConfig, UpdateClasspathResponse } from './types';
 
 let bazelBuildWatcher: FileSystemWatcher;
 let bazelProjectWatcher: FileSystemWatcher;
 const classpathStatus = window.createStatusBarItem(StatusBarAlignment.Left, 1);
+const projectViewStatus = window.createStatusBarItem(StatusBarAlignment.Left, 1);
 const outOfDateClasspaths: Set<Uri> = new Set<Uri>();
 classpathStatus.command = Commands.UPDATE_CLASSPATHS_CMD;
+projectViewStatus.command = Commands.SYNC_PROJECTS_CMD;
 
 export function activate(context: ExtensionContext) {
 
@@ -21,37 +23,37 @@ export function activate(context: ExtensionContext) {
 	bazelBuildWatcher.onDidCreate(toggleBazelClasspathSyncStatus);
 	bazelBuildWatcher.onDidDelete(toggleBazelClasspathSyncStatus);
 
-	bazelProjectWatcher.onDidChange(syncBazelProjectView);
+	bazelProjectWatcher.onDidChange(toggleBazelProjectSyncStatus);
 
-	// Register commands
-
-	context.subscriptions.push(commands.registerCommand(Commands.SYNC_PROJECTS_CMD, async () => {
-        executeJavaLanguageServerCommand(Commands.SYNC_PROJECTS)
-		.then(() => {
-			Promise.allSettled([
-				syncBazelProjectView(),
-				executeJavaLanguageServerCommand<UpdateClasspathResponse>(Commands.JAVA_LS_LIST_SOURCEPATHS)
-					.then((resp) => {
-						const projects = new Set(resp.data.map(p => p.projectName));
-						Log.info(`${projects.size} projects in classpath`);
-						projects.forEach(project => {Log.trace(`${project} synced`);});
-					}, (err: Error) => Promise.reject)
-			])
-			.catch(e => {Log.error(e.message);});
-		});
-    }));
-	context.subscriptions.push(commands.registerCommand(Commands.UPDATE_CLASSPATHS_CMD, async () => {
-		outOfDateClasspaths.forEach(uri => {
-			Log.info(`Updating classpath for ${uri.fsPath}`);
-			executeJavaLanguageServerCommand(Commands.UPDATE_CLASSPATHS, uri.toString())
-				.then(() => outOfDateClasspaths.delete(uri), (err: Error) => {Log.error(`${err.message}\n${err.stack}`);})
-				.then(() => Log.info(`Classpath for ${uri.fsPath} updated`));
-		});
-		classpathStatus.hide();
-    }));
-
-	registerLSClient();
-
+	registerLSClient().then(() => {
+		// Register commands
+		context.subscriptions.push(commands.registerCommand(Commands.SYNC_PROJECTS_CMD, async () => {
+			executeJavaLanguageServerCommand(Commands.SYNC_PROJECTS)
+			.then(() => {
+				projectViewStatus.hide();
+				getBazelTerminal().show();
+				Promise.allSettled([
+					syncBazelProjectView(),
+					executeJavaLanguageServerCommand<UpdateClasspathResponse>(Commands.JAVA_LS_LIST_SOURCEPATHS)
+						.then((resp) => {
+							const projects = new Set(resp.data.map(p => p.projectName));
+							Log.info(`${projects.size} projects in classpath`);
+							projects.forEach(project => {Log.trace(`${project} synced`);});
+						}, (err: Error) => Log.error(err.message))
+				])
+				.catch(e => {Log.error(e.message);});
+			});
+		}));
+		context.subscriptions.push(commands.registerCommand(Commands.UPDATE_CLASSPATHS_CMD, async () => {
+			outOfDateClasspaths.forEach(uri => {
+				Log.info(`Updating classpath for ${uri.fsPath}`);
+				executeJavaLanguageServerCommand(Commands.UPDATE_CLASSPATHS, uri.toString())
+					.then(() => outOfDateClasspaths.delete(uri), (err: Error) => {Log.error(`${err.message}\n${err.stack}`);})
+					.then(() => Log.info(`Classpath for ${uri.fsPath} updated`));
+			});
+			classpathStatus.hide();
+		}));
+	});
 }
 
 export function deactivate() {
@@ -63,11 +65,19 @@ export function deactivate() {
 	}
 }
 
+
+
 function toggleBazelClasspathSyncStatus(uri: Uri){
 	classpathStatus.show();
 	classpathStatus.text = 'Sync bazel classpath';
 	classpathStatus.backgroundColor = new ThemeColor('statusBarItem.warningBackground');
 	outOfDateClasspaths.add(uri);
+}
+
+function toggleBazelProjectSyncStatus(uri: Uri){
+	projectViewStatus.show();
+	projectViewStatus.text = 'Sync bazel project view';
+	projectViewStatus.backgroundColor = new ThemeColor('statusBarItem.warningBackground');
 }
 
 async function syncBazelProjectView() {
@@ -96,14 +106,6 @@ function getWorkspaceRoot(): string {
 		}
 	}
 	throw new Error('No workspace found');
-}
-
-// not sure we need this or not yet
-async function cleanOldProjectFiles() {
-	const workspaceRoot = getWorkspaceRoot();
-	workspace.findFiles('**/\.project').then(val => {
-		console.log(val);
-	});
 }
 
 async function getBazelProjectFile(workspaceRoot: string): Promise<BazelProjectView> {
