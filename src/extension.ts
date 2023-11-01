@@ -6,9 +6,10 @@ import { BazelTaskProvider } from './bazelTaskProvider';
 import { getBazelProjectFile } from './bazelprojectparser';
 import { Commands, executeJavaLanguageServerCommand } from './commands';
 import { registerLSClient } from './loggingTCPServer';
-import { ExcludeConfig, UpdateClasspathResponse } from './types';
+import { ExcludeConfig } from './types';
 import { getWorkspaceRoot, initBazelProjectFile } from './util';
 
+const displayFolders: Set<string> = new Set(['.vscode', '.eclipse']); // TODO: bubble this out to a setting
 const classpathStatus = window.createStatusBarItem(StatusBarAlignment.Left, 1);
 const projectViewStatus = window.createStatusBarItem(StatusBarAlignment.Left, 1);
 const outOfDateClasspaths: Set<Uri> = new Set<Uri>();
@@ -62,22 +63,15 @@ export async function activate(context: ExtensionContext) {
 
 export function deactivate() { }
 
-async function syncProjectView(): Promise<void> {
+function syncProjectView(): void {
 	if(!isRedhatJavaReady()){
 		window.showErrorMessage('Unable to sync project view. Java language server is not ready');
 		return;
 	}
 
 	projectViewStatus.hide();
-	try {
-		await executeJavaLanguageServerCommand(Commands.SYNC_PROJECTS);
-		syncBazelProjectView();
-	} catch(err) {
-		if(err instanceof Error) {
-			BazelLanguageServerTerminal.error(err.message);
-		}
-		BazelLanguageServerTerminal.error(format(err));
-	}
+	executeJavaLanguageServerCommand(Commands.SYNC_PROJECTS)
+	.then(syncBazelProjectView);
 }
 
 function updateClasspaths() {
@@ -111,7 +105,6 @@ function runLSCmd() {
 
 function isRedhatJavaReady(): boolean {
 	const javaExtension = extensions.getExtension('redhat.java')?.exports;
-	console.log();
 	if(javaExtension) {
 		return javaExtension.status === 'Started';
 	}
@@ -133,22 +126,30 @@ function toggleBazelProjectSyncStatus(doc: TextDocument){
 
 async function syncBazelProjectView() {
 	BazelLanguageServerTerminal.debug('Syncing bazel project view');
+	displayFolders.clear();
+	displayFolders.add('.eclipse');
+	displayFolders.add('.vscode');
 	try {
 		const bazelProjectFile = await getBazelProjectFile();
+		let viewAll = false;
+		if(bazelProjectFile.directories.includes('.')){
+			viewAll = true;
+		} else {
+			bazelProjectFile.directories.forEach(d => displayFolders.add(d));
+			bazelProjectFile.targets.forEach(t => displayFolders.add(t.replace('//', '').replace(/:.*/,'')));
+		}
 
-		const lsSourcePaths = await executeJavaLanguageServerCommand<UpdateClasspathResponse>(Commands.JAVA_LS_LIST_SOURCEPATHS);
-
-		const displayFolders = ['.vscode', '.eclipse'] // TODO: bubble this out to a setting
-			.concat(bazelProjectFile.directories)
-			.concat(lsSourcePaths.data.map(cpath => cpath.projectName.replace(/:.+/g, '')));
-
-		workspace.fs.readDirectory(Uri.parse(getWorkspaceRoot())).then(val => {
-			let dirs = val.filter(x => x[1] !== FileType.File).map(d => d[0]);
-			let excludeObj:ExcludeConfig = workspace.getConfiguration('files', ).get('exclude') as ExcludeConfig;
-			dirs.forEach(d => excludeObj[d] = !displayFolders.includes(d));
-			workspace.getConfiguration('files').update('exclude', excludeObj, ConfigurationTarget.Workspace);
-		});
+		updateProjectViewSettings(viewAll);
 	} catch(err) {
 		throw new Error(`Could not read bazelproject file: ${err}`);
 	}
+}
+
+function updateProjectViewSettings(viewAll=false) {
+	workspace.fs.readDirectory(Uri.parse(getWorkspaceRoot())).then(val => {
+		let dirs = val.filter(x => x[1] !== FileType.File).map(d => d[0]);
+		let excludeObj:ExcludeConfig = workspace.getConfiguration('files', ).get('exclude') as ExcludeConfig;
+		dirs.forEach(d => excludeObj[d] = (viewAll) ? false : !displayFolders.has(d));
+		workspace.getConfiguration('files').update('exclude', excludeObj, ConfigurationTarget.Workspace);
+	});
 }
