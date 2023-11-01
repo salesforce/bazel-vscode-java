@@ -9,7 +9,6 @@ import { registerLSClient } from './loggingTCPServer';
 import { ExcludeConfig } from './types';
 import { getWorkspaceRoot, initBazelProjectFile } from './util';
 
-const displayFolders: Set<string> = new Set(['.vscode', '.eclipse']); // TODO: bubble this out to a setting
 const classpathStatus = window.createStatusBarItem(StatusBarAlignment.Left, 1);
 const projectViewStatus = window.createStatusBarItem(StatusBarAlignment.Left, 1);
 const outOfDateClasspaths: Set<Uri> = new Set<Uri>();
@@ -50,7 +49,8 @@ export async function activate(context: ExtensionContext) {
 	if(rootPath){
 		initBazelProjectFile(rootPath);
 		workspace.openTextDocument(join(rootPath, '.eclipse', '.bazelproject'))
-			.then(f => window.showTextDocument(f));
+			.then(f => window.showTextDocument(f))
+			.then(syncBazelProjectView);
 	}
 
 	context.subscriptions.push(commands.registerCommand(Commands.SYNC_PROJECTS_CMD, syncProjectView));
@@ -58,7 +58,7 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(commands.registerCommand(Commands.DEBUG_LS_CMD, runLSCmd));
 
 	// always update the project view after the initial project load
-	registerLSClient().then(() => syncBazelProjectView());
+	registerLSClient();
 }
 
 export function deactivate() { }
@@ -126,9 +126,7 @@ function toggleBazelProjectSyncStatus(doc: TextDocument){
 
 async function syncBazelProjectView() {
 	BazelLanguageServerTerminal.debug('Syncing bazel project view');
-	displayFolders.clear();
-	displayFolders.add('.eclipse');
-	displayFolders.add('.vscode');
+	const displayFolders = new Set<string>(['.eclipse', '.vscode']); // TODO bubble this out to a setting
 	try {
 		const bazelProjectFile = await getBazelProjectFile();
 		let viewAll = false;
@@ -136,20 +134,17 @@ async function syncBazelProjectView() {
 			viewAll = true;
 		} else {
 			bazelProjectFile.directories.forEach(d => displayFolders.add(d));
-			bazelProjectFile.targets.forEach(t => displayFolders.add(t.replace('//', '').replace(/:.*/,'')));
+			bazelProjectFile.targets.forEach(t => displayFolders.add(t.replace('//','').replace(/:.*/,'').replace(/\/.*/,'')));
 		}
 
-		updateProjectViewSettings(viewAll);
+		workspace.fs.readDirectory(Uri.parse(getWorkspaceRoot())).then(val => {
+			let dirs = val.filter(x => x[1] !== FileType.File).map(d => d[0]);
+			let excludeObj:ExcludeConfig = workspace.getConfiguration('files', ).get('exclude') as ExcludeConfig;
+			dirs.forEach(d => excludeObj[d] = (viewAll) ? false : !displayFolders.has(d));
+			workspace.getConfiguration('files').update('exclude', excludeObj, ConfigurationTarget.Workspace);
+		});
+
 	} catch(err) {
 		throw new Error(`Could not read bazelproject file: ${err}`);
 	}
-}
-
-function updateProjectViewSettings(viewAll=false) {
-	workspace.fs.readDirectory(Uri.parse(getWorkspaceRoot())).then(val => {
-		let dirs = val.filter(x => x[1] !== FileType.File).map(d => d[0]);
-		let excludeObj:ExcludeConfig = workspace.getConfiguration('files', ).get('exclude') as ExcludeConfig;
-		dirs.forEach(d => excludeObj[d] = (viewAll) ? false : !displayFolders.has(d));
-		workspace.getConfiguration('files').update('exclude', excludeObj, ConfigurationTarget.Workspace);
-	});
 }
