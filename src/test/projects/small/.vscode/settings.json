@@ -22,6 +22,7 @@
 	"java.bazel.log.level": "debug",
 	"java.debug.logLevel": "verbose",
 	"java.trace.server": "verbose",
+	"java.server.launchMode": "Standard",
 	"java.import.generatesMetadataFilesAtProjectRoot":false,
 	"java.autobuild.enabled": true
 }
