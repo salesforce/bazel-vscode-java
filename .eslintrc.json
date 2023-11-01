@@ -11,7 +11,8 @@
     "rules": {
         "@typescript-eslint/naming-convention": [
 			"warn",
-			{ "selector": "default", "format": ["camelCase", "PascalCase", "UPPER_CASE"] }
+			{ "selector": "default", "format": ["camelCase", "PascalCase", "UPPER_CASE"], "leadingUnderscore": "allow" }
+
 		],
         "@typescript-eslint/semi": "warn",
         "curly": "warn",

@@ -1,7 +1,5 @@
 package log;
 
-import java.time.Instant;
-
 public final class Logger {
 
     private Logger() {

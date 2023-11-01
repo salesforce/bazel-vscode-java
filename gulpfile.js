@@ -34,6 +34,11 @@ const jarIsIncludedInPackageJson = filter(file => {
   return declaredServerJars.has(file.basename);
 });
 
+gulp.task('copy_resources', function() {
+	return gulp.src(['./syntaxes/**/*'])
+		.pipe(gulp.dest('./dist/syntaxes/'));
+});
+
 gulp.task('download_server', function (done) {
   downloadServerImpl();
   done();

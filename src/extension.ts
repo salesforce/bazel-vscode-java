@@ -1,10 +1,13 @@
-import { dirname } from 'path';
-import { ConfigurationTarget, ExtensionContext, FileSystemWatcher, FileType, StatusBarAlignment, ThemeColor, Uri, commands, window, workspace } from 'vscode';
-import { readBazelProject } from './bazelprojectparser';
+import { join } from 'path';
+import { format } from 'util';
+import { ConfigurationTarget, ExtensionContext, FileSystemWatcher, FileType, StatusBarAlignment, ThemeColor, Uri, commands, tasks, window, workspace } from 'vscode';
+import { BazelLanguageServerTerminal, getBazelTerminal } from './bazelLangaugeServerTerminal';
+import { BazelTaskProvider } from './bazelTaskProvider';
+import { getBazelProjectFile } from './bazelprojectparser';
 import { Commands, executeJavaLanguageServerCommand } from './commands';
-import { Log, getBazelTerminal } from './log';
 import { registerLSClient } from './loggingTCPServer';
-import { BazelProjectView, ExcludeConfig, UpdateClasspathResponse } from './types';
+import { ExcludeConfig, UpdateClasspathResponse } from './types';
+import { getWorkspaceRoot, initBazelProjectFile } from './util';
 
 let bazelBuildWatcher: FileSystemWatcher;
 let bazelProjectWatcher: FileSystemWatcher;
@@ -14,7 +17,23 @@ const outOfDateClasspaths: Set<Uri> = new Set<Uri>();
 classpathStatus.command = Commands.UPDATE_CLASSPATHS_CMD;
 projectViewStatus.command = Commands.SYNC_PROJECTS_CMD;
 
+
 export function activate(context: ExtensionContext) {
+
+	// activates
+	// LS processes current .eclipse/.bazelproject file
+		// if it DNE create one
+	// register TCP port with LS
+	// project view should reflect what's in the LS
+		// show any directories listed in the .bazelproject file
+		// fetch all projects loaded into LS and display those too
+		// show both .vscode and .eclipse folders
+	//
+
+	const rootPath = (workspace.workspaceFolders && (workspace.workspaceFolders.length > 0))
+		? workspace.workspaceFolders[0].uri.fsPath : undefined;
+
+	tasks.registerTaskProvider('bazel', new BazelTaskProvider());
 
 	bazelBuildWatcher = workspace.createFileSystemWatcher('**/BUILD.bazel');
 	bazelProjectWatcher = workspace.createFileSystemWatcher('**/.bazelproject');
@@ -25,34 +44,59 @@ export function activate(context: ExtensionContext) {
 
 	bazelProjectWatcher.onDidChange(toggleBazelProjectSyncStatus);
 
+	BazelLanguageServerTerminal.trace('extension activated');
+
+	context.subscriptions.push(commands.registerCommand(Commands.OPEN_BAZEL_BUILD_STATUS_CMD, () => {
+		getBazelTerminal().show();
+	}));
+
+	// create .eclipse/.bazelproject file is DNE
+	if(rootPath){
+		initBazelProjectFile(rootPath);
+		workspace.openTextDocument(join(rootPath, '.eclipse', '.bazelproject'))
+			.then(f => window.showTextDocument(f));
+	}
+
 	registerLSClient().then(() => {
-		// Register commands
+
+		// always update the project view after the initial project load
+		syncBazelProjectView();
+
+		// Register commands here; we don't want to execute them until the TCP port is registered with the LS
 		context.subscriptions.push(commands.registerCommand(Commands.SYNC_PROJECTS_CMD, async () => {
-			executeJavaLanguageServerCommand(Commands.SYNC_PROJECTS)
-			.then(() => {
-				projectViewStatus.hide();
-				getBazelTerminal().show();
-				Promise.allSettled([
-					syncBazelProjectView(),
-					executeJavaLanguageServerCommand<UpdateClasspathResponse>(Commands.JAVA_LS_LIST_SOURCEPATHS)
-						.then((resp) => {
-							const projects = new Set(resp.data.map(p => p.projectName));
-							Log.info(`${projects.size} projects in classpath`);
-							projects.forEach(project => {Log.trace(`${project} synced`);});
-						}, (err: Error) => Log.error(err.message))
-				])
-				.catch(e => {Log.error(e.message);});
-			});
+			projectViewStatus.hide();
+			try {
+				await executeJavaLanguageServerCommand(Commands.SYNC_PROJECTS);
+				syncBazelProjectView();
+			} catch(err) {
+				if(err instanceof Error) {
+					BazelLanguageServerTerminal.error(err.message);
+				}
+				BazelLanguageServerTerminal.error(format(err));
+			}
 		}));
-		context.subscriptions.push(commands.registerCommand(Commands.UPDATE_CLASSPATHS_CMD, async () => {
+
+		context.subscriptions.push(commands.registerCommand(Commands.UPDATE_CLASSPATHS_CMD, () => {
 			outOfDateClasspaths.forEach(uri => {
-				Log.info(`Updating classpath for ${uri.fsPath}`);
+				BazelLanguageServerTerminal.info(`Updating classpath for ${uri.fsPath}`);
 				executeJavaLanguageServerCommand(Commands.UPDATE_CLASSPATHS, uri.toString())
-					.then(() => outOfDateClasspaths.delete(uri), (err: Error) => {Log.error(`${err.message}\n${err.stack}`);})
-					.then(() => Log.info(`Classpath for ${uri.fsPath} updated`));
+					.then(() => outOfDateClasspaths.delete(uri), (err: Error) => {BazelLanguageServerTerminal.error(`${err.message}\n${err.stack}`);});
 			});
 			classpathStatus.hide();
 		}));
+
+		context.subscriptions.push(commands.registerCommand(Commands.DEBUG_LS_CMD, () => {
+			window.showInputBox({
+				value: Commands.JAVA_LS_LIST_SOURCEPATHS
+			}).then(cmd => {
+				if(cmd) {
+					const [lsCmd, args] = cmd.trim().split(/\s(.*)/s);
+					executeJavaLanguageServerCommand<any>(lsCmd, args)
+						.then(resp => BazelLanguageServerTerminal.info(format(resp)), err => BazelLanguageServerTerminal.error(format(err)));
+				}
+			});
+		}));
+
 	});
 }
 
@@ -63,9 +107,8 @@ export function deactivate() {
 	if(bazelProjectWatcher){
 		bazelProjectWatcher.dispose();
 	}
+
 }
-
-
 
 function toggleBazelClasspathSyncStatus(uri: Uri){
 	classpathStatus.show();
@@ -81,41 +124,23 @@ function toggleBazelProjectSyncStatus(uri: Uri){
 }
 
 async function syncBazelProjectView() {
-	Log.debug('Syncing bazel project view');
+	BazelLanguageServerTerminal.debug('Syncing bazel project view');
 	try {
-		const workspaceRoot = getWorkspaceRoot();
-		let bazelProjectFile = await getBazelProjectFile(workspaceRoot);
+		const bazelProjectFile = await getBazelProjectFile();
 
-		workspace.fs.readDirectory(Uri.parse(workspaceRoot)).then(val => {
+		const lsSourcePaths = await executeJavaLanguageServerCommand<UpdateClasspathResponse>(Commands.JAVA_LS_LIST_SOURCEPATHS);
+
+		const displayFolders = ['.vscode', '.eclipse'] // TODO: bubble this out to a setting
+			.concat(bazelProjectFile.directories)
+			.concat(lsSourcePaths.data.map(cpath => cpath.projectName.replace(/:.+/g, '')));
+
+		workspace.fs.readDirectory(Uri.parse(getWorkspaceRoot())).then(val => {
 			let dirs = val.filter(x => x[1] !== FileType.File).map(d => d[0]);
 			let excludeObj:ExcludeConfig = workspace.getConfiguration('files', ).get('exclude') as ExcludeConfig;
-			dirs.forEach(d => excludeObj[d] = !bazelProjectFile.directories.includes(d));
+			dirs.forEach(d => excludeObj[d] = !displayFolders.includes(d));
 			workspace.getConfiguration('files').update('exclude', excludeObj, ConfigurationTarget.Workspace);
 		});
 	} catch(err) {
 		throw new Error(`Could not read bazelproject file: ${err}`);
-	}
-}
-
-function getWorkspaceRoot(): string {
-	if(workspace.workspaceFile) {
-		return dirname(workspace.workspaceFile.path);
-	} else {
-		if(workspace.workspaceFolders){
-			return workspace.workspaceFolders[0].uri.path;
-		}
-	}
-	throw new Error('No workspace found');
-}
-
-async function getBazelProjectFile(workspaceRoot: string): Promise<BazelProjectView> {
-	try{
-		const bazelProjectFileStat = await workspace.fs.stat(Uri.parse(`${workspaceRoot}/.eclipse/.bazelproject`));
-		if(bazelProjectFileStat.type === FileType.File) {
-			return readBazelProject(`.eclipse/.bazelproject`);
-		}
-		throw new Error(`.eclipse/.bazelproject type is ${bazelProjectFileStat.type}, should be ${FileType.File}`);
-	} catch(err) {
-		throw new Error(`Could not read .eclipse/.bazelproject file: ${err}`);
 	}
 }

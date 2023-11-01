@@ -1,0 +1,27 @@
+{
+	"files.exclude": {
+		"**/.git": true,
+		"**/.svn": true,
+		"**/.hg": true,
+		"**/CVS": true,
+		"**/.DS_Store": true,
+		"**/Thumbs.db": true,
+		".eclipse": false,
+		".vscode": false,
+		"module1": false,
+		"module2": false,
+		"module3": false,
+		"third_party": true,
+		"bazel-bin": true,
+		"bazel-out": true,
+		"bazel-small": true,
+		"bazel-testlogs": true,
+		".settings": true,
+		"tools": true
+	},
+	"java.bazel.log.level": "debug",
+	"java.debug.logLevel": "verbose",
+	"java.trace.server": "verbose",
+	"java.import.generatesMetadataFilesAtProjectRoot":false,
+	"java.autobuild.enabled": true
+}

@@ -1,5 +1,6 @@
-import { exec } from "child_process";
 import { Event, EventEmitter, Pseudoterminal, TerminalDimensions } from 'vscode';
+
+let backtickHighlight = true;
 
 export class BazelTerminal implements Pseudoterminal {
 
@@ -17,20 +18,17 @@ export class BazelTerminal implements Pseudoterminal {
 		this.writeEmitter.dispose();
 	}
 	async handleInput?(data: string): Promise<void> {
-		exec(`printf "${data
+		this.writeEmitter.fire(data
 			.replace(/\"/g, '\\"')
-			.replace(/\`/g, '\\`')
-			.replace(/\r+/g, '\r\n')}"`, (err, stdout, stderr) => {
-			if(stdout){
-				this.writeEmitter.fire(stdout);
-			}
-			if(stderr) {
-				this.writeEmitter.fire(stderr);
-			}
-			if(err) {
-				console.log(`failed to execute: ${err.cmd}`);
-				this.writeEmitter.fire(err.message);
-			}
-		});
+			.replace(/\`/g, highlightBacktick)
+			.replace(/(\r|\n)+/g, '\r\n'));
 	}
+}
+
+function highlightBacktick(substring: string, ...args: any[]): string {
+	backtickHighlight = !backtickHighlight;
+	if(backtickHighlight){
+		return '\u001b[0m';
+	}
+	return '\u001b[33m';
 }

@@ -30,6 +30,12 @@ export namespace Commands {
 	// commands copied from vscode-java for interaction with the extension
 	export const JAVA_BUILD_WORKSPACE = "java.workspace.compile";
 	export const JAVA_CLEAN_WORKSPACE = "java.clean.workspace";
+
+	export const GET_ALL_JAVA_PROJECTS = 'java.project.getAll';
+
+	export const DEBUG_LS_CMD = 'java.bazel.debug.command';
+
+	export const OPEN_BAZEL_BUILD_STATUS_CMD = 'java.bazel.showStatus';
 }
 
 export function executeJavaLanguageServerCommand<T = unknown>(...rest: any[]): Thenable<T> {
