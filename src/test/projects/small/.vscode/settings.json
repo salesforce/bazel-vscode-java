@@ -11,17 +11,20 @@
 		"module1": false,
 		"module2": false,
 		"module3": false,
-		"third_party": true,
-		"bazel-bin": true,
-		"bazel-out": true,
-		"bazel-small": true,
-		"bazel-testlogs": true,
+		"third_party": false,
+		"bazel-bin": false,
+		"bazel-out": false,
+		"bazel-small": false,
+		"bazel-testlogs": false,
 		".settings": true,
-		"tools": true
+		"tools": false
 	},
-	"java.bazel.log.level": "debug",
+	"java.bazel.log.level": "trace",
+	"java.showBuildStatusOnStart.enabled": "terminal",
 	"java.debug.logLevel": "verbose",
 	"java.trace.server": "verbose",
+	"java.server.launchMode": "Standard",
+	"java.transport":"stdio",
 	"java.import.generatesMetadataFilesAtProjectRoot":false,
 	"java.autobuild.enabled": true
 }
