@@ -56,11 +56,7 @@ class BazelTaskDefinition implements TaskDefinition {
 async function getBazelTasks(): Promise<Task[]> {
 
 	// setup default bazel tasks
-	const tasksDefenitions: BazelTaskDefinition[] = [
-		new BazelTaskDefinition('Build', 'bazel build //...'),
-		new BazelTaskDefinition('Test', 'bazel test //...'),
-		new BazelTaskDefinition('Dependencies', 'bazel query  --notool_deps --noimplicit_deps \"deps(//...)\" --output graph'),
-	];
+	const tasksDefenitions: BazelTaskDefinition[] = [];
 
 	// add any ij converted run targets to vscode tasks
 	const bazelProjectFile = await getBazelProjectFile();
