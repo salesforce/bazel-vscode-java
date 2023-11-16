@@ -54,6 +54,7 @@ export async function activate(context: ExtensionContext) {
 	}
 
 	context.subscriptions.push(commands.registerCommand(Commands.SYNC_PROJECTS_CMD, syncProjectView));
+	context.subscriptions.push(commands.registerCommand(Commands.SYNC_DIRECTORIES_ONLY, syncBazelProjectView));
 	context.subscriptions.push(commands.registerCommand(Commands.UPDATE_CLASSPATHS_CMD, updateClasspaths));
 	context.subscriptions.push(commands.registerCommand(Commands.DEBUG_LS_CMD, runLSCmd));
 
@@ -133,11 +134,15 @@ async function syncBazelProjectView() {
 		if(bazelProjectFile.directories.includes('.')){
 			viewAll = true;
 		} else {
-			bazelProjectFile.directories.forEach(d => displayFolders.add(d));
+			bazelProjectFile.directories.forEach(d => {
+				let dirRoot = d.split('/').filter(x=>x)[0];
+				displayFolders.add(dirRoot);
+			});
 			bazelProjectFile.targets.forEach(t => displayFolders.add(t.replace('//','').replace(/:.*/,'').replace(/\/.*/,'')));
 		}
 
-		workspace.fs.readDirectory(Uri.parse(getWorkspaceRoot())).then(val => {
+		workspace.fs.readDirectory(Uri.parse(getWorkspaceRoot()))
+		.then(val => {
 			let dirs = val.filter(x => x[1] !== FileType.File).map(d => d[0]);
 			let excludeObj:ExcludeConfig = workspace.getConfiguration('files', ).get('exclude') as ExcludeConfig;
 			dirs.forEach(d => excludeObj[d] = (viewAll) ? false : !displayFolders.has(d));
