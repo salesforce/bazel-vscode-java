@@ -53,6 +53,7 @@ suite('Java Language Extension - Standard', () => {
 		let commands = await vscode.commands.getCommands(true);
 		const JAVA_COMMANDS = [
 			Commands.SYNC_PROJECTS_CMD,
+			Commands.SYNC_DIRECTORIES_ONLY,
 			Commands.UPDATE_CLASSPATHS_CMD,
 			Commands.SYNC_PROJECTS,
 			Commands.UPDATE_CLASSPATHS,

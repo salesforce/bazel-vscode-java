@@ -17,6 +17,7 @@ export namespace Commands {
 	 */
 	export const SYNC_PROJECTS = 'java.bazel.syncProjects';
 	export const SYNC_PROJECTS_CMD = 'java.bazel.syncProjects.command';
+	export const SYNC_DIRECTORIES_ONLY = 'java.bazel.syncDirectoriesOnly.command';
 
 	/**
 	 * Connect our output window
