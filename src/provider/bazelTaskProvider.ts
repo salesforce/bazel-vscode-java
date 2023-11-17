@@ -3,9 +3,9 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { format } from 'util';
 import { ShellExecution, Task, TaskDefinition, TaskProvider, TaskScope } from 'vscode';
-import { BazelLanguageServerTerminal } from './bazelLangaugeServerTerminal';
-import { getBazelProjectFile } from './bazelprojectparser';
-import { getWorkspaceRoot } from './util';
+import { BazelLanguageServerTerminal } from '../bazelLangaugeServerTerminal';
+import { getBazelProjectFile } from '../bazelprojectparser';
+import { getWorkspaceRoot } from '../util';
 
 const parser = new XMLParser({ignoreAttributes : false, allowBooleanAttributes: true});
 

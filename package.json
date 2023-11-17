@@ -142,9 +142,49 @@
 				"command": "java.bazel.showStatus",
 				"title": "Show Bazel Build Status",
 				"category": "Bazel"
+			},
+			{
+				"command": "bazelTaskOutline.refresh",
+				"title": "Refresh Bazel Run Configs",
+				"category": "Bazel",
+				"icon": "$(sync)"
+			},
+			{
+				"command": "bazelTaskOutline.run",
+				"title": "Run Bazel Target",
+				"category": "Bazel",
+				"icon": "$(debug-start)"
+			},
+			{
+				"command": "bazelTaskOutline.kill",
+				"title": "Kill Bazel Target",
+				"category": "Bazel",
+				"icon": "$(debug-stop)"
 			}
 		],
+		"views": {
+			"explorer": [
+				{
+					"id": "bazelTaskOutline",
+					"name": "Bazel Run Targets"
+				}
+			]
+		},
 		"menus": {
+			"commandPalette": [
+				{
+					"command": "bazelTaskOutline.refresh",
+					"when": "false"
+				},
+				{
+					"command": "bazelTaskOutline.run",
+					"when": "false"
+				},
+				{
+					"command": "bazelTaskOutline.kill",
+					"when": "false"
+				}
+			],
 			"explorer/context": [
 				{
 					"command": "java.bazel.syncProjects.command",
@@ -155,6 +195,25 @@
 					"command": "java.bazel.updateClasspaths.command",
 					"when": "javaLSReady && isFileSystemResource",
 					"group": "1_javaactions@11"
+				}
+			],
+			"view/title": [
+				{
+					"command": "bazelTaskOutline.refresh",
+					"when": "view == bazelTaskOutline",
+					"group": "navigation@1"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "bazelTaskOutline.run",
+					"when": "view == bazelTaskOutline && viewItem == task",
+					"group": "inline@1"
+				},
+				{
+					"command": "bazelTaskOutline.kill",
+					"when": "view == bazelTaskOutline && viewItem == runningTask",
+					"group": "inline@2"
 				}
 			]
 		}

@@ -2,10 +2,12 @@ import { join } from 'path';
 import { format } from 'util';
 import { ConfigurationTarget, ExtensionContext, FileType, StatusBarAlignment, TextDocument, ThemeColor, Uri, commands, extensions, tasks, window, workspace } from 'vscode';
 import { BazelLanguageServerTerminal, getBazelTerminal } from './bazelLangaugeServerTerminal';
-import { BazelTaskProvider } from './bazelTaskProvider';
+import { BazelTaskManager } from './bazelTaskManager';
 import { getBazelProjectFile } from './bazelprojectparser';
 import { Commands, executeJavaLanguageServerCommand } from './commands';
 import { registerLSClient } from './loggingTCPServer';
+import { BazelRunTargetProvider } from './provider/bazelRunTargetProvider';
+import { BazelTaskProvider } from './provider/bazelTaskProvider';
 import { ExcludeConfig } from './types';
 import { getWorkspaceRoot, initBazelProjectFile } from './util';
 
@@ -29,6 +31,7 @@ export async function activate(context: ExtensionContext) {
 		// show both .vscode and .eclipse folders
 	//
 
+	window.registerTreeDataProvider('bazelTaskOutline', BazelRunTargetProvider.instance);
 	tasks.registerTaskProvider('bazel', new BazelTaskProvider());
 
 	BazelLanguageServerTerminal.trace('extension activated');
@@ -57,6 +60,13 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(commands.registerCommand(Commands.SYNC_DIRECTORIES_ONLY, syncBazelProjectView));
 	context.subscriptions.push(commands.registerCommand(Commands.UPDATE_CLASSPATHS_CMD, updateClasspaths));
 	context.subscriptions.push(commands.registerCommand(Commands.DEBUG_LS_CMD, runLSCmd));
+	context.subscriptions.push(commands.registerCommand(Commands.BAZEL_TARGET_REFRESH, BazelTaskManager.refreshTasks));
+	context.subscriptions.push(commands.registerCommand(Commands.BAZEL_TARGET_RUN, BazelTaskManager.runTask));
+	context.subscriptions.push(commands.registerCommand(Commands.BAZEL_TARGET_KILL, BazelTaskManager.killTask));
+
+	// trigger a refresh of the tree view when any task get executed
+	tasks.onDidStartTask(_ => BazelRunTargetProvider.instance.refresh());
+	tasks.onDidEndTask(_ => BazelRunTargetProvider.instance.refresh());
 
 	// always update the project view after the initial project load
 	registerLSClient();

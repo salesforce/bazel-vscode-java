@@ -37,6 +37,10 @@ export namespace Commands {
 	export const DEBUG_LS_CMD = 'java.bazel.debug.command';
 
 	export const OPEN_BAZEL_BUILD_STATUS_CMD = 'java.bazel.showStatus';
+
+	export const BAZEL_TARGET_REFRESH = 'bazelTaskOutline.refresh';
+	export const BAZEL_TARGET_RUN = 'bazelTaskOutline.run';
+	export const BAZEL_TARGET_KILL = 'bazelTaskOutline.kill';
 }
 
 export function executeJavaLanguageServerCommand<T = unknown>(...rest: any[]): Thenable<T> {

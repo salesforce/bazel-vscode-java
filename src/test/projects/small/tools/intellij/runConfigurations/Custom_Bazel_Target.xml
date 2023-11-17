@@ -1,6 +1,6 @@
 <configuration default="false" name="Custom Bazel Target" type="BlazeCommandRunConfigurationType" factoryName="Bazel Command" nameIsGenerated="false">
-  <blaze-settings blaze-command="run" kind="java_binary" handler-id="BlazeJavaRunConfigurationHandlerProvider">
-    <blaze-target>//:custom-bazel-target</blaze-target>
+  <blaze-settings blaze-command="query" kind="java_binary" handler-id="BlazeJavaRunConfigurationHandlerProvider">
+    <blaze-target>//...</blaze-target>
     <blaze-user-exe-flag>-c=$PROJECT_DIR$/..</blaze-user-exe-flag>
   </blaze-settings>
   <method v="2">
