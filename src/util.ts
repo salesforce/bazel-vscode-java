@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { workspace } from 'vscode';
 
+// TODO: pull this template out into a file
 const BAZELPROJECT_TEMPLATE = `
 # The project view file (.bazelproject) is used to import targets into the IDE.
 #
@@ -20,18 +21,27 @@ export function getWorkspaceRoot(): string {
 	if(workspace.workspaceFile) {
 		return dirname(workspace.workspaceFile.path);
 	} else {
-		if(workspace.workspaceFolders){
+		if(workspace.workspaceFolders && workspace.workspaceFolders.length > 0){
 			return workspace.workspaceFolders[0].uri.path;
 		}
 	}
-	throw new Error('No workspace found');
+	throw new Error('invalid workspace root');
 }
 
-export function initBazelProjectFile(workspaceRoot: string){
+export function initBazelProjectFile(){
+	const workspaceRoot = getWorkspaceRoot();
 	if(existsSync(join(workspaceRoot, '.eclipse', '.bazelproject'))){
 		return;
 	}
 
-	mkdirSync(join(workspaceRoot, '.eclipse'), {recursive: true});
-	writeFileSync(join(workspaceRoot, '.eclipse', '.bazelproject'), BAZELPROJECT_TEMPLATE);
+	// only create a project view file if there's a bazel WORKSPACE file present in the workspace root
+	if(isBazelWorkspaceRoot()) {
+		mkdirSync(join(workspaceRoot, '.eclipse'), {recursive: true});
+		writeFileSync(join(workspaceRoot, '.eclipse', '.bazelproject'), BAZELPROJECT_TEMPLATE);
+	}
+}
+
+export function isBazelWorkspaceRoot(): boolean {
+	const workspaceRoot = getWorkspaceRoot();
+	return existsSync(join(workspaceRoot, 'WORKSPACE')) || existsSync(join(workspaceRoot, 'WORKSPACE.bazel'));
 }
