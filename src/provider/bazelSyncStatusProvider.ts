@@ -1,8 +1,8 @@
 import { existsSync, lstatSync, readdirSync } from 'fs';
 import * as path from 'path';
 import { CancellationToken, Command, Event, EventEmitter, FileSystemWatcher, ProviderResult, RelativePattern, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, window, workspace } from 'vscode';
-import { Commands, executeJavaLanguageServerCommand } from './commands';
-import { UpdateClasspathResponse } from './types';
+import { Commands, executeJavaLanguageServerCommand } from '../commands';
+import { UpdateClasspathResponse } from '../types';
 
 const SYNCED = 'synced';
 const UNSYNCED = 'unsynced';
