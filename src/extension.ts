@@ -1,3 +1,4 @@
+import { existsSync } from 'fs';
 import { join } from 'path';
 import { format } from 'util';
 import { ConfigurationTarget, ExtensionContext, FileType, StatusBarAlignment, TextDocument, ThemeColor, Uri, commands, extensions, tasks, window, workspace } from 'vscode';
@@ -9,15 +10,14 @@ import { registerLSClient } from './loggingTCPServer';
 import { BazelRunTargetProvider } from './provider/bazelRunTargetProvider';
 import { BazelTaskProvider } from './provider/bazelTaskProvider';
 import { ExcludeConfig } from './types';
-import { getWorkspaceRoot, initBazelProjectFile } from './util';
+import { getWorkspaceRoot, initBazelProjectFile, isBazelWorkspaceRoot } from './util';
 
 const classpathStatus = window.createStatusBarItem(StatusBarAlignment.Left, 1);
 const projectViewStatus = window.createStatusBarItem(StatusBarAlignment.Left, 1);
 const outOfDateClasspaths: Set<Uri> = new Set<Uri>();
 classpathStatus.command = Commands.UPDATE_CLASSPATHS_CMD;
 projectViewStatus.command = Commands.SYNC_PROJECTS_CMD;
-const rootPath = (workspace.workspaceFolders && (workspace.workspaceFolders.length > 0))
-		? workspace.workspaceFolders[0].uri.fsPath : undefined;
+const workspaceRoot = getWorkspaceRoot();
 
 export async function activate(context: ExtensionContext) {
 
@@ -48,12 +48,17 @@ export async function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand(Commands.OPEN_BAZEL_BUILD_STATUS_CMD, getBazelTerminal().show));
 
+	commands.executeCommand('setContext', 'isBazelWorkspaceRoot', isBazelWorkspaceRoot());
 	// create .eclipse/.bazelproject file is DNE
-	if(rootPath){
-		initBazelProjectFile(rootPath);
-		workspace.openTextDocument(join(rootPath, '.eclipse', '.bazelproject'))
-			.then(f => window.showTextDocument(f))
-			.then(syncBazelProjectView);
+	if(isBazelWorkspaceRoot()){
+		initBazelProjectFile();
+		let showBazelprojectConfig = workspace.getConfiguration('bazel.projectview');
+		if(showBazelprojectConfig.get('open')){
+			openBazelProjectFile();
+			showBazelprojectConfig.update('open', false); // only open this file on the first activation of this extension
+		}
+		syncBazelProjectView();
+		context.subscriptions.push(commands.registerCommand(Commands.OPEN_BAZEL_PROJECT_FILE, () => openBazelProjectFile()));
 	}
 
 	context.subscriptions.push(commands.registerCommand(Commands.SYNC_PROJECTS_CMD, syncProjectView));
@@ -136,30 +141,46 @@ function toggleBazelProjectSyncStatus(doc: TextDocument){
 }
 
 async function syncBazelProjectView() {
-	BazelLanguageServerTerminal.debug('Syncing bazel project view');
-	const displayFolders = new Set<string>(['.eclipse', '.vscode']); // TODO bubble this out to a setting
-	try {
-		const bazelProjectFile = await getBazelProjectFile();
-		let viewAll = false;
-		if(bazelProjectFile.directories.includes('.')){
-			viewAll = true;
-		} else {
-			bazelProjectFile.directories.forEach(d => {
-				let dirRoot = d.split('/').filter(x=>x)[0];
-				displayFolders.add(dirRoot);
+	if(workspaceRoot){
+		BazelLanguageServerTerminal.debug('Syncing bazel project view');
+		const displayFolders = new Set<string>(['.eclipse', '.vscode']); // TODO bubble this out to a setting
+		try {
+			const bazelProjectFile = await getBazelProjectFile();
+			let viewAll = false;
+			if(bazelProjectFile.directories.includes('.')){
+				viewAll = true;
+			} else {
+				bazelProjectFile.directories.forEach(d => {
+					let dirRoot = d.split('/').filter(x=>x)[0];
+					displayFolders.add(dirRoot);
+				});
+				bazelProjectFile.targets.forEach(t => displayFolders.add(t.replace('//','').replace(/:.*/,'').replace(/\/.*/,'')));
+			}
+
+			workspace.fs.readDirectory(Uri.parse(workspaceRoot))
+			.then(val => {
+				let dirs = val.filter(x => x[1] !== FileType.File).map(d => d[0]);
+				let excludeObj:ExcludeConfig = workspace.getConfiguration('files', ).get('exclude') as ExcludeConfig;
+				dirs.forEach(d => excludeObj[d] = (viewAll) ? false : !displayFolders.has(d));
+				workspace.getConfiguration('files').update('exclude', excludeObj, ConfigurationTarget.Workspace);
 			});
-			bazelProjectFile.targets.forEach(t => displayFolders.add(t.replace('//','').replace(/:.*/,'').replace(/\/.*/,'')));
+
+		} catch(err) {
+			throw new Error(`Could not read bazelproject file: ${err}`);
 		}
+	}
+}
 
-		workspace.fs.readDirectory(Uri.parse(getWorkspaceRoot()))
-		.then(val => {
-			let dirs = val.filter(x => x[1] !== FileType.File).map(d => d[0]);
-			let excludeObj:ExcludeConfig = workspace.getConfiguration('files', ).get('exclude') as ExcludeConfig;
-			dirs.forEach(d => excludeObj[d] = (viewAll) ? false : !displayFolders.has(d));
-			workspace.getConfiguration('files').update('exclude', excludeObj, ConfigurationTarget.Workspace);
-		});
-
-	} catch(err) {
-		throw new Error(`Could not read bazelproject file: ${err}`);
+function openBazelProjectFile() {
+	try {
+		const projectViewPath = join(workspaceRoot, '.eclipse', '.bazelproject');
+		if(existsSync(projectViewPath)){
+			workspace.openTextDocument(projectViewPath)
+				.then(f => window.showTextDocument(f));
+		} else {
+			window.showErrorMessage(`${projectViewPath} does not exist`);
+		}
+	} catch (err) {
+		window.showErrorMessage('Unable to open the bazel project file; invalid workspace');
 	}
 }

@@ -111,6 +111,12 @@
 					"default": "info",
 					"description": "Configure detailed logging (debug, warn, info, error)",
 					"scope": "window"
+				},
+				"bazel.projectview.open": {
+					"type": "boolean",
+					"default": true,
+					"description": "Open the Bazel Project View file on extension activation",
+					"scope": "window"
 				}
 			}
 		},
@@ -160,6 +166,11 @@
 				"title": "Kill Bazel Target",
 				"category": "Bazel",
 				"icon": "$(debug-stop)"
+			},
+			{
+				"command": "bazel.projectview.open",
+				"title": "Open the Bazel Project View file",
+				"category": "Bazel"
 			}
 		],
 		"views": {
@@ -183,6 +194,10 @@
 				{
 					"command": "bazelTaskOutline.kill",
 					"when": "false"
+				},
+				{
+					"command": "bazel.projectview.open",
+					"when": "isBazelWorkspaceRoot"
 				}
 			],
 			"explorer/context": [

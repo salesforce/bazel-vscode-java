@@ -62,14 +62,15 @@ async function getBazelTasks(): Promise<Task[]> {
 	const bazelProjectFile = await getBazelProjectFile();
 	if((bazelProjectFile).importRunConfigurations) {
 
-		const rootPath = getWorkspaceRoot();
-		bazelProjectFile.importRunConfigurations.forEach(runConfig => {
-			try{
+		try {
+			const rootPath = getWorkspaceRoot();
+			bazelProjectFile.importRunConfigurations.forEach(runConfig => {
 				tasksDefenitions.push(getIJRunConfig(join(rootPath, runConfig)));
-			} catch(err) {
-				BazelLanguageServerTerminal.warn(`failed to convert ${runConfig}: ${format(err)}`);
-			}
-		});
+			});
+		} catch(err) {
+			BazelLanguageServerTerminal.warn(`failed to convert intellj run config: ${format(err)}`);
+		}
+
 	}
 
 	return tasksDefenitions.map((value) => new Task(value, TaskScope.Workspace, `${value.name}`, `${value.type}`, new ShellExecution(`${value.task}`), []));

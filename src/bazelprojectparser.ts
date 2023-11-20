@@ -124,9 +124,8 @@ function removeComments(bazelProjectFileContent: string): string {
 }
 
 export async function getBazelProjectFile(): Promise<BazelProjectView> {
-	const workspaceRoot = getWorkspaceRoot();
 	try{
-		const bazelProjectFileStat = await workspace.fs.stat(Uri.parse(`${workspaceRoot}/.eclipse/.bazelproject`));
+		const bazelProjectFileStat = await workspace.fs.stat(Uri.parse(`${getWorkspaceRoot()}/.eclipse/.bazelproject`));
 		if(bazelProjectFileStat.type === FileType.File) {
 			return readBazelProject(`.eclipse/.bazelproject`);
 		}

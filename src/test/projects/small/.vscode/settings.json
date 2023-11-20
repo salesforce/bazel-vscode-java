@@ -26,5 +26,6 @@
 	"java.server.launchMode": "Standard",
 	"java.transport":"stdio",
 	"java.import.generatesMetadataFilesAtProjectRoot":false,
-	"java.autobuild.enabled": true
+	"java.autobuild.enabled": true,
+	"bazel.projectview.open": false
 }

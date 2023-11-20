@@ -59,7 +59,8 @@ suite('Java Language Extension - Standard', () => {
 			Commands.UPDATE_CLASSPATHS,
 			Commands.REGISTER_BAZEL_TCP_SERVER_PORT,
 			Commands.DEBUG_LS_CMD,
-			Commands.OPEN_BAZEL_BUILD_STATUS_CMD
+			Commands.OPEN_BAZEL_BUILD_STATUS_CMD,
+			Commands.OPEN_BAZEL_PROJECT_FILE
 		].sort();
 
 		const foundBazelJavaCommands = commands.filter((value) => {

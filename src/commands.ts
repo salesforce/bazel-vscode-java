@@ -41,6 +41,8 @@ export namespace Commands {
 	export const BAZEL_TARGET_REFRESH = 'bazelTaskOutline.refresh';
 	export const BAZEL_TARGET_RUN = 'bazelTaskOutline.run';
 	export const BAZEL_TARGET_KILL = 'bazelTaskOutline.kill';
+
+	export const OPEN_BAZEL_PROJECT_FILE = 'bazel.projectview.open';
 }
 
 export function executeJavaLanguageServerCommand<T = unknown>(...rest: any[]): Thenable<T> {
