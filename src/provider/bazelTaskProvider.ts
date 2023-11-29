@@ -1,7 +1,6 @@
 import { XMLParser } from 'fast-xml-parser';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { format } from 'util';
 import { ShellExecution, Task, TaskDefinition, TaskProvider, TaskScope } from 'vscode';
 import { BazelLanguageServerTerminal } from '../bazelLangaugeServerTerminal';
 import { getBazelProjectFile } from '../bazelprojectparser';
@@ -35,20 +34,12 @@ export class BazelTaskProvider implements TaskProvider {
 
 class BazelTaskDefinition implements TaskDefinition {
 	type = 'bazel';
-	_name: string;
-	_task: string;
+	name: string;
+	task: string;
 
 	constructor(name: string, task: string) {
-		this._name = name;
-		this._task = task;
-	}
-
-	public get name() {
-		return this._name;
-	}
-
-	public get task() {
-		return this._task;
+		this.name = name;
+		this.task = task;
 	}
 
 }
@@ -56,27 +47,24 @@ class BazelTaskDefinition implements TaskDefinition {
 async function getBazelTasks(): Promise<Task[]> {
 
 	// setup default bazel tasks
-	const tasksDefenitions: BazelTaskDefinition[] = [];
+	const taskDefinitions: BazelTaskDefinition[] = [];
 
 	// add any ij converted run targets to vscode tasks
 	const bazelProjectFile = await getBazelProjectFile();
 	if((bazelProjectFile).importRunConfigurations) {
-
-		try {
-			const rootPath = getWorkspaceRoot();
-			bazelProjectFile.importRunConfigurations.forEach(runConfig => {
-				tasksDefenitions.push(getIJRunConfig(join(rootPath, runConfig)));
-			});
-		} catch(err) {
-			BazelLanguageServerTerminal.warn(`failed to convert intellj run config: ${format(err)}`);
-		}
-
+		const rootPath = getWorkspaceRoot();
+		bazelProjectFile.importRunConfigurations.forEach(runConfig => {
+			const rconf = getIJRunConfig(join(rootPath, runConfig));
+			if(rconf){
+				taskDefinitions.push(rconf);
+			}
+		});
 	}
 
-	return tasksDefenitions.map((value) => new Task(value, TaskScope.Workspace, `${value.name}`, `${value.type}`, new ShellExecution(`${value.task}`), []));
+	return taskDefinitions.map((value) => new Task(value, TaskScope.Workspace, `${value.name}`, `${value.type}`, new ShellExecution(`${value.task}`), []));
 }
 
-function getIJRunConfig(configPath: string): BazelTaskDefinition {
+function getIJRunConfig(configPath: string): BazelTaskDefinition | undefined {
 	let ijRunConfig = parser.parse(readFileSync(configPath, {encoding: 'utf-8'}));
 	if(typeof(ijRunConfig) === 'object'){
 		if('configuration' in ijRunConfig){
@@ -87,5 +75,6 @@ function getIJRunConfig(configPath: string): BazelTaskDefinition {
 			}
 		}
 	}
-	throw new Error('unable to convert ij run config to vscode task');
+	BazelLanguageServerTerminal.warn(`failed to convert intellj run config: ${configPath}}`);
+	return undefined;
 }

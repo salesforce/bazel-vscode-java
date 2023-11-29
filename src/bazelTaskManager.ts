@@ -7,12 +7,10 @@ export namespace BazelTaskManager {
 	}
 
 	export function runTask(bazelTarget: BazelRunTarget) {
-		bazelTarget.contextValue = 'runningTask';
 		tasks.executeTask(bazelTarget.task!);
 	}
 
 	export function killTask(bazelTarget: BazelRunTarget) {
 		bazelTarget.execution?.terminate();
-		bazelTarget.contextValue = 'task';
 	}
 }
