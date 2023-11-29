@@ -4,15 +4,16 @@
 **/*.map
 **/*.ts
 
+tsconfig.base.json
 .eslintignore
 .gitignore
 .github/**
 .vscode/**
 gulpfile.js
 node_modules
-webpack.config.js
-out
+build.ts
 src
+test
 
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
