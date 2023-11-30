@@ -53,7 +53,7 @@ jobs:
           BUILD_ID: "${{ steps.time.outputs.time }}"
           BUILD_TYPE: "S"
           BUILD_LABEL: "CI ${{ steps.time.outputs.time }} (${{ steps.branch_name.outputs.branch }})"
-        run: npm run build:prod
+        run: npm run build
 
       - name: 📦 Prepare packaging of pre-release extension
         if: ${{ github.event.inputs.releaseChannel == 'edge' }}
