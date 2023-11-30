@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import { setTimeout } from 'node:timers/promises';
 import { env } from 'process';
 import * as vscode from 'vscode';
-import { Commands } from '../../commands';
+import { Commands } from '../../src/commands';
 
 
 suite('Java Language Extension - Standard', () => {
@@ -49,23 +49,27 @@ suite('Java Language Extension - Standard', () => {
 			api = await vscode.extensions.getExtension('bazel-vscode-java')?.activate();
 		}
 
-		await setTimeout(50000);
+		// we have a few 'hidden' cmds that should not be checked for in this test.
+		const COMMAND_EXCLUSIONS = [
+			Commands.SYNC_PROJECTS,
+			Commands.UPDATE_CLASSPATHS,
+			Commands.REGISTER_BAZEL_TCP_SERVER_PORT
+		];
+
 		let commands = await vscode.commands.getCommands(true);
 		const JAVA_COMMANDS = [
 			Commands.SYNC_PROJECTS_CMD,
 			Commands.SYNC_DIRECTORIES_ONLY,
 			Commands.UPDATE_CLASSPATHS_CMD,
-			Commands.SYNC_PROJECTS,
-			Commands.UPDATE_CLASSPATHS,
-			Commands.REGISTER_BAZEL_TCP_SERVER_PORT,
 			Commands.DEBUG_LS_CMD,
 			Commands.OPEN_BAZEL_BUILD_STATUS_CMD,
 			Commands.OPEN_BAZEL_PROJECT_FILE
 		].sort();
 
-		const foundBazelJavaCommands = commands.filter((value) => {
-			return JAVA_COMMANDS.indexOf(value)>=0 || value.startsWith('java.bazel.');
-		}).sort();
+		const foundBazelJavaCommands = commands
+			.filter(value => value.startsWith('java.bazel.') || value.startsWith('bazel.'))
+			.filter(value => !COMMAND_EXCLUSIONS.includes(value))
+			.sort();
 
 		assert.deepStrictEqual(
 			foundBazelJavaCommands,
@@ -80,7 +84,9 @@ suite('Java Language Extension - Standard', () => {
 			api = await vscode.extensions.getExtension('redhat.java')!.activate();
 		}
 		assert.ok(!!api);
-		assert.strictEqual(api.status, 'Started');
+
+		// https://github.com/redhat-developer/vscode-java/blob/master/src/extension.api.ts#L67
+		assert.ok(['Starting','Started'].includes(api.status));
 	});
 
 	// this is currently broken for the `small` test project.

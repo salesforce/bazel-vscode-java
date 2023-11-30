@@ -2,8 +2,8 @@
 // Licensed under the MIT license.
 // copied from https://github.com/jdneo/vscode-java-dependency/blob/86e7b60e8dd17a7bcaf0c39fe9dbcd5e8cf236d9/src/java/jdtls.ts
 
-import { Commands, executeJavaExtensionCommand, executeJavaLanguageServerCommand } from "../../commands";
-import { UpdateClasspathResponse } from "../../types";
+import { Commands, executeJavaExtensionCommand, executeJavaLanguageServerCommand } from "../../src/commands";
+import { UpdateClasspathResponse } from "../../src/types";
 
 export namespace Jdtls {
     export function getSourcePaths(): Thenable<UpdateClasspathResponse> {

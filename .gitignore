@@ -4,3 +4,7 @@ out
 dist
 .vscode-test/
 *.vsix
+meta.json
+stats.html
+server
+test/result

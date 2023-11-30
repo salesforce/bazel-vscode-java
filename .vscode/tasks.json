@@ -6,8 +6,8 @@
 		{
 			"label": "npm: watch",
 			"type": "npm",
-			"script": "watch",
-			"problemMatcher": ["$ts-webpack-watch", "$eslint-stylish"],
+			"script": "esbuild:watch",
+			"problemMatcher": ["$esbuild-watch", "$eslint-stylish"],
 			"isBackground": true,
 			"presentation": {
 				"reveal": "never"

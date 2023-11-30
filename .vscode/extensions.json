@@ -4,6 +4,6 @@
 	"recommendations": [
 		"dbaeumer.vscode-eslint",
 		"EditorConfig.EditorConfig",
-		"amodio.tsl-problem-matcher"
+		"connor4312.esbuild-problem-matchers"
 	]
 }

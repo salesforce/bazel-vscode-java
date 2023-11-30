@@ -34,7 +34,7 @@
 		"workspaceContains:**/BUILD",
 		"workspaceContains:**/*.bazel"
 	],
-	"main": "./dist/extension",
+	"main": "./out/src/extension.js",
 	"contributes": {
 		"javaExtensions": [
 			"./server/com.github.ben-manes.caffeine.jar",
@@ -64,7 +64,7 @@
 				"extensions": [
 					".bazelproject"
 				],
-				"configuration": ".src/syntaxes/bazelproject-language-configuration.json"
+				"configuration": "./syntaxes/bazelproject-language-configuration.json"
 			}
 		],
 		"grammars": [
@@ -77,7 +77,10 @@
 		"taskDefinitions": [
 			{
 				"type": "bazel",
-				"required": ["name", "task"],
+				"required": [
+					"name",
+					"task"
+				],
 				"properties": {
 					"name": {
 						"type": "string",
@@ -123,7 +126,6 @@
 		"commands": [
 			{
 				"command": "java.bazel.syncProjects.command",
-				"when": "javaLSReady",
 				"title": "Synchronize Projects with Bazel Project View",
 				"category": "Java"
 			},
@@ -134,13 +136,11 @@
 			},
 			{
 				"command": "java.bazel.updateClasspaths.command",
-				"when": "javaLSReady && isFileSystemResource",
 				"title": "Refresh classpath from Bazel BUILD file",
 				"category": "Java"
 			},
 			{
 				"command": "java.bazel.debug.command",
-				"when": "javaLSReady && isFileSystemResource",
 				"title": "Debug LS",
 				"category": "Bazel"
 			},
@@ -183,6 +183,18 @@
 		},
 		"menus": {
 			"commandPalette": [
+				{
+					"command": "java.bazel.syncProjects.command",
+					"when": "javaLSReady"
+				},
+				{
+					"command": "java.bazel.updateClasspaths.command",
+					"when": "javaLSReady && isFileSystemResource"
+				},
+				{
+					"command": "java.bazel.debug.command",
+					"when": "javaLSReady && isFileSystemResource"
+				},
 				{
 					"command": "bazelTaskOutline.refresh",
 					"when": "false"
@@ -234,44 +246,37 @@
 		}
 	},
 	"scripts": {
-		"build": "run-s build:server copy:resources build:dev",
-		"build:prod": "run-s compile bundle:prod",
-		"build:dev": "run-s compile bundle:dev",
+		"vscode:prepublish": "run-s clean esbuild:base -- --minify",
+		"build": "run-s clean build:server esbuild:base",
 		"build:server": "gulp build_or_download",
-		"bundle:prod": "cross-env NODE_ENV=production webpack --mode production",
-		"bundle:dev": "cross-env NODE_ENV=development webpack --mode development",
-		"copy:resources": "gulp copy_resources",
-		"clean": "rimraf dist node_modules build out server",
-		"compile": "cross-env NODE_ENV=production run-s compile:*",
-		"compile:ts": "run-s compile:ts:*",
-		"compile:ts:extension": "tsc --project tsconfig.json",
-		"test": "run-s test:*",
+		"clean": "npx rimraf out meta.json stats.html *.vsix",
+		"esbuild:base": "tsx build.ts",
+		"esbuild:watch": "npm run esbuild:base -- --sourcemap --watch",
+		"analyze": "npm run esbuild:base -- --minify --metafile --analyze && esbuild-visualizer --metadata ./meta.json --open",
+		"lint": "eslint src --ext ts",
+		"test": "run-s clean test:*",
+		"test:compile": "tsc -b ./test/tsconfig.json",
 		"test:lint": "eslint --ext .js,.ts,.tsx src",
 		"test:repo": "gulp repo_check",
-		"test:extension": "cross-env NODE_ENV=production node ./out/test/runTest.js",
-		"watch": "run-p watch:*",
-		"watch:ts": "run-p watch:ts:*",
-		"watch:ts:extension": "tsc --project tsconfig.json --watch",
-		"watch:webpack": "cross-env NODE_ENV=development webpack --mode development --watch"
+		"test:extension": "node ./out/test/runTest.js",
+		"package": "run-s clean build vsce:package",
+		"vsce:package": "npx vsce package --no-dependencies"
 	},
 	"extensionDependencies": [
 		"redhat.java"
 	],
 	"devDependencies": {
 		"@types/glob": "^8.1.0",
-		"@types/jsdom": "^21.1.1",
 		"@types/mocha": "^8.0.4",
 		"@types/node": "^20.7.1",
 		"@types/vscode": "^1.80.0",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
 		"@vscode/test-electron": "^2.3.4",
-		"@vscode/vsce": "^2.19.0",
-		"cross-env": "^7.0.3",
+		"@vscode/vsce": "^2.22.0",
+		"esbuild": "0.19.8",
+		"esbuild-visualizer": "^0.4.1",
 		"eslint": "^8.45.0",
-		"eslint-webpack-plugin": "^4.0.1",
-		"fancy-log": "^2.0.0",
-		"fs-extra": "^11.1.1",
 		"glob": "^10.3.4",
 		"gulp": "^4.0.0",
 		"gulp-decompress": "^3.0.0",
@@ -280,26 +285,13 @@
 		"gulp-regex-rename": "^0.1.0",
 		"gulp-rename": "^2.0.0",
 		"gulp-util": "^3.0.8",
-		"jest": "^29.4.3",
-		"jest-css-modules": "^2.1.0",
-		"jest-environment-jsdom": "^29.6.1",
-		"jsdom": "^22.1.0",
-		"lodash.template": "^4.5.0",
+		"esbuild-plugin-eslint": "^0.3.7",
 		"mocha": "^10.2.0",
-		"node-stdlib-browser": "^1.2.0",
 		"npm-run-all": "^4.1.5",
-		"request": "^2.88.2",
-		"rimraf": "^5.0.1",
-		"semver": "^7.3.8",
-		"style-loader": "^3.3.1",
-		"ts-jest": "^29.0.5",
-		"ts-loader": "^9.4.2",
-		"ts-node": "^10.9.1",
-		"typescript": "^5.1.6",
-		"vscode-languageclient": "^9.0.0",
-		"webpack": "^5.75.0",
-		"webpack-bundle-analyzer": "^4.8.0",
-		"webpack-cli": "^5.0.1"
+		"rimraf": "^5.0.5",
+		"tsx": "^4.6.0",
+		"typescript": "^5.3.0",
+		"vscode-languageclient": "^9.0.1"
 	},
 	"dependencies": {
 		"fast-xml-parser": "^4.3.2"

@@ -1,11 +1,13 @@
 import { glob } from 'glob';
-import * as Mocha from 'mocha';
+import Mocha from 'mocha';
 import * as path from 'path';
 
 export function run(): Promise<void> {
 	// Create the mocha test
 	const mocha = new Mocha({
-		ui: 'tdd'
+		ui: 'tdd',
+		reporter: 'json',
+		reporterOptions: {output: './test/result/extension.test.json'}
 	});
 
 	const testsRoot = path.resolve(__dirname, '..');

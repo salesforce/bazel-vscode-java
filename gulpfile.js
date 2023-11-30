@@ -8,13 +8,7 @@ const download = require('gulp-download');
 const rename = require('gulp-rename');
 const filter = require('gulp-filter');
 const gRegexRename = require('gulp-regex-rename');
-const request = require('request');
-const glob = require('glob');
-const fse = require('fs-extra');
-const path = require('path');
-const url = require("url");
-const log = require('fancy-log');
-const argv = require('minimist')(process.argv.slice(2));
+const fs = require('node:fs');
 const BAZEL_ECLIPSE_DIR = '../bazel-eclipse';
 const BAZEL_ECLIPSE_LATEST_URL = "https://opensource.salesforce.com/bazel-eclipse/latest/p2-repository.zip";
 const NON_NPM_REPOSITORY_RE = new RegExp(
@@ -26,17 +20,12 @@ const NON_NPM_REPOSITORY_RE = new RegExp(
 const DROP_JAR_VERSION = gRegexRename(/_\d+\.\d+\.\d+(\.[^\.]+)?\.jar/, '.jar');
 
 // read the package.json once so we can use it in the gulp script
-const packageJson = JSON.parse(fse.readFileSync("./package.json").toString());
+const packageJson = JSON.parse(fs.readFileSync("./package.json").toString());
 
 // we only need the headless jars of the Bazel JDT Language Server extension
 const declaredServerJars = new Set(packageJson.contributes.javaExtensions.map(path => path.split('/').reverse()[0]));
 const jarIsIncludedInPackageJson = filter(file => {
   return declaredServerJars.has(file.basename);
-});
-
-gulp.task('copy_resources', function() {
-	return gulp.src(['./syntaxes/**/*'])
-		.pipe(gulp.dest('./dist/syntaxes/'));
 });
 
 gulp.task('download_server', function (done) {
@@ -50,7 +39,7 @@ gulp.task('build_server', function (done) {
 });
 
 gulp.task('build_or_download', function (done) {
-  if (!fse.existsSync(BAZEL_ECLIPSE_DIR)) {
+  if (!fs.existsSync(BAZEL_ECLIPSE_DIR)) {
     console.log('NOTE: bazel-eclipse is not found as a sibling directory, downloading the latest snapshot of the Bazel JDT Language Server extension...');
     downloadServerImpl();
   }
@@ -78,13 +67,13 @@ gulp.task('prepare_pre_release', function (done) {
 	const insiderPackageJson = Object.assign(packageJson, {
 		version: `${major}.${year}.${patch}`,
 	});
-	log.info(`Applying pre-release version '${major}.${year}.${patch}'...`);
-	fse.writeFileSync("./package.json", JSON.stringify(insiderPackageJson, null, "\t"));
+	console.log(`Applying pre-release version '${major}.${year}.${patch}'...`);
+	fs.writeFileSync("./package.json", JSON.stringify(insiderPackageJson, null, "\t"));
 	done();
 });
 
 gulp.task('repo_check', function (done) {
-	const data = fse.readFileSync("./package-lock.json", { encoding: "utf-8" });
+	const data = fs.readFileSync("./package-lock.json", { encoding: "utf-8" });
 
 	if (NON_NPM_REPOSITORY_RE.test(data)) {
 		done(new Error("Found references to the internal registry in the file package-lock.json. Please fix it with replacing all URLs using 'https://registry.npmjs.org'!"));
@@ -117,7 +106,7 @@ function prependZero(num) {
 }
 
 function downloadServerImpl() {
-  fse.removeSync('./server');
+  fs.rmSync('./server', {recursive: true, force: true});
   download(BAZEL_ECLIPSE_LATEST_URL)
     .pipe(decompress())
     .pipe(filter(['plugins/*.jar']))
@@ -134,7 +123,7 @@ function downloadServerImpl() {
 }
 
 function buildServerImpl() {
-  fse.removeSync('./server');
+  fs.rmSync('./server', {recursive: true, force: true});
   cp.execSync(mvnw() + ' clean package -DskipTests=true', { cwd: BAZEL_ECLIPSE_DIR, stdio: [0, 1, 2] });
   gulp.src(BAZEL_ECLIPSE_DIR + '/releng/p2repository/target/repository/plugins/*.jar')
     .pipe(DROP_JAR_VERSION)

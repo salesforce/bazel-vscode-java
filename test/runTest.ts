@@ -15,7 +15,7 @@ async function main() {
 	const extensionTestsPath = path.resolve(__dirname, './suite/index');
 
 	// path to the sampel project for testing
-	const testProjectPath: string = path.resolve(extensionDevelopmentPath, './src/test/projects/small/');
+	const testProjectPath: string = path.resolve(extensionDevelopmentPath, './test/projects/small/');
 
 	// temp area for test user data
 	const testUserDataPath: string = path.resolve(os.tmpdir(), './suite-projects-small/');
