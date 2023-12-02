@@ -59,19 +59,18 @@ jobs:
         if: ${{ github.event.inputs.releaseChannel == 'edge' }}
         run: npx gulp prepare_pre_release
 
-      - name: 🚀 Publish pre-release to Visual Studio Marketplace
+      - name: 🚀 Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
-        if: ${{ github.event.inputs.releaseChannel == 'edge' }}
         id: publishToVscMktp
         with:
-            preRelease: true
+            preRelease: ${{ github.event.inputs.releaseChannel == 'edge' && true || false }}
             pat: ${{ secrets.VSC_MKTP_TOKEN }}
             registryUrl: https://marketplace.visualstudio.com
 
-      - name: 🚀 Publish pre-release to Open VSX Registry
+      - name: 🚀 Publish to Open VSX Registry
         uses: HaaLeo/publish-vscode-extension@v1
-        if: ${{ github.event.inputs.releaseChannel == 'edge' }}
         with:
-          preRelease: true
+          preRelease: ${{ github.event.inputs.releaseChannel == 'edge' && true || false }}
           pat: ${{ secrets.OPEN_VSX_TOKEN }}
           extensionFile: ${{ steps.publishToVscMktp.outputs.vsixPath }}
+
