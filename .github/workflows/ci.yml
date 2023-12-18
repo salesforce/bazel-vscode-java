@@ -99,7 +99,7 @@ jobs:
           options: "-screen 0 1600x1200x24"
 
       - name: Upload Test Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results-${{ matrix.os }}
@@ -110,7 +110,7 @@ jobs:
             !test/**/runConfigurations/*.xml
 
       - name: Upload screenshots on failure
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: screenshots-${{ matrix.os }}
@@ -119,7 +119,7 @@ jobs:
             test/logs
 
       - name: Upload Bazel JDT Language Server extension
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: success() && matrix.os == 'ubuntu-latest'
         with:
           name: server
@@ -133,7 +133,7 @@ jobs:
     # needed for publishing test results from forks
     steps:
       - name: Upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ci-event-file
           path: ${{ github.event_path }}
