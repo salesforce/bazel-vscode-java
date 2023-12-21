@@ -124,7 +124,13 @@
 				"bazel.projectview.updateFileWatcherExclusion": {
 					"type": "boolean",
 					"default": true,
-					"description": "update the files.watcherExclude setting to only watch directories specified in the .bazelproject file. when enabled the window will automatically be reloaded after the change is applied",
+					"description": "update the files.watcherExclude setting to only watch directories specified in the .bazelproject file.",
+					"scope": "window"
+				},
+				"bazel.projectview.notification": {
+					"type": "boolean",
+					"default": true,
+					"description": "Display 'sync project view' notification info window on .bazelproject edit",
 					"scope": "window"
 				}
 			}
