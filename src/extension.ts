@@ -92,7 +92,7 @@ export async function activate(context: ExtensionContext) {
 			openBazelProjectFile();
 			showBazelprojectConfig.update('open', false); // only open this file on the first activation of this extension
 		}
-		syncBazelProjectView();
+		syncProjectViewDirectories();
 		context.subscriptions.push(
 			commands.registerCommand(Commands.OPEN_BAZEL_PROJECT_FILE, () =>
 				openBazelProjectFile()
@@ -106,7 +106,7 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(
 		commands.registerCommand(
 			Commands.SYNC_DIRECTORIES_ONLY,
-			syncBazelProjectView
+			syncProjectViewDirectories
 		)
 	);
 	context.subscriptions.push(
@@ -154,7 +154,7 @@ function syncProjectView(): void {
 
 	projectViewStatus.hide();
 	executeJavaLanguageServerCommand(Commands.SYNC_PROJECTS).then(
-		syncBazelProjectView
+		syncProjectViewDirectories
 	);
 }
 
@@ -220,14 +220,32 @@ function toggleBazelClasspathSyncStatus(doc: TextDocument) {
 }
 
 function toggleBazelProjectSyncStatus(doc: TextDocument) {
+	if (workspace.getConfiguration('bazel.projectview').get('notification')) {
+		window
+			.showInformationMessage(
+				`Project View Updated [details](https://github.com/salesforce/bazel-eclipse/blob/main/docs/common/projectviews.md#supported-features)`,
+				...['Sync Project View', 'Sync Directories Only', 'Do Not Show Again']
+			)
+			.then((val) => {
+				if (val === 'Sync Project View') {
+					syncProjectView();
+				} else if (val === 'Sync Directories Only') {
+					syncProjectViewDirectories();
+				} else if (val === 'Do Not Show Again') {
+					workspace
+						.getConfiguration('bazel.projectview')
+						.update('notification', false);
+				}
+			});
+	}
 	projectViewStatus.show();
-	projectViewStatus.text = 'Sync bazel project view';
+	projectViewStatus.text = 'Sync Project View';
 	projectViewStatus.backgroundColor = new ThemeColor(
 		'statusBarItem.warningBackground'
 	);
 }
 
-async function syncBazelProjectView() {
+async function syncProjectViewDirectories() {
 	if (workspaceRoot) {
 		BazelLanguageServerTerminal.debug('Syncing bazel project view');
 		const displayFolders = new Set<string>(['.eclipse', '.vscode']); // TODO bubble this out to a setting
