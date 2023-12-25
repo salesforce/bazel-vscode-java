@@ -8,7 +8,7 @@ It plugs into the Eclipse Java Language server and computes project dependencies
 
 ## Getting Started
 
-Go and [install the extension](vscode:extension/sfdc.bazel-vscode-java) from the VSCode Marketplace (see [listing here](https://marketplace.visualstudio.com/items?itemName=sfdc.bazel-vscode-java)).
+Go and [install the extension](vscode:extension/sfdc.bazel-vscode-java) from the VSCode Marketplace (see [listing here](https://marketplace.visualstudio.com/items?itemName=sfdc.bazel-vscode-java)) or OpenVSX Registry (see [listing here](https://open-vsx.org/extension/sfdc/bazel-vscode-java)).
 
 Once installed, open VSCode in any Bazel Workspace with Java targets.
 The extension will look for a `WORKSPACE` (`WORKSPACE.bazel`) file to identify a Bazel workspace.
