@@ -1,5 +1,8 @@
 import { tasks } from 'vscode';
-import { BazelRunTarget, BazelRunTargetProvider } from "./provider/bazelRunTargetProvider";
+import {
+	BazelRunTarget,
+	BazelRunTargetProvider,
+} from './provider/bazelRunTargetProvider';
 
 export namespace BazelTaskManager {
 	export function refreshTasks() {
