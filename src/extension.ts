@@ -35,7 +35,7 @@ import {
 const classpathStatus = window.createStatusBarItem(StatusBarAlignment.Left, 1);
 const projectViewStatus = window.createStatusBarItem(
 	StatusBarAlignment.Left,
-	1,
+	1
 );
 const outOfDateClasspaths: Set<Uri> = new Set<Uri>();
 classpathStatus.command = Commands.UPDATE_CLASSPATHS_CMD;
@@ -55,7 +55,7 @@ export async function activate(context: ExtensionContext) {
 
 	window.registerTreeDataProvider(
 		'bazelTaskOutline',
-		BazelRunTargetProvider.instance,
+		BazelRunTargetProvider.instance
 	);
 	tasks.registerTaskProvider('bazel', new BazelTaskProvider());
 
@@ -74,14 +74,14 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(
 		commands.registerCommand(
 			Commands.OPEN_BAZEL_BUILD_STATUS_CMD,
-			getBazelTerminal().show,
-		),
+			getBazelTerminal().show
+		)
 	);
 
 	commands.executeCommand(
 		'setContext',
 		'isBazelWorkspaceRoot',
-		isBazelWorkspaceRoot(),
+		isBazelWorkspaceRoot()
 	);
 	// create .eclipse/.bazelproject file is DNE
 	if (isBazelWorkspaceRoot()) {
@@ -95,43 +95,43 @@ export async function activate(context: ExtensionContext) {
 		syncBazelProjectView();
 		context.subscriptions.push(
 			commands.registerCommand(Commands.OPEN_BAZEL_PROJECT_FILE, () =>
-				openBazelProjectFile(),
-			),
+				openBazelProjectFile()
+			)
 		);
 	}
 
 	context.subscriptions.push(
-		commands.registerCommand(Commands.SYNC_PROJECTS_CMD, syncProjectView),
+		commands.registerCommand(Commands.SYNC_PROJECTS_CMD, syncProjectView)
 	);
 	context.subscriptions.push(
 		commands.registerCommand(
 			Commands.SYNC_DIRECTORIES_ONLY,
-			syncBazelProjectView,
-		),
+			syncBazelProjectView
+		)
 	);
 	context.subscriptions.push(
-		commands.registerCommand(Commands.UPDATE_CLASSPATHS_CMD, updateClasspaths),
+		commands.registerCommand(Commands.UPDATE_CLASSPATHS_CMD, updateClasspaths)
 	);
 	context.subscriptions.push(
-		commands.registerCommand(Commands.DEBUG_LS_CMD, runLSCmd),
+		commands.registerCommand(Commands.DEBUG_LS_CMD, runLSCmd)
 	);
 	context.subscriptions.push(
 		commands.registerCommand(
 			Commands.BAZEL_TARGET_REFRESH,
-			BazelTaskManager.refreshTasks,
-		),
+			BazelTaskManager.refreshTasks
+		)
 	);
 	context.subscriptions.push(
 		commands.registerCommand(
 			Commands.BAZEL_TARGET_RUN,
-			BazelTaskManager.runTask,
-		),
+			BazelTaskManager.runTask
+		)
 	);
 	context.subscriptions.push(
 		commands.registerCommand(
 			Commands.BAZEL_TARGET_KILL,
-			BazelTaskManager.killTask,
-		),
+			BazelTaskManager.killTask
+		)
 	);
 
 	// trigger a refresh of the tree view when any task get executed
@@ -147,21 +147,21 @@ export function deactivate() {}
 function syncProjectView(): void {
 	if (!isRedhatJavaReady()) {
 		window.showErrorMessage(
-			'Unable to sync project view. Java language server is not ready',
+			'Unable to sync project view. Java language server is not ready'
 		);
 		return;
 	}
 
 	projectViewStatus.hide();
 	executeJavaLanguageServerCommand(Commands.SYNC_PROJECTS).then(
-		syncBazelProjectView,
+		syncBazelProjectView
 	);
 }
 
 function updateClasspaths() {
 	if (!isRedhatJavaReady()) {
 		window.showErrorMessage(
-			'Unable to update classpath. Java language server is not ready',
+			'Unable to update classpath. Java language server is not ready'
 		);
 		return;
 	}
@@ -169,12 +169,12 @@ function updateClasspaths() {
 		BazelLanguageServerTerminal.info(`Updating classpath for ${uri.fsPath}`);
 		executeJavaLanguageServerCommand(
 			Commands.UPDATE_CLASSPATHS,
-			uri.toString(),
+			uri.toString()
 		).then(
 			() => outOfDateClasspaths.delete(uri),
 			(err: Error) => {
 				BazelLanguageServerTerminal.error(`${err.message}\n${err.stack}`);
-			},
+			}
 		);
 	});
 	classpathStatus.hide();
@@ -183,7 +183,7 @@ function updateClasspaths() {
 function runLSCmd() {
 	if (!isRedhatJavaReady()) {
 		window.showErrorMessage(
-			'Unable to execute LS cmd. Java language server is not ready',
+			'Unable to execute LS cmd. Java language server is not ready'
 		);
 		return;
 	}
@@ -196,7 +196,7 @@ function runLSCmd() {
 				const [lsCmd, args] = cmd.trim().split(/\s(.*)/s);
 				executeJavaLanguageServerCommand<any>(lsCmd, args).then(
 					(resp) => BazelLanguageServerTerminal.info(format(resp)),
-					(err) => BazelLanguageServerTerminal.error(format(err)),
+					(err) => BazelLanguageServerTerminal.error(format(err))
 				);
 			}
 		});
@@ -214,7 +214,7 @@ function toggleBazelClasspathSyncStatus(doc: TextDocument) {
 	classpathStatus.show();
 	classpathStatus.text = 'Sync bazel classpath';
 	classpathStatus.backgroundColor = new ThemeColor(
-		'statusBarItem.warningBackground',
+		'statusBarItem.warningBackground'
 	);
 	outOfDateClasspaths.add(doc.uri);
 }
@@ -223,7 +223,7 @@ function toggleBazelProjectSyncStatus(doc: TextDocument) {
 	projectViewStatus.show();
 	projectViewStatus.text = 'Sync bazel project view';
 	projectViewStatus.backgroundColor = new ThemeColor(
-		'statusBarItem.warningBackground',
+		'statusBarItem.warningBackground'
 	);
 }
 
@@ -243,8 +243,8 @@ async function syncBazelProjectView() {
 				});
 				bazelProjectFile.targets.forEach((t) =>
 					displayFolders.add(
-						t.replace('//', '').replace(/:.*/, '').replace(/\/.*/, ''),
-					),
+						t.replace('//', '').replace(/:.*/, '').replace(/\/.*/, '')
+					)
 				);
 			}
 
@@ -254,7 +254,7 @@ async function syncBazelProjectView() {
 					.getConfiguration('files')
 					.get('exclude') as ExcludeConfig;
 				dirs.forEach(
-					(d) => (excludeObj[d] = viewAll ? false : !displayFolders.has(d)),
+					(d) => (excludeObj[d] = viewAll ? false : !displayFolders.has(d))
 				);
 				workspace
 					.getConfiguration('files')
@@ -278,7 +278,7 @@ function openBazelProjectFile() {
 		}
 	} catch (err) {
 		window.showErrorMessage(
-			'Unable to open the bazel project file; invalid workspace',
+			'Unable to open the bazel project file; invalid workspace'
 		);
 	}
 }

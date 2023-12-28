@@ -12,13 +12,13 @@ import {
 type DocumentSymbolsResponse = DocumentSymbol[] | SymbolInformation[] | null;
 export type GetDocumentSymbolsCommand = (
 	params: DocumentSymbolParams,
-	token?: CancellationToken,
+	token?: CancellationToken
 ) => Promise<DocumentSymbolsResponse>;
 
 type GoToDefinitionResponse = Location | Location[] | LocationLink[] | null;
 export type GoToDefinitionCommand = (
 	params: DefinitionParams,
-	token?: CancellationToken,
+	token?: CancellationToken
 ) => Promise<GoToDefinitionResponse>;
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -38,7 +38,7 @@ export enum ServerMode {
 
 export type ProvideHoverCommandFn = (
 	params: TextDocumentPositionParams,
-	token: CancellationToken,
+	token: CancellationToken
 ) => ProviderResult<Command[] | undefined>;
 export type RegisterHoverCommand = (callback: ProvideHoverCommandFn) => void;
 
@@ -58,7 +58,7 @@ export type RegisterHoverCommand = (callback: ProvideHoverCommandFn) => void;
 
 export type GetProjectSettingsCommand = (
 	uri: string,
-	SettingKeys: string[],
+	SettingKeys: string[]
 ) => Promise<Object>;
 
 /**
@@ -71,7 +71,7 @@ export type GetProjectSettingsCommand = (
 
 export type GetClasspathsCommand = (
 	uri: string,
-	options: ClasspathQueryOptions,
+	options: ClasspathQueryOptions
 ) => Promise<ClasspathResult>;
 export type ClasspathQueryOptions = {
 	/**

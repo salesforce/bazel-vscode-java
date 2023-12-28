@@ -40,12 +40,12 @@ export class BazelRunTargetProvider
 		return element;
 	}
 	getChildren(
-		element?: BazelRunTarget | undefined,
+		element?: BazelRunTarget | undefined
 	): ProviderResult<BazelRunTarget[]> {
 		return tasks
 			.fetchTasks({ type: 'bazel' })
 			.then((bt) =>
-				bt.map((t) => new BazelRunTarget(t, TreeItemCollapsibleState.None)),
+				bt.map((t) => new BazelRunTarget(t, TreeItemCollapsibleState.None))
 			);
 	}
 }
@@ -57,13 +57,13 @@ export class BazelRunTarget extends TreeItem {
 	constructor(
 		task: Task,
 		collapsibleState: TreeItemCollapsibleState,
-		command?: Command,
+		command?: Command
 	) {
 		super(task.name, collapsibleState);
 		this.task = task;
 		this.command = command;
 		this.execution = tasks.taskExecutions.find(
-			(e) => e.task.name === this.task?.name && e.task.source === task.source,
+			(e) => e.task.name === this.task?.name && e.task.source === task.source
 		);
 		this.contextValue = this.execution ? 'runningTask' : 'task';
 		if (this.execution) {

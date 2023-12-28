@@ -38,7 +38,7 @@ export class BazelTaskProvider implements TaskProvider {
 				task.scope ?? TaskScope.Workspace,
 				definition.name,
 				definition.type,
-				new ShellExecution(`${definition.task}`),
+				new ShellExecution(`${definition.task}`)
 			);
 		}
 		return undefined;
@@ -80,14 +80,14 @@ async function getBazelTasks(): Promise<Task[]> {
 				`${value.name}`,
 				`${value.type}`,
 				new ShellExecution(`${value.task}`),
-				[],
-			),
+				[]
+			)
 	);
 }
 
 function getIJRunConfig(configPath: string): BazelTaskDefinition | undefined {
 	const ijRunConfig = parser.parse(
-		readFileSync(configPath, { encoding: 'utf-8' }),
+		readFileSync(configPath, { encoding: 'utf-8' })
 	);
 	if (typeof ijRunConfig === 'object') {
 		if ('configuration' in ijRunConfig) {
@@ -98,13 +98,13 @@ function getIJRunConfig(configPath: string): BazelTaskDefinition | undefined {
 			) {
 				return new BazelTaskDefinition(
 					ijRunConfig.configuration['@_name'],
-					`bazel ${ijRunConfig.configuration['blaze-settings']['@_blaze-command']} ${ijRunConfig.configuration['blaze-settings']['blaze-target']}`,
+					`bazel ${ijRunConfig.configuration['blaze-settings']['@_blaze-command']} ${ijRunConfig.configuration['blaze-settings']['blaze-target']}`
 				);
 			}
 		}
 	}
 	BazelLanguageServerTerminal.warn(
-		`failed to convert intellj run config: ${configPath}}`,
+		`failed to convert intellj run config: ${configPath}}`
 	);
 	return undefined;
 }

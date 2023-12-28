@@ -33,14 +33,14 @@ function startTCPServer(attempts = 0): Promise<number> {
 				if (address) {
 					const port = (address as AddressInfo).port;
 					BazelLanguageServerTerminal.debug(
-						`Bazel log server listening on port ${port}`,
+						`Bazel log server listening on port ${port}`
 					);
 					resolve(port);
 				}
 			} else {
 				BazelLanguageServerTerminal.error(`Failed to start bazel TCP server`);
 				setTimeout<number>(1000 * attempts).then(() =>
-					startTCPServer(attempts + 1),
+					startTCPServer(attempts + 1)
 				);
 			}
 		});
@@ -57,15 +57,15 @@ export function registerLSClient(): Promise<void> {
 		.then((port) => registerPortWithLanguageServer(port))
 		.catch((err) =>
 			BazelLanguageServerTerminal.error(
-				`Failed to register port with BLS: ${err.message}`,
-			),
+				`Failed to register port with BLS: ${err.message}`
+			)
 		);
 }
 
 async function registerPortWithLanguageServer(
 	port: number,
 	attempts = 0,
-	maxRetries = 50,
+	maxRetries = 50
 ): Promise<void> {
 	let error = null;
 	for (let i = 0; i < maxRetries; i++) {
@@ -74,10 +74,10 @@ async function registerPortWithLanguageServer(
 				.executeCommand(
 					Commands.EXECUTE_WORKSPACE_COMMAND,
 					Commands.REGISTER_BAZEL_TCP_SERVER_PORT,
-					port,
+					port
 				)
 				.then(() =>
-					BazelLanguageServerTerminal.trace(`port ${port} registered with BLS`),
+					BazelLanguageServerTerminal.trace(`port ${port} registered with BLS`)
 				);
 		} catch (err) {
 			error = err;

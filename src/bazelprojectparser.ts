@@ -17,8 +17,8 @@ function parseProjectFile(config: ParseConfig): BazelProjectView {
 			if (config.processedImports.includes(current)) {
 				throw new Error(
 					`Recursive import detected for file ${current}, ${config.processedImports.join(
-						'-> ',
-					)}`,
+						'-> '
+					)}`
 				);
 			}
 			config.processedImports.push(current);
@@ -33,10 +33,10 @@ function parseProjectFile(config: ParseConfig): BazelProjectView {
 							new Set(
 								config.projectView.directories.concat(
 									parseAsList(section.body).filter(
-										(s) => !s.startsWith(EXCLUDED_ENTRY_PREFIX),
-									),
-								),
-							),
+										(s) => !s.startsWith(EXCLUDED_ENTRY_PREFIX)
+									)
+								)
+							)
 						);
 						break;
 					case 'targets':
@@ -44,10 +44,10 @@ function parseProjectFile(config: ParseConfig): BazelProjectView {
 							new Set(
 								config.projectView.targets.concat(
 									parseAsList(section.body).filter(
-										(s) => !s.startsWith(EXCLUDED_ENTRY_PREFIX),
-									),
-								),
-							),
+										(s) => !s.startsWith(EXCLUDED_ENTRY_PREFIX)
+									)
+								)
+							)
 						);
 						break;
 					case 'import':
@@ -55,7 +55,7 @@ function parseProjectFile(config: ParseConfig): BazelProjectView {
 						break;
 					case 'derive_targets_from_directories':
 						config.projectView.deriveTargetsFromDirectories = parseAsBoolean(
-							section.body,
+							section.body
 						);
 						break;
 					case 'workspace_type':
@@ -63,10 +63,10 @@ function parseProjectFile(config: ParseConfig): BazelProjectView {
 						break;
 					case 'additional_languages':
 						config.projectView.additionalLanguages = Array.isArray(
-							config.projectView.additionalLanguages,
+							config.projectView.additionalLanguages
 						)
 							? config.projectView.additionalLanguages.concat(
-									parseAsList(section.body),
+									parseAsList(section.body)
 								)
 							: parseAsList(section.body);
 						break;
@@ -75,19 +75,19 @@ function parseProjectFile(config: ParseConfig): BazelProjectView {
 						break;
 					case 'ts_config_rules':
 						config.projectView.tsConfigRules = Array.isArray(
-							config.projectView.tsConfigRules,
+							config.projectView.tsConfigRules
 						)
 							? config.projectView.tsConfigRules.concat(
-									parseAsList(section.body),
+									parseAsList(section.body)
 								)
 							: parseAsList(section.body);
 						break;
 					case 'import_run_configurations':
 						config.projectView.importRunConfigurations = Array.isArray(
-							config.projectView.importRunConfigurations,
+							config.projectView.importRunConfigurations
 						)
 							? config.projectView.importRunConfigurations.concat(
-									parseAsList(section.body),
+									parseAsList(section.body)
 								)
 							: parseAsList(section.body);
 						break;
@@ -96,7 +96,7 @@ function parseProjectFile(config: ParseConfig): BazelProjectView {
 						break;
 					case 'project_mappings':
 						config.projectView.projectMappings = Array.isArray(
-							config.projectView.projectMappings,
+							config.projectView.projectMappings
 						)
 							? config.projectView.projectMappings.concat(section.body)
 							: parseAsList(section.body);
@@ -109,7 +109,7 @@ function parseProjectFile(config: ParseConfig): BazelProjectView {
 						break;
 					default:
 						BazelLanguageServerTerminal.warn(
-							`unexpected section '${section.name}' while reading '${current}'`,
+							`unexpected section '${section.name}' while reading '${current}'`
 						);
 				}
 			});
@@ -143,12 +143,12 @@ function parseRawSections(projectFileContents: string): RawSection[] {
 		throw new Error(
 			`Syntax error in .bazelproject: The number of section headers doesn't match the number of section bodies (${headers?.length} != ${
 				bodies.length
-			}; header: ${headers?.join(',')}).`,
+			}; header: ${headers?.join(',')}).`
 		);
 	}
 
 	headers.forEach((value, idx) =>
-		result.push({ name: value, body: bodies[idx + 1].trim() }),
+		result.push({ name: value, body: bodies[idx + 1].trim() })
 	);
 
 	return result;
@@ -161,13 +161,13 @@ function removeComments(bazelProjectFileContent: string): string {
 export async function getBazelProjectFile(): Promise<BazelProjectView> {
 	try {
 		const bazelProjectFileStat = await workspace.fs.stat(
-			Uri.parse(`${getWorkspaceRoot()}/.eclipse/.bazelproject`),
+			Uri.parse(`${getWorkspaceRoot()}/.eclipse/.bazelproject`)
 		);
 		if (bazelProjectFileStat.type === FileType.File) {
 			return readBazelProject(`.eclipse/.bazelproject`);
 		}
 		throw new Error(
-			`.eclipse/.bazelproject type is ${bazelProjectFileStat.type}, should be ${FileType.File}`,
+			`.eclipse/.bazelproject type is ${bazelProjectFileStat.type}, should be ${FileType.File}`
 		);
 	} catch (err) {
 		throw new Error(`Could not read .eclipse/.bazelproject file: ${err}`);

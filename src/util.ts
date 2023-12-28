@@ -39,7 +39,7 @@ export function initBazelProjectFile() {
 		mkdirSync(join(workspaceRoot, '.eclipse'), { recursive: true });
 		writeFileSync(
 			join(workspaceRoot, '.eclipse', '.bazelproject'),
-			BAZELPROJECT_TEMPLATE,
+			BAZELPROJECT_TEMPLATE
 		);
 	}
 }

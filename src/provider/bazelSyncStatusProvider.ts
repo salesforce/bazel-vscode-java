@@ -62,7 +62,7 @@ export class BazelSyncStatusProvider implements TreeDataProvider<SyncStatus> {
 	resolveTreeItem?(
 		item: TreeItem,
 		element: SyncStatus,
-		token: CancellationToken,
+		token: CancellationToken
 	): ProviderResult<TreeItem> {
 		throw new Error('Method not implemented.');
 	}
@@ -70,7 +70,7 @@ export class BazelSyncStatusProvider implements TreeDataProvider<SyncStatus> {
 	buildTreeData(): Promise<SyncStatus[]> {
 		return new Promise((resolve, reject) => {
 			executeJavaLanguageServerCommand<UpdateClasspathResponse>(
-				Commands.JAVA_LS_LIST_SOURCEPATHS,
+				Commands.JAVA_LS_LIST_SOURCEPATHS
 			).then(
 				(resp) => {
 					this.treeData = resp.data.map((cp) => {
@@ -78,19 +78,19 @@ export class BazelSyncStatusProvider implements TreeDataProvider<SyncStatus> {
 						return new SyncStatus(
 							cp.projectName,
 							workspace.createFileSystemWatcher(
-								new RelativePattern(path.dirname(moduleBuildFile), 'BUILD*'),
+								new RelativePattern(path.dirname(moduleBuildFile), 'BUILD*')
 							),
 							TreeItemCollapsibleState.None,
 							{
 								title: 'sync module',
 								command: Commands.UPDATE_CLASSPATHS_CMD,
 								arguments: [moduleBuildFile],
-							},
+							}
 						);
 					});
 					resolve(this.treeData);
 				},
-				(err) => reject(err),
+				(err) => reject(err)
 			);
 		});
 	}
@@ -110,7 +110,7 @@ export class SyncStatus extends TreeItem {
 		public readonly label: string,
 		public readonly watcher: FileSystemWatcher,
 		public readonly collapsibleState: TreeItemCollapsibleState,
-		public readonly command?: Command,
+		public readonly command?: Command
 	) {
 		super(label, collapsibleState);
 		this.tooltip = this.label;

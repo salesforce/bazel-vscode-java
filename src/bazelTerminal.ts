@@ -26,7 +26,7 @@ export class BazelTerminal implements Pseudoterminal {
 			data
 				.replace(/\"/g, '\\"')
 				.replace(/\`/g, highlightBacktick)
-				.replace(/(\r|\n)+/g, '\r\n'),
+				.replace(/(\r|\n)+/g, '\r\n')
 		);
 	}
 }

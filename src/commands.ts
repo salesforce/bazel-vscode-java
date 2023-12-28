@@ -51,7 +51,7 @@ export function executeJavaLanguageServerCommand<T = unknown>(
 ): Thenable<T> {
 	return executeJavaExtensionCommand(
 		Commands.EXECUTE_WORKSPACE_COMMAND,
-		...rest,
+		...rest
 	);
 }
 

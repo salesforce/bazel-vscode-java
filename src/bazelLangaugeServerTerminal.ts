@@ -42,7 +42,7 @@ export namespace BazelLanguageServerTerminal {
 
 export function getBazelTerminal(): Terminal {
 	const term = window.terminals.find(
-		(term) => term.name === BAZEL_TERMINAL_NAME,
+		(term) => term.name === BAZEL_TERMINAL_NAME
 	);
 	if (!term) {
 		return window.createTerminal({
