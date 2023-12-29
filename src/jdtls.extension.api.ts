@@ -1,14 +1,25 @@
 import { CancellationToken, Command, Event, ProviderResult, Uri } from 'vscode';
 import {
-	DefinitionParams, DocumentSymbol, DocumentSymbolParams, Location,
-	LocationLink, SymbolInformation, TextDocumentPositionParams
+	DefinitionParams,
+	DocumentSymbol,
+	DocumentSymbolParams,
+	Location,
+	LocationLink,
+	SymbolInformation,
+	TextDocumentPositionParams,
 } from 'vscode-languageclient';
 
 type DocumentSymbolsResponse = DocumentSymbol[] | SymbolInformation[] | null;
-export type GetDocumentSymbolsCommand = (params: DocumentSymbolParams, token?: CancellationToken) => Promise<DocumentSymbolsResponse>;
+export type GetDocumentSymbolsCommand = (
+	params: DocumentSymbolParams,
+	token?: CancellationToken
+) => Promise<DocumentSymbolsResponse>;
 
 type GoToDefinitionResponse = Location | Location[] | LocationLink[] | null;
-export type GoToDefinitionCommand = (params: DefinitionParams, token?: CancellationToken) => Promise<GoToDefinitionResponse>;
+export type GoToDefinitionCommand = (
+	params: DefinitionParams,
+	token?: CancellationToken
+) => Promise<GoToDefinitionResponse>;
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export interface RequirementsData {
@@ -22,10 +33,13 @@ export interface RequirementsData {
 export enum ServerMode {
 	standard = 'Standard',
 	lightWeight = 'LightWeight',
-	hybrid = 'Hybrid'
+	hybrid = 'Hybrid',
 }
 
-export type ProvideHoverCommandFn = (params: TextDocumentPositionParams, token: CancellationToken) => ProviderResult<Command[] | undefined>;
+export type ProvideHoverCommandFn = (
+	params: TextDocumentPositionParams,
+	token: CancellationToken
+) => ProviderResult<Command[] | undefined>;
 export type RegisterHoverCommand = (callback: ProvideHoverCommandFn) => void;
 
 /**
@@ -42,7 +56,10 @@ export type RegisterHoverCommand = (callback: ProvideHoverCommandFn) => void;
  * @throws Will throw errors if the Uri does not belong to any project.
  */
 
-export type GetProjectSettingsCommand = (uri: string, SettingKeys: string[]) => Promise<Object>;
+export type GetProjectSettingsCommand = (
+	uri: string,
+	SettingKeys: string[]
+) => Promise<Object>;
 
 /**
  * Gets the classpaths and modulepaths. This API is not supported in light weight server mode so far.
@@ -52,7 +69,10 @@ export type GetProjectSettingsCommand = (uri: string, SettingKeys: string[]) => 
  * @throws Will throw errors if the Uri does not belong to any project.
  */
 
-export type GetClasspathsCommand = (uri: string, options: ClasspathQueryOptions) => Promise<ClasspathResult>;
+export type GetClasspathsCommand = (
+	uri: string,
+	options: ClasspathQueryOptions
+) => Promise<ClasspathResult>;
 export type ClasspathQueryOptions = {
 	/**
 	 * Determines the scope of the classpath. Valid scopes are "runtime" and "test".
@@ -85,12 +105,12 @@ export type ClasspathResult = {
 export type IsTestFileCommand = (uri: string) => Promise<boolean>;
 
 export enum ClientStatus {
-	uninitialized = "Uninitialized",
-	initialized = "Initialized",
-	starting = "Starting",
-	started = "Started",
-	error = "Error",
-	stopping = "Stopping",
+	uninitialized = 'Uninitialized',
+	initialized = 'Initialized',
+	starting = 'Starting',
+	started = 'Started',
+	error = 'Error',
+	stopping = 'Stopping',
 }
 
 export interface TraceEvent {

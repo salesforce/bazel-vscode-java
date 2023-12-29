@@ -1,6 +1,6 @@
 'use strict';
 
-import { commands } from "vscode";
+import { commands } from 'vscode';
 
 /**
  * Commonly used commands
@@ -22,15 +22,16 @@ export namespace Commands {
 	/**
 	 * Connect our output window
 	 */
-	export const REGISTER_BAZEL_TCP_SERVER_PORT = 'java.bazel.connectProcessStreamSocket';
+	export const REGISTER_BAZEL_TCP_SERVER_PORT =
+		'java.bazel.connectProcessStreamSocket';
 
 	// commands copied from vscode-java for interaction with JDT LS
 	export const EXECUTE_WORKSPACE_COMMAND = 'java.execute.workspaceCommand';
 	export const JAVA_LS_LIST_SOURCEPATHS = 'java.project.listSourcePaths';
 
 	// commands copied from vscode-java for interaction with the extension
-	export const JAVA_BUILD_WORKSPACE = "java.workspace.compile";
-	export const JAVA_CLEAN_WORKSPACE = "java.clean.workspace";
+	export const JAVA_BUILD_WORKSPACE = 'java.workspace.compile';
+	export const JAVA_CLEAN_WORKSPACE = 'java.clean.workspace';
 
 	export const GET_ALL_JAVA_PROJECTS = 'java.project.getAll';
 
@@ -45,10 +46,18 @@ export namespace Commands {
 	export const OPEN_BAZEL_PROJECT_FILE = 'bazel.projectview.open';
 }
 
-export function executeJavaLanguageServerCommand<T = unknown>(...rest: any[]): Thenable<T> {
-	return executeJavaExtensionCommand(Commands.EXECUTE_WORKSPACE_COMMAND, ...rest);
+export function executeJavaLanguageServerCommand<T = unknown>(
+	...rest: any[]
+): Thenable<T> {
+	return executeJavaExtensionCommand(
+		Commands.EXECUTE_WORKSPACE_COMMAND,
+		...rest
+	);
 }
 
-export function executeJavaExtensionCommand<T = unknown>(commandName: string, ...rest: any[]): Thenable<T> {
+export function executeJavaExtensionCommand<T = unknown>(
+	commandName: string,
+	...rest: any[]
+): Thenable<T> {
 	return commands.executeCommand(commandName, ...rest);
 }

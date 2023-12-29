@@ -1,6 +1,6 @@
 export interface UpdateClasspathResponse {
 	data: Array<ClasspathInfo>;
-	status: boolean
+	status: boolean;
 }
 
 export interface ClasspathInfo {
@@ -12,14 +12,14 @@ export interface ClasspathInfo {
 }
 
 export interface ExcludeConfig {
-	[x:string]: boolean;
+	[x: string]: boolean;
 }
 
 export interface ParseConfig {
-	root: string,
-	imports: string[],
-	projectView: BazelProjectView,
-	processedImports: string[]
+	root: string;
+	imports: string[];
+	projectView: BazelProjectView;
+	processedImports: string[];
 }
 
 export interface BazelProjectView {
@@ -35,7 +35,7 @@ export interface BazelProjectView {
 	projectMappings?: string[];
 	targetDiscoveryStrategy?: string;
 	targetProvisioningStrategy?: string;
-  }
+}
 
 export interface RawSection {
 	name: string;

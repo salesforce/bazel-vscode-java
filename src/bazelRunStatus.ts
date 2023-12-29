@@ -6,9 +6,10 @@ export namespace BazelRunStatus {
 
 	bazelStatus.command = Commands.OPEN_BAZEL_BUILD_STATUS_CMD;
 	bazelStatus.text = `$(sync~spin) bazel building`;
-	bazelStatus.backgroundColor = new ThemeColor('statusBarItem.warningBackground');
+	bazelStatus.backgroundColor = new ThemeColor(
+		'statusBarItem.warningBackground'
+	);
 
 	export const show = () => bazelStatus.show();
 	export const hide = () => bazelStatus.hide();
-
 }
