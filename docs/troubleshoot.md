@@ -39,6 +39,8 @@ Check out the following places for log-like details to spot any problems:
 * The command above should also have opened the `client.log.YYYY-MM-DD`
 
 Please attach (or copy/paste) all x3 if you file issues for support.
+(Rename `.log` to e.g. `log.txt` and `client.log.YYYY-MM-DD` to e.g. `client.log.YYYY-MM-DD.json`
+in order to be able to upload as attachment to GitHub issues.)
 
 ## Extensions
 
