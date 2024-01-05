@@ -23,7 +23,7 @@ So it's normal in VSC for e.g. _Sources_ to get "gradually initialized" as you o
 1. `code .`
 1. Double check that the [the extension](vscode:extension/sfdc.bazel-vscode-java) is installed **and not disabled**
 1. Run (Alt/Cmd+Shift+P) the _Java: Clean Java Language Server Workspace_ command (this clears the Logs, see below)
-1. Open (Ctrl-P) any `X.java` file in the editor (this is required to trigger the plugin to kick in, see above)
+1. Open (Ctrl-P) any `X.java` file in the editor (this is required to trigger the extension to kick in, see above)
 1. Run the _Java: Show Build Job Status_ command, and wait for it to "quiet down" and everything in it to be `[Done]`
 1. Run the _Java: Synchronize Projects with Bazel Project View_ command
 1. Run the _Java: Refresh Classpath from Bazel BUILD file_ command
@@ -39,6 +39,16 @@ Check out the following places for log-like details to spot any problems:
 * The command above should also have opened the `client.log.YYYY-MM-DD`
 
 Please attach (or copy/paste) all x3 if you file issues for support.
+
+## Extensions
+
+Please note that this _Bazel for Java_ extension (`sfdc.bazel-vscode-java`, which adds support for Bazel's **Java** rules to VSC), is technically completely independent of _[the VSC Bazel](https://marketplace.visualstudio.com/items?itemName=BazelBuild.vscode-bazel)_ extension (`BazelBuild.vscode-bazel`, which adds generic support for Bazel `BUILD` files editing, and "externally running" any Bazel targets; but specific nothing for Java).
+
+It's therefore totally possible to run the former (this) without the latter.
+
+When troubleshooting, it can sometimes be slightly confusing which extension issues what message. For example, notification pop ups with `Command failed: bazel (...)` errors are from the other extension, not this one.
+
+If in doubt, it is therefore recommended to temporarily _Disable in Workspace_ that other Bazel extension when debugging problems with this extension.
 
 ## Menus
 
