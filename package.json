@@ -120,6 +120,12 @@
 					"default": true,
 					"description": "Open the Bazel Project View file on extension activation",
 					"scope": "window"
+				},
+				"bazel.projectview.updateFileWatcherExclusion": {
+					"type": "boolean",
+					"default": true,
+					"description": "update the files.watcherExclude setting to only watch directories specified in the .bazelproject file. when enabled the window will automatically be reloaded after the change is applied",
+					"scope": "window"
 				}
 			}
 		},
