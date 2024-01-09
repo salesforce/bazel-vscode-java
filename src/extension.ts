@@ -1,5 +1,5 @@
 import { existsSync } from 'fs';
-import { join } from 'path';
+import path, { join } from 'path';
 import { format } from 'util';
 import {
 	ConfigurationTarget,
@@ -25,7 +25,7 @@ import { Commands, executeJavaLanguageServerCommand } from './commands';
 import { registerLSClient } from './loggingTCPServer';
 import { BazelRunTargetProvider } from './provider/bazelRunTargetProvider';
 import { BazelTaskProvider } from './provider/bazelTaskProvider';
-import { ExcludeConfig } from './types';
+import { ExcludeConfig, FileWatcherExcludeConfig } from './types';
 import {
 	getWorkspaceRoot,
 	initBazelProjectFile,
@@ -248,17 +248,87 @@ async function syncBazelProjectView() {
 				);
 			}
 
-			workspace.fs.readDirectory(Uri.parse(workspaceRoot)).then((val) => {
+			workspace.fs.readDirectory(Uri.parse(workspaceRoot)).then(async (val) => {
 				const dirs = val.filter((x) => x[1] !== FileType.File).map((d) => d[0]);
-				const excludeObj: ExcludeConfig = workspace
-					.getConfiguration('files')
-					.get('exclude') as ExcludeConfig;
+				const workspaceFilesConfig = workspace.getConfiguration('files');
+				const filesExclude = workspaceFilesConfig.get(
+					'exclude'
+				) as ExcludeConfig;
 				dirs.forEach(
-					(d) => (excludeObj[d] = viewAll ? false : !displayFolders.has(d))
+					(d) => (filesExclude[d] = viewAll ? false : !displayFolders.has(d))
 				);
-				workspace
-					.getConfiguration('files')
-					.update('exclude', excludeObj, ConfigurationTarget.Workspace);
+				await workspaceFilesConfig.update(
+					'exclude',
+					filesExclude,
+					ConfigurationTarget.Workspace
+				);
+
+				// if the updateFileWatcherExclusion setting is enabled
+				if (
+					workspace
+						.getConfiguration('bazel.projectview')
+						.get('updateFileWatcherExclusion')
+				) {
+					BazelLanguageServerTerminal.debug(
+						'updating files.watcherExclude setting'
+					);
+
+					const filesWatcherExclude =
+						workspaceFilesConfig.get<FileWatcherExcludeConfig>(
+							'watcherExclude',
+							{}
+						);
+
+					const fileWatcherKeys = Object.keys(filesWatcherExclude);
+					const hasOldEntry = fileWatcherKeys.filter(
+						(k) => k.includes('.vscode') && k.includes('.eclipse')
+					).length;
+
+					const baseFolder = getWorkspaceRoot().split(path.sep).reverse()[0];
+					const fileWatcherExcludePattern = viewAll
+						? ''
+						: `**/${baseFolder}/!(${Array.from(displayFolders).join('|')})/**`;
+
+					if (viewAll) {
+						// if viewAll and existing config doesn't contain .vscode/.eclipse return
+						if (!hasOldEntry) {
+							return;
+						}
+					} else {
+						// if !viewAll and existing config contains identical entry return
+						if (fileWatcherKeys.includes(fileWatcherExcludePattern)) {
+							return;
+						}
+					}
+
+					// copy the old config obj, but remove any previous exclude based on the .bazelproject file
+					const newFilesWatcherExclude: FileWatcherExcludeConfig = {};
+					for (const val in filesWatcherExclude) {
+						if (!(val.includes('.eclipse') && val.includes('.vscode'))) {
+							newFilesWatcherExclude[val] = filesWatcherExclude[val];
+						}
+					}
+
+					if (fileWatcherExcludePattern) {
+						newFilesWatcherExclude[fileWatcherExcludePattern] = true;
+					}
+
+					// reload the workspace to make the updated file watcher exclusions take effect
+					workspaceFilesConfig
+						.update('watcherExclude', newFilesWatcherExclude)
+						.then((x) =>
+							window
+								.showInformationMessage(
+									'File watcher exclusions are out of date. Please reload the window to apply the change',
+									...['Reload', 'Ignore']
+								)
+								.then((opt) => {
+									if (opt === 'Reload') {
+										commands.executeCommand('workbench.action.reloadWindow');
+									}
+								})
+						);
+				}
 			});
 		} catch (err) {
 			throw new Error(`Could not read bazelproject file: ${err}`);
