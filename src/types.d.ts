@@ -15,6 +15,10 @@ export interface ExcludeConfig {
 	[x: string]: boolean;
 }
 
+export interface FileWatcherExcludeConfig {
+	[x: string]: boolean;
+}
+
 export interface ParseConfig {
 	root: string;
 	imports: string[];
