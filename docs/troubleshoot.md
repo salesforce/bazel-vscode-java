@@ -7,12 +7,18 @@ If this Bazel Java extension managed to correctly configure your workspace, then
 * The _Explorer_ view will have a _Java Projects_ tab
 * The _Java Projects_ will contain a _Bazel dependencies_ in addition to the _JRE System Library_
 * The _Java Projects_ will **NOT** contain _Referenced Libraries_ after the _JRE System Library_
-* When a `X.java` editor is open, then the status bar should show _{ } Java_ (**NOT** {·} for [Lightweight Java Mode](https://code.visualstudio.com/docs/java/java-project#_lightweight-mode))
 * Run (Alt/Cmd+Shift+P) the _Java: Configure Java Runtime_ command; the _Type_ should be _Unmanaged folder,_ **NOT** _Maven_ or _Gradle._
 * Run the _Java: Configure Classpath_ command; the _Sources_ should include the correct paths
 
 Note that VSC only starts to initialize things when you open the first `.java` file/s.
 So it's normal in VSC for e.g. _Sources_ to get "gradually initialized" as you open more Java files.
+
+## Lightweight Java Mode
+
+When the status bar shows _{·} Java_ or _Java ✈️_ (for
+[Lightweight Java Mode](https://code.visualstudio.com/docs/java/java-project#_lightweight-mode)
+instead of _{ } Java_ when an `X.java` editor is open, then click on that to make VSC switch to
+_Standard_ Java Mode.
 
 ## Hard Reset
 
@@ -91,6 +97,14 @@ Homebrew sets this up. On Linux, you need to [do this yourself e.g. in your dotf
 Alternatively, add `bazel_binary: bazelisk` in the project's `.bazelproject` configuration file.
 
 More background in [issue #477](https://github.com/salesforce/bazel-eclipse/issues/477).
+
+## Maven or Gradle
+
+If there is a _Build tool conflicts are detected in workspace. Which one would you like to use? Maven, or Gradle?_ pop-up:
+
+Just click _Maven_ - and this extension will still correctly kick-in and initialize classpaths and source folders etc. from Bazel.
+
+More background in [issue #82](https://github.com/salesforce/bazel-vscode-java/issues/82).
 
 ## Alternatives
 
