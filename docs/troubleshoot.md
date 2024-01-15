@@ -104,6 +104,8 @@ If there is a _Build tool conflicts are detected in workspace. Which one would y
 
 Just click _Maven_ - and this extension will still correctly kick-in and initialize classpaths and source folders etc. from Bazel.
 
+We recommend to add `"java.import.maven.enabled": false, "java.import.gradle.enabled": false,` to your repo's `.vscode/settings.json` to avoid this.
+
 More background in [issue #82](https://github.com/salesforce/bazel-vscode-java/issues/82).
 
 ## Alternatives
