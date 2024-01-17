@@ -66,7 +66,9 @@ If in doubt, it is therefore recommended to temporarily _Disable in Workspace_ t
  message: Preview features enabled at an invalid source release level 11, preview can be enabled only at source level 21; code: 2098258; resource: /home/vorburger/git/github.com/vorburger/LearningBazel/java-one/src/main/java/ch/vorburger/learningbazel/Main.java;
 ```
 
-This error (visible in `.log`) actually appears to be "harmless"; more background in [issue #74](https://github.com/salesforce/bazel-vscode-java/issues/74).
+This error (visible in `.log`) means that you need to use Java 21 to use this extension.
+
+More background in [issue #85](https://github.com/salesforce/bazel-vscode-java/issues/85) and [issue #74](https://github.com/salesforce/bazel-vscode-java/issues/74).
 
 ## Menus
 
