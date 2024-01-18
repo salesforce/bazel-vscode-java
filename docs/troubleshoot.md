@@ -13,6 +13,14 @@ If this Bazel Java extension managed to correctly configure your workspace, then
 Note that VSC only starts to initialize things when you open the first `.java` file/s.
 So it's normal in VSC for e.g. _Sources_ to get "gradually initialized" as you open more Java files.
 
+## Pre-Release Version
+
+Please note that this extension's is currently still in _Preview._
+
+The last _Release Version_ may not include the latest required bug fixes.
+
+Remember to click _Switch to Pre-Release Version_ on the extension installation page!
+
 ## Lightweight Java Mode
 
 When the status bar shows _{·} Java_ or _Java ✈️_ (for
