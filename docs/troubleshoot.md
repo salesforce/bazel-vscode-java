@@ -28,6 +28,8 @@ When the status bar shows _{·} Java_ or _Java ✈️_ (for
 instead of _{ } Java_ when an `X.java` editor is open, then click on that to make VSC switch to
 _Standard_ Java Mode.
 
+We recommend to add `"java.server.launchMode": "Standard"` to your repo's `.vscode/settings.json`.
+
 ## Hard Reset
 
 1. Close (all of) your VSC windows
@@ -104,7 +106,7 @@ If you use [Bazelisk](https://github.com/bazelbuild/bazelisk) (which we recommen
 make sure you have a _symlink_ from `bazel` to `bazelisk` on `$PATH`. On macOS,
 Homebrew sets this up. On Linux, you need to [do this yourself e.g. in your dotfiles](https://github.com/vorburger/vorburger-dotfiles-bin-etc/commit/b8dea1dcf465db6f201d1cfa4302b748a08fc3b5).
 
-Alternatively, add `bazel_binary: bazelisk` in the project's `.bazelproject` configuration file.
+Alternatively, add `bazel_binary: bazelisk` in the project's `.bazelproject` configuration file (but see [issue #88](https://github.com/salesforce/bazel-vscode-java/issues/88)).
 
 More background in [issue #477](https://github.com/salesforce/bazel-eclipse/issues/477).
 
