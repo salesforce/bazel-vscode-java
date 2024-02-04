@@ -94,7 +94,7 @@
 			}
 		],
 		"configuration": {
-			"title": "BJLS",
+			"title": "Bazel Java",
 			"properties": {
 				"java.import.bazel.disabled": {
 					"type": "boolean",
