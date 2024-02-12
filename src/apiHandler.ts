@@ -1,9 +1,9 @@
 import { Uri } from 'vscode';
 import { Emitter } from 'vscode-languageclient';
-import { MyExtensionAPI } from './extension.api';
+import { BazelEventsExtensionAPI } from './extension.api';
 
 class ApiHandler {
-    private api!: MyExtensionAPI;
+    private api!: BazelEventsExtensionAPI;
     private onSyncStartedEmitter: Emitter<string> = new Emitter<string>();
     private onBazelProjectFileCreatedEmitter: Emitter<string> = new Emitter<string>();
     private onBazelProjectFileUpdatedEmitter: Emitter<Uri> = new Emitter<Uri>();
@@ -46,7 +46,7 @@ class ApiHandler {
         this.onSyncDirectoriesEndedEmitter.fire(event);
     }
 
-    public getApi(): MyExtensionAPI{
+    public getApi(): BazelEventsExtensionAPI{
         if (!this.api) throw new Error(`ApiHandler is not initialized`);
         return this.api;
     }

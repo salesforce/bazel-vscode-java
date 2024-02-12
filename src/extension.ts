@@ -23,7 +23,7 @@ import {
 import { BazelTaskManager } from './bazelTaskManager';
 import { getBazelProjectFile } from './bazelprojectparser';
 import { Commands, executeJavaLanguageServerCommand } from './commands';
-import { MyExtensionAPI } from './extension.api';
+import { BazelEventsExtensionAPI } from './extension.api';
 import { registerLSClient } from './loggingTCPServer';
 import { BazelRunTargetProvider } from './provider/bazelRunTargetProvider';
 import { BazelTaskProvider } from './provider/bazelTaskProvider';
@@ -144,7 +144,7 @@ export async function activate(context: ExtensionContext) {
 	// always update the project view after the initial project load
 	registerLSClient();
 
-	return new Promise<MyExtensionAPI>((resolve,reject)=>{
+	return new Promise<BazelEventsExtensionAPI>((resolve,reject)=>{
 		apiHandler.initApi();
 		resolve(apiHandler.getApi());
 	})
