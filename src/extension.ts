@@ -15,6 +15,7 @@ import {
 	window,
 	workspace,
 } from 'vscode';
+import { apiHandler } from './apiHandler';
 import {
 	BazelLanguageServerTerminal,
 	getBazelTerminal,
@@ -22,6 +23,7 @@ import {
 import { BazelTaskManager } from './bazelTaskManager';
 import { getBazelProjectFile } from './bazelprojectparser';
 import { Commands, executeJavaLanguageServerCommand } from './commands';
+import { MyExtensionAPI } from './extension.api';
 import { registerLSClient } from './loggingTCPServer';
 import { BazelRunTargetProvider } from './provider/bazelRunTargetProvider';
 import { BazelTaskProvider } from './provider/bazelTaskProvider';
@@ -65,6 +67,7 @@ export async function activate(context: ExtensionContext) {
 		const doc = event.document;
 		if (doc.uri.fsPath.includes('bazelproject') && !doc.isDirty) {
 			toggleBazelProjectSyncStatus(doc);
+			apiHandler.fireBazelProjectFileUpdated(doc.uri);
 		}
 		if (doc.uri.fsPath.includes('BUILD') && !doc.isDirty) {
 			toggleBazelClasspathSyncStatus(doc);
@@ -140,6 +143,11 @@ export async function activate(context: ExtensionContext) {
 
 	// always update the project view after the initial project load
 	registerLSClient();
+
+	return new Promise<MyExtensionAPI>((resolve,reject)=>{
+		apiHandler.initApi();
+		resolve(apiHandler.getApi());
+	})
 }
 
 export function deactivate() {}
@@ -152,6 +160,7 @@ function syncProjectView(): void {
 		return;
 	}
 
+	apiHandler.fireSyncStarted(workspaceRoot);
 	projectViewStatus.hide();
 	executeJavaLanguageServerCommand(Commands.SYNC_PROJECTS).then(
 		syncBazelProjectView
@@ -236,7 +245,9 @@ async function syncBazelProjectView() {
 			let viewAll = false;
 			if (bazelProjectFile.directories.includes('.')) {
 				viewAll = true;
+				apiHandler.fireSyncDirectoriesStarted([]);
 			} else {
+				apiHandler.fireSyncDirectoriesStarted(bazelProjectFile.directories);
 				bazelProjectFile.directories.forEach((d) => {
 					const dirRoot = d.split('/').filter((x) => x)[0];
 					displayFolders.add(dirRoot);
@@ -330,6 +341,7 @@ async function syncBazelProjectView() {
 						);
 				}
 			});
+			apiHandler.fireSyncDirectoriesEnded(bazelProjectFile.directories);
 		} catch (err) {
 			throw new Error(`Could not read bazelproject file: ${err}`);
 		}

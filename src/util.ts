@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { workspace } from 'vscode';
+import { apiHandler } from './apiHandler';
 
 // TODO: pull this template out into a file
 const BAZELPROJECT_TEMPLATE = `
@@ -41,6 +42,7 @@ export function initBazelProjectFile() {
 			join(workspaceRoot, '.eclipse', '.bazelproject'),
 			BAZELPROJECT_TEMPLATE
 		);
+		apiHandler.fireBazelProjectFileCreated(join(workspaceRoot, '.eclipse', '.bazelproject'));
 	}
 }
 
