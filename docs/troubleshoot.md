@@ -30,6 +30,11 @@ _Standard_ Java Mode.
 
 We recommend to add `"java.server.launchMode": "Standard"` to your repo's `.vscode/settings.json`.
 
+## VSC Web UI
+
+This extension may not yet work well in a VS Code Web and/or Remote Development set-up;
+see [issue #94](https://github.com/salesforce/bazel-vscode-java/issues/94).
+
 ## Hard Reset
 
 1. Close (all of) your VSC windows
