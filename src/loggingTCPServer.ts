@@ -1,6 +1,6 @@
 import { AddressInfo, Server, Socket, createServer } from 'net';
 import { setTimeout } from 'timers/promises';
-import { commands } from 'vscode';
+import { commands, workspace } from 'vscode';
 import { BazelLanguageServerTerminal } from './bazelLangaugeServerTerminal';
 import { Commands } from './commands';
 
@@ -11,6 +11,21 @@ const RETRY_INTERVAL = 5000; // ms
 let server: Server | undefined;
 
 function startTCPServer(attempts = 0): Promise<number> {
+	let port = 0;
+	if (workspace.getConfiguration('java').has('jdt.ls.vmargs')) {
+		const vmargs = workspace
+			.getConfiguration('java')
+			.get<string>('jdt.ls.vmargs');
+		if (vmargs?.includes('java.bazel.staticProcessStreamSocket')) {
+			port = parseInt(
+				vmargs
+					.split(/\s+/)
+					.filter((x) => x.includes('java.bazel.staticProcessStreamSocket'))[0]
+					.split('=')[1]
+			);
+		}
+	}
+
 	return new Promise((resolve) => {
 		if (!server) {
 			server = createServer((sock: Socket) => {
@@ -27,7 +42,7 @@ function startTCPServer(attempts = 0): Promise<number> {
 				});
 			});
 		}
-		server.listen(0, 'localhost', () => {
+		server.listen(port, 'localhost', () => {
 			if (server) {
 				const address = server.address();
 				if (address) {
