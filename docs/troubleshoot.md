@@ -40,6 +40,8 @@ see [issue #94](https://github.com/salesforce/bazel-vscode-java/issues/94).
 1. Close (all of) your VSC windows
 1. `killall java` (check that `jps` only shows _Jps_ itself)
 1. `cd YOURPROJECT`
+1. `rm -rf bazel-*` removes all Bazel related temporary files of course; but this should almost never be required!
+1. `rm -rf .eclipse/` removes all files configuring this extension, this normally also isn't required, but just in case
 1. `bazel build //...` must first work, obviously (double check!)
 1. `code .`
 1. Double check that the [the extension](vscode:extension/sfdc.bazel-vscode-java) is installed **and not disabled**
@@ -48,6 +50,8 @@ see [issue #94](https://github.com/salesforce/bazel-vscode-java/issues/94).
 1. Run the _Java: Show Build Job Status_ command, and wait for it to "quiet down" and everything in it to be `[Done]`
 1. Run the _Java: Synchronize Projects with Bazel Project View_ command
 1. Run the _Java: Refresh Classpath from Bazel BUILD file_ command
+
+You could also try to uninstall and reinstall the extension, to see if that helps.
 
 ## Logs
 
