@@ -67,6 +67,10 @@ Please attach (or copy/paste) all x3 if you file issues for support.
 (Rename `.log` to e.g. `log.txt` and `client.log.YYYY-MM-DD` to e.g. `client.log.YYYY-MM-DD.json`
 in order to be able to upload as attachment to GitHub issues.)
 
+The Bazel and JDT Job status is not in these log files, but visible
+on the _Terminal_ view _Bazel Build Status_ and _Java Build Status_ tabs;
+if in doubt, have a look at that as well.
+
 ## Extensions
 
 Please note that this _Bazel for Java_ extension (`sfdc.bazel-vscode-java`, which adds support for Bazel's **Java** rules to VSC), is technically completely independent of _[the VSC Bazel](https://marketplace.visualstudio.com/items?itemName=BazelBuild.vscode-bazel)_ extension (`BazelBuild.vscode-bazel`, which adds generic support for Bazel `BUILD` files editing, and "externally running" any Bazel targets; but specific nothing for Java).
