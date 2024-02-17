@@ -67,7 +67,7 @@ in order to be able to upload as attachment to GitHub issues.)
 
 The Bazel and JDT Job status is not in these log files, but visible
 on the _Terminal_ view _Bazel Build Status_ and _Java Build Status_ tabs;
-if in doubt, have a look at that as well.
+if in doubt, have a look at that as well (see also [issue #100](https://github.com/salesforce/bazel-vscode-java/issues/100)).
 
 ## Extensions
 
