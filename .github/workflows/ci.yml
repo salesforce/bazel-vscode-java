@@ -108,6 +108,7 @@ jobs:
             test/**/*.json
             !test/**/tsconfig.json
             !test/**/runConfigurations/*.xml
+            !test/projects/**/*
 
       - name: Upload screenshots on failure
         uses: actions/upload-artifact@v4
