@@ -37,6 +37,7 @@
 	"main": "./out/src/extension.js",
 	"contributes": {
 		"javaExtensions": [
+			"./server/org.eclipse.equinox.event.jar",
 			"./server/com.github.ben-manes.caffeine.jar",
 			"./server/com.github.ben-manes.caffeine.guava.jar",
 			"./server/org.jsr-305.jar",
