@@ -69,6 +69,12 @@ The Bazel and JDT Job status is not in these log files, but visible
 on the _Terminal_ view _Bazel Build Status_ and _Java Build Status_ tabs;
 if in doubt, have a look at that as well (see also [issue #100](https://github.com/salesforce/bazel-vscode-java/issues/100)).
 
+There is a known limitation during initialization of the Java Language Server.
+While the initialization is ongoing the _Bazel Build Status_ will remain empty.
+It only starts working _after_ initialization completed.
+To work around this limitation you should configure a _static_ port for the extension to use.
+This can be done by adding `-Djava.bazel.staticProcessStreamSocket=22222` to `"java.jdt.ls.vmargs":` option in `.vscode/settings.json`.
+
 ## Extensions
 
 Please note that this _Bazel for Java_ extension (`sfdc.bazel-vscode-java`, which adds support for Bazel's **Java** rules to VSC), is technically completely independent of _[the VSC Bazel](https://marketplace.visualstudio.com/items?itemName=BazelBuild.vscode-bazel)_ extension (`BazelBuild.vscode-bazel`, which adds generic support for Bazel `BUILD` files editing, and "externally running" any Bazel targets; but specific nothing for Java).
