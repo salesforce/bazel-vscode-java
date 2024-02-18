@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest] #, macos-latest] #, windows-latest] # https://github.com/coactions/setup-xvfb/issues/18
+        os: [ubuntu-latest, macos-latest] #, windows-latest] # https://github.com/coactions/setup-xvfb/issues/18
 
     steps:
       - name: Checkout
@@ -108,6 +108,7 @@ jobs:
             test/**/*.json
             !test/**/tsconfig.json
             !test/**/runConfigurations/*.xml
+            !test/projects/**/*
 
       - name: Upload screenshots on failure
         uses: actions/upload-artifact@v4
