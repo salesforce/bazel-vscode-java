@@ -32,8 +32,13 @@ We recommend to add `"java.server.launchMode": "Standard"` to your repo's `.vsco
 
 ## VSC Web UI
 
-This extension may not yet work well in a VS Code Web and/or Remote Development set-up;
-see [issue #94](https://github.com/salesforce/bazel-vscode-java/issues/94).
+This extension can well in a VS Code Web and/or Remote Development set-up.
+
+If it doesn't seem to work, check the Extension's _Runtime Status_ tag UI; if that shows
+_Runtime Status: Not yet activated._ then you have be facing some permission (?) problems
+in your Web browser (Brave? Firefox?) and can try with another one (Chrome).
+
+[Issue #94](https://github.com/salesforce/bazel-vscode-java/issues/94) has some related background.
 
 ## Hard Reset
 
