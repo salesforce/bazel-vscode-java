@@ -144,10 +144,10 @@ export async function activate(context: ExtensionContext) {
 	// always update the project view after the initial project load
 	registerLSClient();
 
-	return new Promise<BazelEventsExtensionAPI>((resolve,reject)=>{
+	return new Promise<BazelEventsExtensionAPI>((resolve, reject) => {
 		apiHandler.initApi();
 		resolve(apiHandler.getApi());
-	})
+	});
 }
 
 export function deactivate() {}
@@ -162,9 +162,10 @@ function syncProjectView(): void {
 
 	apiHandler.fireSyncStarted(workspaceRoot);
 	projectViewStatus.hide();
-	executeJavaLanguageServerCommand(Commands.SYNC_PROJECTS).then(
-		syncBazelProjectView
-	);
+	executeJavaLanguageServerCommand(Commands.SYNC_PROJECTS).then(() => {
+		apiHandler.fireSyncEnded(workspaceRoot);
+		syncBazelProjectView();
+	});
 }
 
 function updateClasspaths() {
