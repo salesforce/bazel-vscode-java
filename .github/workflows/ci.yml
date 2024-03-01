@@ -68,7 +68,7 @@ jobs:
           key: ${{ runner.os }}-bazel
 
       - name: Setup Bazelisk
-        uses: bazelbuild/setup-bazelisk@v2
+        uses: bazelbuild/setup-bazelisk@v3
 
       - name: Print Maven toolchains.xml
         shell: bash
@@ -108,6 +108,7 @@ jobs:
             test/**/*.json
             !test/**/tsconfig.json
             !test/**/runConfigurations/*.xml
+            !test/projects/**/*
 
       - name: Upload screenshots on failure
         uses: actions/upload-artifact@v4

@@ -37,12 +37,12 @@
 	"main": "./out/src/extension.js",
 	"contributes": {
 		"javaExtensions": [
+			"./server/org.eclipse.equinox.event.jar",
 			"./server/com.github.ben-manes.caffeine.jar",
 			"./server/com.github.ben-manes.caffeine.guava.jar",
 			"./server/org.jsr-305.jar",
 			"./server/org.fusesource.jansi.jar",
 			"./server/wrapped.com.google.protobuf.protobuf-java.jar",
-			"./server/com.salesforce.bazel.logback.jar",
 			"./server/com.salesforce.bazel.importedsource.jar",
 			"./server/com.salesforce.bazel.sdk.jar",
 			"./server/com.salesforce.bazel.eclipse.core.jar",
@@ -124,7 +124,13 @@
 				"bazel.projectview.updateFileWatcherExclusion": {
 					"type": "boolean",
 					"default": true,
-					"description": "update the files.watcherExclude setting to only watch directories specified in the .bazelproject file. when enabled the window will automatically be reloaded after the change is applied",
+					"description": "update the files.watcherExclude setting to only watch directories specified in the .bazelproject file.",
+					"scope": "window"
+				},
+				"bazel.projectview.notification": {
+					"type": "boolean",
+					"default": true,
+					"description": "Display 'sync project view' notification info window on .bazelproject edit",
 					"scope": "window"
 				}
 			}

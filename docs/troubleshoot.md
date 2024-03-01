@@ -30,6 +30,16 @@ _Standard_ Java Mode.
 
 We recommend to add `"java.server.launchMode": "Standard"` to your repo's `.vscode/settings.json`.
 
+## VSC Web UI
+
+This extension can well in a VS Code Web and/or Remote Development set-up.
+
+If it doesn't seem to work, check the Extension's _Runtime Status_ tag UI; if that shows
+_Runtime Status: Not yet activated._ then you have be facing some permission (?) problems
+in your Web browser (Brave? Firefox?) and can try with another one (Chrome).
+
+[Issue #94](https://github.com/salesforce/bazel-vscode-java/issues/94) has some related background.
+
 ## Hard Reset
 
 1. Close (all of) your VSC windows
@@ -44,6 +54,8 @@ We recommend to add `"java.server.launchMode": "Standard"` to your repo's `.vsco
 1. Run the _Java: Synchronize Projects with Bazel Project View_ command
 1. Run the _Java: Refresh Classpath from Bazel BUILD file_ command
 
+You could also try to uninstall and reinstall the extension, to see if that helps.
+
 ## Logs
 
 Check out the following places for log-like details to spot any problems:
@@ -57,6 +69,16 @@ Check out the following places for log-like details to spot any problems:
 Please attach (or copy/paste) all x3 if you file issues for support.
 (Rename `.log` to e.g. `log.txt` and `client.log.YYYY-MM-DD` to e.g. `client.log.YYYY-MM-DD.json`
 in order to be able to upload as attachment to GitHub issues.)
+
+The Bazel and JDT Job status is not in these log files, but visible
+on the _Terminal_ view _Bazel Build Status_ and _Java Build Status_ tabs;
+if in doubt, have a look at that as well (see also [issue #100](https://github.com/salesforce/bazel-vscode-java/issues/100)).
+
+There is a known limitation during initialization of the Java Language Server.
+While the initialization is ongoing the _Bazel Build Status_ will remain empty.
+It only starts working _after_ initialization completed.
+To work around this limitation you should configure a _static_ port for the extension to use.
+This can be done by adding `-Djava.bazel.staticProcessStreamSocket=22222` to `"java.jdt.ls.vmargs":` option in `.vscode/settings.json`.
 
 ## Extensions
 

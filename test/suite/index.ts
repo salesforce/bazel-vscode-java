@@ -7,31 +7,34 @@ export function run(): Promise<void> {
 	const mocha = new Mocha({
 		ui: 'tdd',
 		reporter: 'json',
-		reporterOptions: {output: './test/result/extension.test.json'}
+		reporterOptions: { output: './test/result/extension.test.json' },
 	});
 
 	const testsRoot = path.resolve(__dirname, '..');
 
 	return new Promise((c, e) => {
-		glob('**/**.test.js', { cwd: testsRoot }).then((files) => {
-			// Add files to the test suite
-			files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
+		glob('**/**.test.js', { cwd: testsRoot }).then(
+			(files) => {
+				// Add files to the test suite
+				files.forEach((f) => mocha.addFile(path.resolve(testsRoot, f)));
 
-			try {
-				// Run the mocha test
-				mocha.run(failures => {
-					if (failures > 0) {
-						e(new Error(`${failures} tests failed.`));
-					} else {
-						c();
-					}
-				});
-			} catch (err) {
-				console.error(err);
-				e(err);
+				try {
+					// Run the mocha test
+					mocha.run((failures) => {
+						if (failures > 0) {
+							e(new Error(`${failures} tests failed.`));
+						} else {
+							c();
+						}
+					});
+				} catch (err) {
+					console.error(err);
+					e(err);
+				}
+			},
+			(err) => {
+				return e(err);
 			}
-		}, (err) => {
-			return e(err);
-		});
+		);
 	});
 }
