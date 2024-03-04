@@ -3,6 +3,7 @@ import { setTimeout } from 'timers/promises';
 import { commands, workspace } from 'vscode';
 import { BazelLanguageServerTerminal } from './bazelLangaugeServerTerminal';
 import { Commands } from './commands';
+import { LOGGER } from './util';
 
 const SERVER_START_RETRIES = 10;
 const PORT_REGISTRATION_RETRIES = 10;
@@ -13,6 +14,7 @@ let server: Server | undefined;
 function startTCPServer(attempts = 0): Promise<number> {
 	let port = 0;
 	if (workspace.getConfiguration('java').has('jdt.ls.vmargs')) {
+		LOGGER.info('Adjusting vmargs for TCP Server.');
 		const vmargs = workspace
 			.getConfiguration('java')
 			.get<string>('jdt.ls.vmargs');
@@ -28,6 +30,7 @@ function startTCPServer(attempts = 0): Promise<number> {
 
 	return new Promise((resolve) => {
 		if (!server) {
+			LOGGER.info('Starting TCP Server.');
 			server = createServer((sock: Socket) => {
 				attempts = 0;
 
@@ -50,10 +53,12 @@ function startTCPServer(attempts = 0): Promise<number> {
 					BazelLanguageServerTerminal.debug(
 						`Bazel log server listening on port ${port}`
 					);
+					LOGGER.info(`Bazel log server listening on port ${port}`);
 					resolve(port);
 				}
 			} else {
-				BazelLanguageServerTerminal.error(`Failed to start bazel TCP server`);
+				LOGGER.info('Failed to start bazel TCP server');
+				BazelLanguageServerTerminal.error('Failed to start bazel TCP server');
 				setTimeout<number>(1000 * attempts).then(() =>
 					startTCPServer(attempts + 1)
 				);

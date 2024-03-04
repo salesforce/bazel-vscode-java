@@ -1,11 +1,11 @@
 import { Uri } from 'vscode';
 import { Emitter } from 'vscode-languageclient';
-import { BazelEventsExtensionAPI } from './extension.api';
-
+import { BazelEventsExtensionAPI, TimeEvent } from './extension.api';
+``;
 class ApiHandler {
 	private api!: BazelEventsExtensionAPI;
 	private onSyncStartedEmitter: Emitter<string> = new Emitter<string>();
-	private onSyncEndedEmitter: Emitter<string> = new Emitter<string>();
+	private onSyncEndedEmitter: Emitter<TimeEvent> = new Emitter<TimeEvent>();
 	private onBazelProjectFileCreatedEmitter: Emitter<string> =
 		new Emitter<string>();
 	private onBazelProjectFileUpdatedEmitter: Emitter<Uri> = new Emitter<Uri>();
@@ -40,8 +40,11 @@ class ApiHandler {
 		this.onSyncStartedEmitter.fire(event);
 	}
 
-	public fireSyncEnded(event: string) {
-		this.onSyncEndedEmitter.fire(event);
+	public fireSyncEnded(workspace: string, timeSpecSec: number) {
+		this.onSyncEndedEmitter.fire({
+			workspaceRoot: workspace,
+			timeTookSec: timeSpecSec,
+		});
 	}
 
 	public fireBazelProjectFileCreated(event: string) {

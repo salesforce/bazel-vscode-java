@@ -1,5 +1,10 @@
 import * as vscode from 'vscode';
 
+export interface TimeEvent {
+	workspaceRoot: string;
+	timeTookSec: number;
+}
+
 export interface BazelEventsExtensionAPI {
 	/* An event which is fired on start of a Bazel Sync session.
 	 * The string points to path of the Workspace root.
@@ -8,7 +13,7 @@ export interface BazelEventsExtensionAPI {
 	/* An event which is fired on end of a Bazel Sync session.
 	 * The string points to path of the Workspace root.
 	 */
-	readonly onSyncEnded: vscode.Event<string>;
+	readonly onSyncEnded: vscode.Event<TimeEvent>;
 	/* An event which is fired on creation of a .bazelproject file.
 	 *The string points to path of the .bazelproject file.
 	 */

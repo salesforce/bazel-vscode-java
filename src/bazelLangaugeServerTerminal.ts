@@ -1,14 +1,29 @@
 import { Writable } from 'stream';
 import { Terminal, window, workspace } from 'vscode';
+import { apiHandler } from './apiHandler';
 import { BazelTerminal } from './bazelTerminal';
+import { LOGGER, getWorkspaceRoot } from './util';
 
 const BAZEL_TERMINAL_NAME = 'Bazel Build Status';
+const workspaceRoot = getWorkspaceRoot();
+const SYNC_INFO = RegExp(/100.0%\s+Synchronizing\s+core\s+(\S+)\n/);
 
 export namespace BazelLanguageServerTerminal {
 	export function stream(): Writable {
 		const s = new Writable();
 		s._write = (chunk: Buffer, encoding, next) => {
 			getBazelTerminal().sendText(chunk.toString());
+			const syncInfo = SYNC_INFO.exec(chunk.toString());
+			if (syncInfo) {
+				let timeTook = 0;
+				if (syncInfo[1]) {
+					if (/[0-9]+s/.test(syncInfo[1])) {
+						timeTook = parseInt(syncInfo[1].replace('s', ''));
+					}
+				}
+				LOGGER.info(`Synchronization Summary detected. TimeTook ${timeTook}`);
+				apiHandler.fireSyncEnded(workspaceRoot, timeTook);
+			}
 			next();
 		};
 		s.on('unpipe', () => s.end());
