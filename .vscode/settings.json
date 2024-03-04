@@ -13,6 +13,5 @@
 		"source.fixAll": "explicit",
 		"source.organizeImports": "explicit"
 	},
-	"java.configuration.updateBuildConfiguration": "disabled",
-	"sarif-viewer.connectToGithubCodeScanning": "off"
+	"java.configuration.updateBuildConfiguration": "disabled"
 }

@@ -13,17 +13,7 @@ export namespace BazelLanguageServerTerminal {
 		const s = new Writable();
 		s._write = (chunk: Buffer, encoding, next) => {
 			getBazelTerminal().sendText(chunk.toString());
-			const syncInfo = SYNC_INFO.exec(chunk.toString());
-			if (syncInfo) {
-				let timeTook = 0;
-				if (syncInfo[1]) {
-					if (/[0-9]+s/.test(syncInfo[1])) {
-						timeTook = parseInt(syncInfo[1].replace('s', ''));
-					}
-				}
-				LOGGER.info(`Synchronization Summary detected. TimeTook ${timeTook}`);
-				apiHandler.fireSyncEnded(workspaceRoot, timeTook);
-			}
+			catchBazelLog(chunk.toString());
 			next();
 		};
 		s.on('unpipe', () => s.end());
@@ -55,6 +45,7 @@ export namespace BazelLanguageServerTerminal {
 	} // gray
 }
 
+// Catch some bazel log messages to trigger API events
 export function getBazelTerminal(): Terminal {
 	const term = window.terminals.find(
 		(term) => term.name === BAZEL_TERMINAL_NAME
@@ -88,5 +79,19 @@ function getLogLevel(): LogLevel {
 			return LogLevel.TRACE;
 		default:
 			return LogLevel.INFO;
+	}
+}
+
+function catchBazelLog(chunk: string) {
+	const syncInfo = SYNC_INFO.exec(chunk);
+	if (syncInfo) {
+		let timeTook = 0;
+		if (syncInfo[1]) {
+			if (/[0-9]+s/.test(syncInfo[1])) {
+				timeTook = parseInt(syncInfo[1].replace('s', ''));
+			}
+		}
+		LOGGER.info(`Synchronization Summary detected. TimeTook ${timeTook}`);
+		apiHandler.fireSyncEnded(workspaceRoot, timeTook);
 	}
 }
