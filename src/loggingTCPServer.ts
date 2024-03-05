@@ -55,7 +55,6 @@ function startTCPServer(attempts = 0): Promise<number> {
 				}
 			} else {
 				LOGGER.info('Failed to start bazel TCP server');
-				BazelLanguageServerTerminal.error('Failed to start bazel TCP server');
 				setTimeout<number>(1000 * attempts).then(() =>
 					startTCPServer(attempts + 1)
 				);

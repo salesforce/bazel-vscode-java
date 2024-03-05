@@ -238,7 +238,7 @@ function toggleBazelProjectSyncStatus(doc: TextDocument) {
 						.getConfiguration('bazel.projectview')
 						.update('notification', false);
 				} else {
-					LOGGER.error(
+					throw new Error(
 						`toggleBazelProjectSyncStatus: Unexpected value returned from showWarningMessage ${val}`
 					);
 				}
