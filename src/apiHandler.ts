@@ -1,7 +1,7 @@
 import { Uri } from 'vscode';
 import { Emitter } from 'vscode-languageclient';
 import { BazelEventsExtensionAPI, TimeEvent } from './extension.api';
-``;
+
 class ApiHandler {
 	private api!: BazelEventsExtensionAPI;
 	private onSyncStartedEmitter: Emitter<string> = new Emitter<string>();
@@ -40,10 +40,10 @@ class ApiHandler {
 		this.onSyncStartedEmitter.fire(event);
 	}
 
-	public fireSyncEnded(workspace: string, timeSpecSec: number) {
+	public fireSyncEnded(workspace: string, duration: number) {
 		this.onSyncEndedEmitter.fire({
 			workspaceRoot: workspace,
-			timeTookSec: timeSpecSec,
+			duration: duration,
 		});
 	}
 

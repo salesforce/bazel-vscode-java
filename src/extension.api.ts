@@ -2,7 +2,8 @@ import * as vscode from 'vscode';
 
 export interface TimeEvent {
 	workspaceRoot: string;
-	timeTookSec: number;
+	// Duration in seconds
+	duration: number;
 }
 
 export interface BazelEventsExtensionAPI {
