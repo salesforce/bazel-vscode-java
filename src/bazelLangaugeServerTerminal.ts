@@ -1,14 +1,19 @@
 import { Writable } from 'stream';
 import { Terminal, window, workspace } from 'vscode';
+import { apiHandler } from './apiHandler';
 import { BazelTerminal } from './bazelTerminal';
+import { TerminalLogPattern } from './extension.api';
+import { LOGGER, getWorkspaceRoot } from './util';
 
 const BAZEL_TERMINAL_NAME = 'Bazel Build Status';
+const workspaceRoot = getWorkspaceRoot();
 
 export namespace BazelLanguageServerTerminal {
 	export function stream(): Writable {
 		const s = new Writable();
 		s._write = (chunk: Buffer, encoding, next) => {
 			getBazelTerminal().sendText(chunk.toString());
+			catchBazelLog(chunk.toString());
 			next();
 		};
 		s.on('unpipe', () => s.end());
@@ -40,6 +45,7 @@ export namespace BazelLanguageServerTerminal {
 	} // gray
 }
 
+// Catch some bazel log messages to trigger API events
 export function getBazelTerminal(): Terminal {
 	const term = window.terminals.find(
 		(term) => term.name === BAZEL_TERMINAL_NAME
@@ -74,4 +80,27 @@ function getLogLevel(): LogLevel {
 		default:
 			return LogLevel.INFO;
 	}
+}
+
+function catchBazelLog(chunk: string) {
+	// apiHandler.bazelTerminalLogListeners['BazelTest']={ name: 'BazelTest', pattern: RegExp(/100.0%\s+Synchronizing\s+core\s+(\S+)\n/), sendFullMessage: true}
+	apiHandler.bazelTerminalLogListeners.forEach(
+		(logPattern: TerminalLogPattern, name: string) => {
+			const patternToMatch = logPattern.pattern;
+			const patternMatched = patternToMatch.exec(chunk);
+			if (patternMatched) {
+				LOGGER.debug(`catchBazelLog ${name}`);
+				let textPiece = patternMatched[0];
+				if (logPattern.sendFullMessage) {
+					textPiece = chunk;
+				}
+				apiHandler.fireBazelTerminalLog({
+					name: name,
+					pattern: patternToMatch,
+					fullMessage: textPiece,
+					workspaceRoot: workspaceRoot,
+				});
+			}
+		}
+	);
 }

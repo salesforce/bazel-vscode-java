@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
-import { workspace } from 'vscode';
+import { window, workspace } from 'vscode';
+import { apiHandler } from './apiHandler';
 
 // TODO: pull this template out into a file
 const BAZELPROJECT_TEMPLATE = `
@@ -16,6 +17,10 @@ directories:
 
 derive_targets_from_directories: true
 `;
+
+export const LOGGER = window.createOutputChannel('bazel-vscode-java', {
+	log: true,
+});
 
 export function getWorkspaceRoot(): string {
 	if (workspace.workspaceFile) {

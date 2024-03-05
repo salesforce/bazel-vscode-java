@@ -13,6 +13,7 @@ import {
 	window,
 	workspace,
 } from 'vscode';
+import { apiHandler } from './apiHandler';
 import {
 	BazelLanguageServerTerminal,
 	getBazelTerminal,
@@ -20,11 +21,13 @@ import {
 import { BazelTaskManager } from './bazelTaskManager';
 import { getBazelProjectFile } from './bazelprojectparser';
 import { Commands, executeJavaLanguageServerCommand } from './commands';
+import { BazelEventsExtensionAPI } from './extension.api';
 import { registerLSClient } from './loggingTCPServer';
 import { BazelRunTargetProvider } from './provider/bazelRunTargetProvider';
 import { BazelTaskProvider } from './provider/bazelTaskProvider';
 import { ExcludeConfig, FileWatcherExcludeConfig } from './types';
 import {
+	LOGGER,
 	getWorkspaceRoot,
 	initBazelProjectFile,
 	isBazelWorkspaceRoot,
@@ -42,7 +45,7 @@ export async function activate(context: ExtensionContext) {
 	// fetch all projects loaded into LS and display those too
 	// show both .vscode and .eclipse folders
 	//
-
+	LOGGER.debug('Extension bazel-vscode-java is being activated');
 	window.registerTreeDataProvider(
 		'bazelTaskOutline',
 		BazelRunTargetProvider.instance
@@ -53,6 +56,9 @@ export async function activate(context: ExtensionContext) {
 
 	workspace.onDidSaveTextDocument((doc) => {
 		if (doc.fileName.includes('bazelproject')) {
+			LOGGER.debug(
+				`File with name including bazelproject has been changed. ${doc.fileName}`
+			);
 			toggleBazelProjectSyncStatus(doc);
 		}
 	});
@@ -71,6 +77,7 @@ export async function activate(context: ExtensionContext) {
 	);
 	// create .eclipse/.bazelproject file is DNE
 	if (isBazelWorkspaceRoot()) {
+		LOGGER.debug(`Bazel Workspace Root detected. ${getWorkspaceRoot()}`);
 		initBazelProjectFile();
 		const showBazelprojectConfig =
 			workspace.getConfiguration('bazel.projectview');
@@ -84,6 +91,8 @@ export async function activate(context: ExtensionContext) {
 				openBazelProjectFile()
 			)
 		);
+	} else {
+		LOGGER.debug('Bazel Workspace Root not detected.');
 	}
 
 	context.subscriptions.push(
@@ -126,22 +135,33 @@ export async function activate(context: ExtensionContext) {
 
 	// always update the project view after the initial project load
 	registerLSClient();
+
+	LOGGER.debug('Activation is complete.');
+
+	return new Promise<BazelEventsExtensionAPI>((resolve, reject) => {
+		apiHandler.initApi();
+		resolve(apiHandler.getApi());
+	});
 }
 
 export function deactivate() {}
 
 function syncProjectView(): void {
 	if (!isRedhatJavaReady()) {
+		LOGGER.warn('RedHat Java is not ready for Bazel Project Sync.');
 		window.showErrorMessage(
 			'Unable to sync project view. Java language server is not ready'
 		);
 		return;
 	}
+	LOGGER.debug('RedHat Java is ready. Starting Bazel Project Sync.');
 
+	apiHandler.fireSyncStarted(workspaceRoot);
 	const launchMode = workspace
 		.getConfiguration('java.server')
 		.get('launchMode');
 	// if the launchMode is not Standard it should be changed and the window reloaded to apply that change
+	LOGGER.debug(`Java server launch mode is ${launchMode} .`);
 	if (!launchMode || launchMode !== 'Standard') {
 		workspace
 			.getConfiguration('java.server')
@@ -194,13 +214,21 @@ function isRedhatJavaReady(): boolean {
 }
 
 function toggleBazelProjectSyncStatus(doc: TextDocument) {
-	if (workspace.getConfiguration('bazel.projectview').get('notification')) {
+	const showNotification = workspace
+		.getConfiguration('bazel.projectview')
+		.get('notification');
+	LOGGER.debug(
+		`toggleBazelProjectSyncStatus: Is notification to be shown ${showNotification}`
+	);
+	if (showNotification) {
+		LOGGER.debug(`toggleBazelProjectSyncStatus: Notification is required.`);
 		window
 			.showWarningMessage(
 				`The Bazel Project View changed. Do you want to synchronize? [details](https://github.com/salesforce/bazel-eclipse/blob/main/docs/common/projectviews.md#project-views)`,
 				...['Java Projects', 'Only Directories', 'Do Nothing']
 			)
 			.then((val) => {
+				LOGGER.debug(`toggleBazelProjectSyncStatus: Sync requested for ${val}`);
 				if (val === 'Java Projects') {
 					syncProjectView();
 				} else if (val === 'Only Directories') {
@@ -209,13 +237,22 @@ function toggleBazelProjectSyncStatus(doc: TextDocument) {
 					workspace
 						.getConfiguration('bazel.projectview')
 						.update('notification', false);
+				} else {
+					throw new Error(
+						`toggleBazelProjectSyncStatus: Unexpected value returned from showWarningMessage ${val}`
+					);
 				}
 			});
+	} else {
+		LOGGER.debug(`toggleBazelProjectSyncStatus: Notification is not required.`);
 	}
 }
 
 async function syncProjectViewDirectories() {
 	if (workspaceRoot) {
+		LOGGER.debug(
+			'Workspace root is defined for Directories sync. Syncing bazel project view.'
+		);
 		BazelLanguageServerTerminal.debug('Syncing bazel project view');
 		const displayFolders = new Set<string>(['.eclipse', '.vscode']); // TODO bubble this out to a setting
 		try {
@@ -223,7 +260,9 @@ async function syncProjectViewDirectories() {
 			let viewAll = false;
 			if (bazelProjectFile.directories.includes('.')) {
 				viewAll = true;
+				apiHandler.fireSyncDirectoriesStarted([]);
 			} else {
+				apiHandler.fireSyncDirectoriesStarted(bazelProjectFile.directories);
 				bazelProjectFile.directories.forEach((d) => {
 					const dirRoot = d.split('/').filter((x) => x)[0];
 					displayFolders.add(dirRoot);
@@ -322,9 +361,12 @@ async function syncProjectViewDirectories() {
 						);
 				}
 			});
+			apiHandler.fireSyncDirectoriesEnded(bazelProjectFile.directories);
 		} catch (err) {
 			throw new Error(`Could not read bazelproject file: ${err}`);
 		}
+	} else {
+		LOGGER.warn('Workspace root is not defined for Directories sync.');
 	}
 }
 
