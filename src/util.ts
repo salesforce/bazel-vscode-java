@@ -46,9 +46,6 @@ export function initBazelProjectFile() {
 			join(workspaceRoot, '.eclipse', '.bazelproject'),
 			BAZELPROJECT_TEMPLATE
 		);
-		apiHandler.fireBazelProjectFileCreated(
-			join(workspaceRoot, '.eclipse', '.bazelproject')
-		);
 	}
 }
 

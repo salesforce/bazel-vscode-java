@@ -1,14 +1,16 @@
-import { Uri } from 'vscode';
 import { Emitter } from 'vscode-languageclient';
-import { BazelEventsExtensionAPI, TimeEvent } from './extension.api';
+import {
+	BazelEventsExtensionAPI,
+	TerminalLogEvent,
+	TerminalLogPattern,
+} from './extension.api';
+import { LOGGER } from './util';
 
 class ApiHandler {
 	private api!: BazelEventsExtensionAPI;
 	private onSyncStartedEmitter: Emitter<string> = new Emitter<string>();
-	private onSyncEndedEmitter: Emitter<TimeEvent> = new Emitter<TimeEvent>();
-	private onBazelProjectFileCreatedEmitter: Emitter<string> =
-		new Emitter<string>();
-	private onBazelProjectFileUpdatedEmitter: Emitter<Uri> = new Emitter<Uri>();
+	private onBazelTerminalLogEmitter: Emitter<TerminalLogEvent> =
+		new Emitter<TerminalLogEvent>();
 	private onSyncDirectoriesStartedEmitter: Emitter<string[]> = new Emitter<
 		string[]
 	>();
@@ -16,43 +18,38 @@ class ApiHandler {
 		string[]
 	>();
 
+	public bazelTerminalLogListeners: Map<string, TerminalLogPattern> = new Map();
+
 	public initApi() {
 		const onSyncStarted = this.onSyncStartedEmitter.event;
-		const onSyncEnded = this.onSyncEndedEmitter.event;
-		const onBazelProjectFileCreated =
-			this.onBazelProjectFileCreatedEmitter.event;
-		const onBazelProjectFileUpdated =
-			this.onBazelProjectFileUpdatedEmitter.event;
+		const onBazelTerminalLog = this.onBazelTerminalLogEmitter.event;
 		const onSyncDirectoriesStarted = this.onSyncDirectoriesStartedEmitter.event;
 		const onSyncDirectoriesEnded = this.onSyncDirectoriesEndedEmitter.event;
+		const appendBazelTerminalLogPattern = this.appendBazelTerminalLogPattern;
 
 		this.api = {
 			onSyncStarted,
-			onSyncEnded,
-			onBazelProjectFileCreated,
-			onBazelProjectFileUpdated,
+			onBazelTerminalLog,
 			onSyncDirectoriesStarted,
 			onSyncDirectoriesEnded,
+			appendBazelTerminalLogPattern,
 		};
+	}
+
+	private appendBazelTerminalLogPattern(pattern: TerminalLogPattern): boolean {
+		LOGGER.debug(
+			`appendBazelTerminalLogPattern ${pattern.name} RegExp:${pattern.pattern}`
+		);
+		this.bazelTerminalLogListeners.set(pattern.name, pattern);
+		return true;
 	}
 
 	public fireSyncStarted(event: string) {
 		this.onSyncStartedEmitter.fire(event);
 	}
 
-	public fireSyncEnded(workspace: string, duration: number) {
-		this.onSyncEndedEmitter.fire({
-			workspaceRoot: workspace,
-			duration: duration,
-		});
-	}
-
-	public fireBazelProjectFileCreated(event: string) {
-		this.onBazelProjectFileCreatedEmitter.fire(event);
-	}
-
-	public fireBazelProjectFileUpdated(event: Uri) {
-		this.onBazelProjectFileUpdatedEmitter.fire(event);
+	public fireBazelTerminalLog(event: TerminalLogEvent) {
+		this.onBazelTerminalLogEmitter.fire(event);
 	}
 
 	public fireSyncDirectoriesStarted(event: string[]) {

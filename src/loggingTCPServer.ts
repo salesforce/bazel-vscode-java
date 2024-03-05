@@ -14,7 +14,7 @@ let server: Server | undefined;
 function startTCPServer(attempts = 0): Promise<number> {
 	let port = 0;
 	if (workspace.getConfiguration('java').has('jdt.ls.vmargs')) {
-		LOGGER.info('Adjusting vmargs for TCP Server.');
+		LOGGER.debug('Adjusting vmargs for TCP Server.');
 		const vmargs = workspace
 			.getConfiguration('java')
 			.get<string>('jdt.ls.vmargs');
@@ -30,7 +30,7 @@ function startTCPServer(attempts = 0): Promise<number> {
 
 	return new Promise((resolve) => {
 		if (!server) {
-			LOGGER.info('Starting TCP Server.');
+			LOGGER.debug('Starting TCP Server.');
 			server = createServer((sock: Socket) => {
 				attempts = 0;
 
@@ -50,10 +50,7 @@ function startTCPServer(attempts = 0): Promise<number> {
 				const address = server.address();
 				if (address) {
 					const port = (address as AddressInfo).port;
-					BazelLanguageServerTerminal.debug(
-						`Bazel log server listening on port ${port}`
-					);
-					LOGGER.info(`Bazel log server listening on port ${port}`);
+					LOGGER.debug(`Bazel log server listening on port ${port}`);
 					resolve(port);
 				}
 			} else {

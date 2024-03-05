@@ -2,11 +2,11 @@ import { Writable } from 'stream';
 import { Terminal, window, workspace } from 'vscode';
 import { apiHandler } from './apiHandler';
 import { BazelTerminal } from './bazelTerminal';
+import { TerminalLogPattern } from './extension.api';
 import { LOGGER, getWorkspaceRoot } from './util';
 
 const BAZEL_TERMINAL_NAME = 'Bazel Build Status';
 const workspaceRoot = getWorkspaceRoot();
-const SYNC_INFO = RegExp(/100.0%\s+Synchronizing\s+core\s+(\S+)\n/);
 
 export namespace BazelLanguageServerTerminal {
 	export function stream(): Writable {
@@ -83,15 +83,24 @@ function getLogLevel(): LogLevel {
 }
 
 function catchBazelLog(chunk: string) {
-	const syncInfo = SYNC_INFO.exec(chunk);
-	if (syncInfo) {
-		let timeTook = 0;
-		if (syncInfo[1]) {
-			if (/[0-9]+s/.test(syncInfo[1])) {
-				timeTook = parseInt(syncInfo[1].replace('s', ''));
+	// apiHandler.bazelTerminalLogListeners['BazelTest']={ name: 'BazelTest', pattern: RegExp(/100.0%\s+Synchronizing\s+core\s+(\S+)\n/), sendFullMessage: true}
+	apiHandler.bazelTerminalLogListeners.forEach(
+		(logPattern: TerminalLogPattern, name: string) => {
+			const patternToMatch = logPattern.pattern;
+			const patternMatched = patternToMatch.exec(chunk);
+			if (patternMatched) {
+				LOGGER.debug(`catchBazelLog ${name}`);
+				let textPiece = patternMatched[0];
+				if (logPattern.sendFullMessage) {
+					textPiece = chunk;
+				}
+				apiHandler.fireBazelTerminalLog({
+					name: name,
+					pattern: patternToMatch,
+					fullMessage: textPiece,
+					workspaceRoot: workspaceRoot,
+				});
 			}
 		}
-		LOGGER.info(`Synchronization Summary detected. TimeTook ${timeTook}`);
-		apiHandler.fireSyncEnded(workspaceRoot, timeTook);
-	}
+	);
 }

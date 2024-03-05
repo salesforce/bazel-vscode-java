@@ -1,28 +1,33 @@
 import * as vscode from 'vscode';
 
+export interface TerminalLogEvent {
+	name: string;
+	pattern: RegExp;
+	fullMessage: string;
+	workspaceRoot: string;
+}
+
 export interface TimeEvent {
 	workspaceRoot: string;
 	// Duration in seconds
 	duration: number;
 }
 
+export interface TerminalLogPattern {
+	name: string;
+	pattern: RegExp;
+	sendFullMessage: boolean;
+}
+
+export type AppendBazelTerminalLogPattern = (
+	pattern: TerminalLogPattern
+) => boolean;
+
 export interface BazelEventsExtensionAPI {
 	/* An event which is fired on start of a Bazel Sync session.
 	 * The string points to path of the Workspace root.
 	 */
 	readonly onSyncStarted: vscode.Event<string>;
-	/* An event which is fired on end of a Bazel Sync session.
-	 * The string points to path of the Workspace root.
-	 */
-	readonly onSyncEnded: vscode.Event<TimeEvent>;
-	/* An event which is fired on creation of a .bazelproject file.
-	 *The string points to path of the .bazelproject file.
-	 */
-	readonly onBazelProjectFileCreated: vscode.Event<string>;
-	/* An event which is fired on updates to the .bazelproject file.
-	 * The Uri points to Uri of the .bazelproject file.
-	 */
-	readonly onBazelProjectFileUpdated: vscode.Event<vscode.Uri>;
 	/* An event which is fired on start of a Bazel Sync Directories session.
 	 * The list of strings stores the list of directories in .bazelproject
 	 * that are being synced.
@@ -33,4 +38,13 @@ export interface BazelEventsExtensionAPI {
 	 * that are being synced.
 	 */
 	readonly onSyncDirectoriesEnded: vscode.Event<string[]>;
+	/* An event which is fired when BazelTerminal listener catches a message which
+	 * matches a registered pattern.
+	 * The string points to path of the Workspace root.
+	 */
+	readonly onBazelTerminalLog: vscode.Event<TerminalLogEvent>;
+	/* A method do register a patter to be matched agains BazelTerminalLog to trigger
+	 * the event onBazelTerminalLog
+	 */
+	readonly appendBazelTerminalLogPattern: AppendBazelTerminalLogPattern;
 }
