@@ -5,9 +5,7 @@ import {
 	ConfigurationTarget,
 	ExtensionContext,
 	FileType,
-	StatusBarAlignment,
 	TextDocument,
-	ThemeColor,
 	Uri,
 	commands,
 	extensions,
@@ -32,14 +30,6 @@ import {
 	isBazelWorkspaceRoot,
 } from './util';
 
-const classpathStatus = window.createStatusBarItem(StatusBarAlignment.Left, 1);
-const projectViewStatus = window.createStatusBarItem(
-	StatusBarAlignment.Left,
-	1
-);
-const outOfDateClasspaths: Set<Uri> = new Set<Uri>();
-classpathStatus.command = Commands.UPDATE_CLASSPATHS_CMD;
-projectViewStatus.command = Commands.SYNC_PROJECTS_CMD;
 const workspaceRoot = getWorkspaceRoot();
 
 export async function activate(context: ExtensionContext) {
@@ -61,13 +51,9 @@ export async function activate(context: ExtensionContext) {
 
 	BazelLanguageServerTerminal.trace('extension activated');
 
-	workspace.onDidChangeTextDocument((event) => {
-		const doc = event.document;
-		if (doc.uri.fsPath.includes('bazelproject') && !doc.isDirty) {
+	workspace.onDidSaveTextDocument((doc) => {
+		if (doc.fileName.includes('bazelproject')) {
 			toggleBazelProjectSyncStatus(doc);
-		}
-		if (doc.uri.fsPath.includes('BUILD') && !doc.isDirty) {
-			toggleBazelClasspathSyncStatus(doc);
 		}
 	});
 
@@ -92,7 +78,7 @@ export async function activate(context: ExtensionContext) {
 			openBazelProjectFile();
 			showBazelprojectConfig.update('open', false); // only open this file on the first activation of this extension
 		}
-		syncBazelProjectView();
+		syncProjectViewDirectories();
 		context.subscriptions.push(
 			commands.registerCommand(Commands.OPEN_BAZEL_PROJECT_FILE, () =>
 				openBazelProjectFile()
@@ -106,7 +92,7 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(
 		commands.registerCommand(
 			Commands.SYNC_DIRECTORIES_ONLY,
-			syncBazelProjectView
+			syncProjectViewDirectories
 		)
 	);
 	context.subscriptions.push(
@@ -152,9 +138,19 @@ function syncProjectView(): void {
 		return;
 	}
 
-	projectViewStatus.hide();
+	const launchMode = workspace
+		.getConfiguration('java.server')
+		.get('launchMode');
+	// if the launchMode is not Standard it should be changed and the window reloaded to apply that change
+	if (!launchMode || launchMode !== 'Standard') {
+		workspace
+			.getConfiguration('java.server')
+			.update('launchMode', 'Standard')
+			.then(() => commands.executeCommand('workbench.action.reloadWindow'));
+	}
+
 	executeJavaLanguageServerCommand(Commands.SYNC_PROJECTS).then(
-		syncBazelProjectView
+		syncProjectViewDirectories
 	);
 }
 
@@ -165,19 +161,6 @@ function updateClasspaths() {
 		);
 		return;
 	}
-	outOfDateClasspaths.forEach((uri) => {
-		BazelLanguageServerTerminal.info(`Updating classpath for ${uri.fsPath}`);
-		executeJavaLanguageServerCommand(
-			Commands.UPDATE_CLASSPATHS,
-			uri.toString()
-		).then(
-			() => outOfDateClasspaths.delete(uri),
-			(err: Error) => {
-				BazelLanguageServerTerminal.error(`${err.message}\n${err.stack}`);
-			}
-		);
-	});
-	classpathStatus.hide();
 }
 
 function runLSCmd() {
@@ -210,24 +193,28 @@ function isRedhatJavaReady(): boolean {
 	return false;
 }
 
-function toggleBazelClasspathSyncStatus(doc: TextDocument) {
-	classpathStatus.show();
-	classpathStatus.text = 'Sync bazel classpath';
-	classpathStatus.backgroundColor = new ThemeColor(
-		'statusBarItem.warningBackground'
-	);
-	outOfDateClasspaths.add(doc.uri);
-}
-
 function toggleBazelProjectSyncStatus(doc: TextDocument) {
-	projectViewStatus.show();
-	projectViewStatus.text = 'Sync bazel project view';
-	projectViewStatus.backgroundColor = new ThemeColor(
-		'statusBarItem.warningBackground'
-	);
+	if (workspace.getConfiguration('bazel.projectview').get('notification')) {
+		window
+			.showWarningMessage(
+				`The Bazel Project View changed. Do you want to synchronize? [details](https://github.com/salesforce/bazel-eclipse/blob/main/docs/common/projectviews.md#project-views)`,
+				...['Java Projects', 'Only Directories', 'Do Nothing']
+			)
+			.then((val) => {
+				if (val === 'Java Projects') {
+					syncProjectView();
+				} else if (val === 'Only Directories') {
+					syncProjectViewDirectories();
+				} else if (val === 'Do Nothing') {
+					workspace
+						.getConfiguration('bazel.projectview')
+						.update('notification', false);
+				}
+			});
+	}
 }
 
-async function syncBazelProjectView() {
+async function syncProjectViewDirectories() {
 	if (workspaceRoot) {
 		BazelLanguageServerTerminal.debug('Syncing bazel project view');
 		const displayFolders = new Set<string>(['.eclipse', '.vscode']); // TODO bubble this out to a setting
@@ -318,13 +305,18 @@ async function syncBazelProjectView() {
 						.update('watcherExclude', newFilesWatcherExclude)
 						.then((x) =>
 							window
-								.showInformationMessage(
+								.showWarningMessage(
 									'File watcher exclusions are out of date. Please reload the window to apply the change',
 									...['Reload', 'Ignore']
 								)
 								.then((opt) => {
 									if (opt === 'Reload') {
 										commands.executeCommand('workbench.action.reloadWindow');
+									}
+									if (opt === 'Ignore') {
+										workspace
+											.getConfiguration('bazel.projectview')
+											.update('updateFileWatcherExclusion', false);
 									}
 								})
 						);
