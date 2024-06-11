@@ -1,5 +1,5 @@
 import { existsSync } from 'fs';
-import path, { join } from 'path';
+import { join } from 'path';
 import { format } from 'util';
 import {
 	ConfigurationTarget,
@@ -69,7 +69,7 @@ export async function activate(context: ExtensionContext) {
 		'isBazelWorkspaceRoot',
 		isBazelWorkspaceRoot()
 	);
-	// create .eclipse/.bazelproject file is DNE
+	// create .eclipse/.bazelproject file if DNE
 	if (isBazelWorkspaceRoot()) {
 		initBazelProjectFile();
 		const showBazelprojectConfig =
@@ -271,10 +271,9 @@ async function syncProjectViewDirectories() {
 						(k) => k.includes('.vscode') && k.includes('.eclipse')
 					).length;
 
-					const baseFolder = getWorkspaceRoot().split(path.sep).reverse()[0];
 					const fileWatcherExcludePattern = viewAll
 						? ''
-						: `**/${baseFolder}/!(${Array.from(displayFolders).join('|')})/**`;
+						: `**/!(${Array.from(displayFolders).join('|')})/**`;
 
 					if (viewAll) {
 						// if viewAll and existing config doesn't contain .vscode/.eclipse return
