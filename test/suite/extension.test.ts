@@ -65,6 +65,7 @@ suite('Java Language Extension - Standard', () => {
 			Commands.DEBUG_LS_CMD,
 			Commands.OPEN_BAZEL_BUILD_STATUS_CMD,
 			Commands.OPEN_BAZEL_PROJECT_FILE,
+			Commands.CONVERT_PROJECT_WORKSPACE,
 		].sort();
 
 		const foundBazelJavaCommands = commands

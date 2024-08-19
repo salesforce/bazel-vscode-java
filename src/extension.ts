@@ -2,11 +2,8 @@ import { existsSync } from 'fs';
 import { join } from 'path';
 import { format } from 'util';
 import {
-	ConfigurationTarget,
 	ExtensionContext,
-	FileType,
 	TextDocument,
-	Uri,
 	commands,
 	extensions,
 	tasks,
@@ -18,12 +15,11 @@ import {
 	getBazelTerminal,
 } from './bazelLangaugeServerTerminal';
 import { BazelTaskManager } from './bazelTaskManager';
-import { getBazelProjectFile } from './bazelprojectparser';
 import { Commands, executeJavaLanguageServerCommand } from './commands';
 import { registerLSClient } from './loggingTCPServer';
+import { ProjectViewManager } from './projectViewManager';
 import { BazelRunTargetProvider } from './provider/bazelRunTargetProvider';
 import { BazelTaskProvider } from './provider/bazelTaskProvider';
-import { ExcludeConfig, FileWatcherExcludeConfig } from './types';
 import {
 	getWorkspaceRoot,
 	initBazelProjectFile,
@@ -31,6 +27,7 @@ import {
 } from './util';
 
 const workspaceRoot = getWorkspaceRoot();
+const workspaceRootName = workspaceRoot.split('/').reverse()[0];
 
 export async function activate(context: ExtensionContext) {
 	// activates
@@ -39,8 +36,8 @@ export async function activate(context: ExtensionContext) {
 	// register TCP port with LS
 	// project view should reflect what's in the LS
 	// show any directories listed in the .bazelproject file
-	// fetch all projects loaded into LS and display those too
-	// show both .vscode and .eclipse folders
+	// fetch all projects loaded into LS and display those as well
+	// show .eclipse folder
 	//
 
 	window.registerTreeDataProvider(
@@ -117,6 +114,13 @@ export async function activate(context: ExtensionContext) {
 		commands.registerCommand(
 			Commands.BAZEL_TARGET_KILL,
 			BazelTaskManager.killTask
+		)
+	);
+
+	context.subscriptions.push(
+		commands.registerCommand(
+			Commands.CONVERT_PROJECT_WORKSPACE,
+			ProjectViewManager.covertToMultiRoot
 		)
 	);
 
@@ -214,117 +218,8 @@ function toggleBazelProjectSyncStatus(doc: TextDocument) {
 	}
 }
 
-async function syncProjectViewDirectories() {
-	if (workspaceRoot) {
-		BazelLanguageServerTerminal.debug('Syncing bazel project view');
-		const displayFolders = new Set<string>(['.eclipse', '.vscode']); // TODO bubble this out to a setting
-		try {
-			const bazelProjectFile = await getBazelProjectFile();
-			let viewAll = false;
-			if (bazelProjectFile.directories.includes('.')) {
-				viewAll = true;
-			} else {
-				bazelProjectFile.directories.forEach((d) => {
-					const dirRoot = d.split('/').filter((x) => x)[0];
-					displayFolders.add(dirRoot);
-				});
-				bazelProjectFile.targets.forEach((t) =>
-					displayFolders.add(
-						t.replace('//', '').replace(/:.*/, '').replace(/\/.*/, '')
-					)
-				);
-			}
-
-			workspace.fs.readDirectory(Uri.parse(workspaceRoot)).then(async (val) => {
-				const dirs = val.filter((x) => x[1] !== FileType.File).map((d) => d[0]);
-				const workspaceFilesConfig = workspace.getConfiguration('files');
-				const filesExclude = workspaceFilesConfig.get(
-					'exclude'
-				) as ExcludeConfig;
-				dirs.forEach(
-					(d) => (filesExclude[d] = viewAll ? false : !displayFolders.has(d))
-				);
-				await workspaceFilesConfig.update(
-					'exclude',
-					filesExclude,
-					ConfigurationTarget.Workspace
-				);
-
-				// if the updateFileWatcherExclusion setting is enabled
-				if (
-					workspace
-						.getConfiguration('bazel.projectview')
-						.get('updateFileWatcherExclusion')
-				) {
-					BazelLanguageServerTerminal.debug(
-						'updating files.watcherExclude setting'
-					);
-
-					const filesWatcherExclude =
-						workspaceFilesConfig.get<FileWatcherExcludeConfig>(
-							'watcherExclude',
-							{}
-						);
-
-					const fileWatcherKeys = Object.keys(filesWatcherExclude);
-					const hasOldEntry = fileWatcherKeys.filter(
-						(k) => k.includes('.vscode') && k.includes('.eclipse')
-					).length;
-
-					const fileWatcherExcludePattern = viewAll
-						? ''
-						: `**/!(${Array.from(displayFolders).join('|')})/**`;
-
-					if (viewAll) {
-						// if viewAll and existing config doesn't contain .vscode/.eclipse return
-						if (!hasOldEntry) {
-							return;
-						}
-					} else {
-						// if !viewAll and existing config contains identical entry return
-						if (fileWatcherKeys.includes(fileWatcherExcludePattern)) {
-							return;
-						}
-					}
-
-					// copy the old config obj, but remove any previous exclude based on the .bazelproject file
-					const newFilesWatcherExclude: FileWatcherExcludeConfig = {};
-					for (const val in filesWatcherExclude) {
-						if (!(val.includes('.eclipse') && val.includes('.vscode'))) {
-							newFilesWatcherExclude[val] = filesWatcherExclude[val];
-						}
-					}
-
-					if (fileWatcherExcludePattern) {
-						newFilesWatcherExclude[fileWatcherExcludePattern] = true;
-					}
-
-					// reload the workspace to make the updated file watcher exclusions take effect
-					workspaceFilesConfig
-						.update('watcherExclude', newFilesWatcherExclude)
-						.then((x) =>
-							window
-								.showWarningMessage(
-									'File watcher exclusions are out of date. Please reload the window to apply the change',
-									...['Reload', 'Ignore']
-								)
-								.then((opt) => {
-									if (opt === 'Reload') {
-										commands.executeCommand('workbench.action.reloadWindow');
-									}
-									if (opt === 'Ignore') {
-										workspace
-											.getConfiguration('bazel.projectview')
-											.update('updateFileWatcherExclusion', false);
-									}
-								})
-						);
-				}
-			});
-		} catch (err) {
-			throw new Error(`Could not read bazelproject file: ${err}`);
-		}
-	}
+function syncProjectViewDirectories() {
+	ProjectViewManager.updateProjectView();
 }
 
 function openBazelProjectFile() {
