@@ -44,6 +44,8 @@ export namespace Commands {
 	export const BAZEL_TARGET_KILL = 'bazelTaskOutline.kill';
 
 	export const OPEN_BAZEL_PROJECT_FILE = 'bazel.projectview.open';
+
+	export const CONVERT_PROJECT_WORKSPACE = 'bazel.convert.workspace';
 }
 
 export function executeJavaLanguageServerCommand<T = unknown>(

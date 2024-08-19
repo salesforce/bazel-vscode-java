@@ -182,6 +182,11 @@
 				"command": "bazel.projectview.open",
 				"title": "Open the Bazel Project View file",
 				"category": "Bazel"
+			},
+			{
+				"command": "bazel.convert.workspace",
+				"title": "Convert to Multi-Root workspace",
+				"category": "Bazel"
 			}
 		],
 		"views": {
@@ -285,7 +290,7 @@
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
 		"@vscode/test-electron": "^2.3.4",
-		"@vscode/vsce": "^2.22.0",
+		"@vscode/vsce": "^3.0.0",
 		"esbuild": "0.19.8",
 		"esbuild-plugin-eslint": "^0.3.7",
 		"esbuild-visualizer": "^0.4.1",

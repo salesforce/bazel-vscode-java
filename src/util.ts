@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
-import { workspace } from 'vscode';
+import { Uri, workspace } from 'vscode';
 
 // TODO: pull this template out into a file
 const BAZELPROJECT_TEMPLATE = `
@@ -50,4 +50,16 @@ export function isBazelWorkspaceRoot(): boolean {
 		existsSync(join(workspaceRoot, 'WORKSPACE')) ||
 		existsSync(join(workspaceRoot, 'WORKSPACE.bazel'))
 	);
+}
+
+export async function getVscodeConfig(
+	name: 'settings' | 'launch' | 'tasks' | 'extensions'
+): Promise<Object | undefined> {
+	const root = getWorkspaceRoot();
+	const filePath = `${root}/.vscode/${name}.json`;
+	return existsSync(filePath)
+		? await workspace.fs
+				.readFile(Uri.file(`${`${root}/.vscode/${name}.json`}`))
+				.then((content) => JSON.parse(content.toString()))
+		: undefined;
 }

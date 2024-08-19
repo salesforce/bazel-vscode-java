@@ -176,9 +176,7 @@ export async function getBazelProjectFile(): Promise<BazelProjectView> {
 
 export function readBazelProject(bazelProjectFile: string): BazelProjectView {
 	return parseProjectFile({
-		root: workspace.workspaceFolders
-			? workspace.workspaceFolders[0].uri.fsPath
-			: './',
+		root: getWorkspaceRoot(),
 		imports: [bazelProjectFile],
 		projectView: {
 			directories: [],
