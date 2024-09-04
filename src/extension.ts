@@ -15,6 +15,7 @@ import {
 	getBazelTerminal,
 } from './bazelLangaugeServerTerminal';
 import { BazelTaskManager } from './bazelTaskManager';
+import { registerBuildifierFormatter } from './buildifier';
 import { Commands, executeJavaLanguageServerCommand } from './commands';
 import { registerLSClient } from './loggingTCPServer';
 import { ProjectViewManager } from './projectViewManager';
@@ -27,7 +28,6 @@ import {
 } from './util';
 
 const workspaceRoot = getWorkspaceRoot();
-const workspaceRootName = workspaceRoot.split('/').reverse()[0];
 
 export async function activate(context: ExtensionContext) {
 	// activates
@@ -123,6 +123,8 @@ export async function activate(context: ExtensionContext) {
 			ProjectViewManager.covertToMultiRoot
 		)
 	);
+
+	registerBuildifierFormatter();
 
 	// trigger a refresh of the tree view when any task get executed
 	tasks.onDidStartTask((_) => BazelRunTargetProvider.instance.refresh());
