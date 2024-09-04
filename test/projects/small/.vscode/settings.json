@@ -17,15 +17,24 @@
 		"bazel-small": false,
 		"bazel-testlogs": false,
 		".settings": true,
-		"tools": false
+		"tools": false,
+		"bin": false
 	},
 	"java.bazel.log.level": "trace",
 	"java.showBuildStatusOnStart.enabled": "terminal",
 	"java.debug.logLevel": "verbose",
 	"java.trace.server": "verbose",
 	"java.server.launchMode": "Standard",
-	"java.transport":"stdio",
-	"java.import.generatesMetadataFilesAtProjectRoot":false,
+	"java.transport": "stdio",
+	"java.import.generatesMetadataFilesAtProjectRoot": false,
 	"java.autobuild.enabled": true,
-	"bazel.projectview.open": false
+	"bazel.projectview.open": false,
+	"files.watcherExclude": {
+		"**/.git/objects/**": true,
+		"**/.git/subtree-cache/**": true,
+		"**/node_modules/*/**": true,
+		"**/.hg/store/**": true
+	},
+	"editor.formatOnSave": true,
+	"bazel.buildifier.enable": true
 }

@@ -1,0 +1,24 @@
+{
+  "documentation for humans": {
+    "What": "This file explains to buildifier how to sort format custom attributes.",
+    "See": "https://github.com/bazelbuild/buildtools/blob/master/tables/tables.go"
+  },
+  "IsLabelArg": {},
+  "LabelDenylist": {},
+  "IsSortableListArg": {
+      "dependencies": true,
+      "runtime_dependencies": true,
+      "junit_package_prefix_pref": false
+  },
+  "SortableAllowlist": {},
+  "NamePriority": {
+      "type": -10,
+      "dependencies": 10,
+      "notes": 12,
+      "runtime_dependencies": 15,
+      "additional_resources": 20,
+      "source_generators": 30,
+      "junit_package_prefix_pref": 39,
+      "testdata": 40
+  }
+}

@@ -57,13 +57,34 @@
 			{
 				"id": "bazelproject",
 				"aliases": [
-					"bazelproject",
 					"bazelproject"
 				],
 				"extensions": [
 					".bazelproject"
 				],
 				"configuration": "./syntaxes/bazelproject-language-configuration.json"
+			},
+			{
+				"id": "starlark",
+				"aliases": [
+					"Starlark",
+					"starlark",
+					"Bazel"
+				],
+				"extensions": [
+					".BUILD",
+					".WORKSPACE",
+					".bazel",
+					".bzl",
+					".bzlmod",
+					".sky",
+					".star"
+				],
+				"filenames": [
+					"BUILD",
+					"WORKSPACE"
+				],
+				"configuration": "./syntaxes/starlark-language-configuration.json"
 			}
 		],
 		"grammars": [
@@ -71,6 +92,11 @@
 				"language": "bazelproject",
 				"scopeName": "source.bazelproject",
 				"path": "./syntaxes/bazelproject.tmLanguage.json"
+			},
+			{
+				"language": "starlark",
+				"scopeName": "source.starlark",
+				"path": "./syntaxes/starlark.tmLanguage.json"
 			}
 		],
 		"taskDefinitions": [
@@ -130,6 +156,18 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Display 'sync project view' notification info window on .bazelproject edit",
+					"scope": "window"
+				},
+				"bazel.buildifier.enable": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable buildifier formatting tool on save",
+					"scope": "window"
+				},
+				"bazel.buildifier.binary": {
+					"type": ["string", "null"],
+					"default": null,
+					"description": "path to buildifier binary. If not set buildifier from your PATH will be used",
 					"scope": "window"
 				}
 			}
@@ -270,7 +308,7 @@
 		"esbuild:watch": "npm run esbuild:base -- --sourcemap --watch",
 		"analyze": "npm run esbuild:base -- --minify --metafile --analyze && esbuild-visualizer --metadata ./meta.json --open",
 		"lint": "eslint src --ext ts",
-		"lint:fix" : "eslint src --ext ts --fix",
+		"lint:fix": "eslint src --ext ts --fix",
 		"test": "run-s clean test:*",
 		"test:compile": "tsc -b ./test/tsconfig.json",
 		"test:lint": "eslint --ext .js,.ts,.tsx src",
