@@ -232,6 +232,11 @@
 				{
 					"id": "bazelTaskOutline",
 					"name": "Bazel Run Targets"
+				},
+				{
+					"id": "rootFileViewer",
+					"name": "Project Root (Files)",
+					"when": "isMultiRoot"
 				}
 			]
 		},

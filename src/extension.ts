@@ -21,6 +21,7 @@ import { registerLSClient } from './loggingTCPServer';
 import { ProjectViewManager } from './projectViewManager';
 import { BazelRunTargetProvider } from './provider/bazelRunTargetProvider';
 import { BazelTaskProvider } from './provider/bazelTaskProvider';
+import { RootFileViewProvider } from './provider/rootFileViewProvider';
 import {
 	getWorkspaceRoot,
 	initBazelProjectFile,
@@ -45,6 +46,10 @@ export async function activate(context: ExtensionContext) {
 		BazelRunTargetProvider.instance
 	);
 	tasks.registerTaskProvider('bazel', new BazelTaskProvider());
+	window.registerTreeDataProvider(
+		'rootFileViewer',
+		RootFileViewProvider.instance
+	);
 
 	BazelLanguageServerTerminal.trace('extension activated');
 
@@ -65,6 +70,11 @@ export async function activate(context: ExtensionContext) {
 		'setContext',
 		'isBazelWorkspaceRoot',
 		isBazelWorkspaceRoot()
+	);
+	commands.executeCommand(
+		'setContext',
+		'isMultiRoot',
+		workspace.workspaceFile?.fsPath.includes('code-workspace')
 	);
 	// create .eclipse/.bazelproject file if DNE
 	if (isBazelWorkspaceRoot()) {
@@ -134,7 +144,7 @@ export async function activate(context: ExtensionContext) {
 	registerLSClient();
 }
 
-export function deactivate() {}
+export function deactivate() { }
 
 function syncProjectView(): void {
 	if (!isRedhatJavaReady()) {
