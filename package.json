@@ -232,11 +232,6 @@
 				{
 					"id": "bazelTaskOutline",
 					"name": "Bazel Run Targets"
-				},
-				{
-					"id": "rootFileViewer",
-					"name": "Project Root (Files)",
-					"when": "isMultiRoot"
 				}
 			]
 		},
@@ -333,7 +328,7 @@
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
 		"@vscode/test-electron": "^2.3.4",
-		"@vscode/vsce": "^3.0.0",
+		"@vscode/vsce": "^3.2.1",
 		"esbuild": "0.19.8",
 		"esbuild-plugin-eslint": "^0.3.7",
 		"esbuild-visualizer": "^0.4.1",
