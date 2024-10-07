@@ -77,6 +77,9 @@ export namespace ProjectViewManager {
 
 	async function getDisplayFolders(): Promise<string[]> {
 		let displayFolders = new Set<string>(['.eclipse']); // TODO bubble this out to a setting
+		if (isMultiRoot()) {
+			displayFolders.add('.');
+		}
 		try {
 			const bazelProjectFile = await getBazelProjectFile();
 			if (bazelProjectFile.directories.includes('.')) {
@@ -164,11 +167,11 @@ export namespace ProjectViewManager {
 			k.includes('.eclipse')
 		).length;
 
-		const viewAll = displayFolders.includes('.');
+		const viewAll = displayFolders.includes('.') && !isMultiRoot();
 
 		const fileWatcherExcludePattern = viewAll
 			? ''
-			: `**/!(${Array.from(displayFolders.sort()).join('|')})/**`;
+			: `**/!(${Array.from(displayFolders.filter((s) => s !== '.').sort()).join('|')})/**`;
 
 		if (viewAll) {
 			// if viewAll and existing config doesn't contain .eclipse return
