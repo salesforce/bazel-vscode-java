@@ -8,3 +8,4 @@ meta.json
 stats.html
 server
 test/result
+*.bazel.lock
