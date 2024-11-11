@@ -41,7 +41,7 @@
 			"./server/com.github.ben-manes.caffeine.jar",
 			"./server/org.jsr-305.jar",
 			"./server/org.fusesource.jansi.jar",
-			"./server/wrapped.com.google.protobuf.protobuf-java.jar",
+			"./server/com.google.protobuf.jar",
 			"./server/com.salesforce.bazel.importedsource.jar",
 			"./server/com.salesforce.bazel.sdk.jar",
 			"./server/com.salesforce.bazel.eclipse.core.jar",
