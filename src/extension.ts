@@ -15,6 +15,7 @@ import {
 	getBazelTerminal,
 } from './bazelLangaugeServerTerminal';
 import { BazelTaskManager } from './bazelTaskManager';
+import { registerBuildifierFormatter } from './buildifier';
 import { Commands, executeJavaLanguageServerCommand } from './commands';
 import { registerLSClient } from './loggingTCPServer';
 import { ProjectViewManager } from './projectViewManager';
@@ -27,7 +28,6 @@ import {
 } from './util';
 
 const workspaceRoot = getWorkspaceRoot();
-const workspaceRootName = workspaceRoot.split('/').reverse()[0];
 
 export async function activate(context: ExtensionContext) {
 	// activates
@@ -65,6 +65,11 @@ export async function activate(context: ExtensionContext) {
 		'setContext',
 		'isBazelWorkspaceRoot',
 		isBazelWorkspaceRoot()
+	);
+	commands.executeCommand(
+		'setContext',
+		'isMultiRoot',
+		workspace.workspaceFile?.fsPath.includes('code-workspace')
 	);
 	// create .eclipse/.bazelproject file if DNE
 	if (isBazelWorkspaceRoot()) {
@@ -124,6 +129,8 @@ export async function activate(context: ExtensionContext) {
 		)
 	);
 
+	registerBuildifierFormatter();
+
 	// trigger a refresh of the tree view when any task get executed
 	tasks.onDidStartTask((_) => BazelRunTargetProvider.instance.refresh());
 	tasks.onDidEndTask((_) => BazelRunTargetProvider.instance.refresh());
@@ -132,7 +139,7 @@ export async function activate(context: ExtensionContext) {
 	registerLSClient();
 }
 
-export function deactivate() {}
+export function deactivate() { }
 
 function syncProjectView(): void {
 	if (!isRedhatJavaReady()) {
