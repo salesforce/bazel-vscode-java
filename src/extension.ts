@@ -14,9 +14,11 @@ import {
 	BazelLanguageServerTerminal,
 	getBazelTerminal,
 } from './bazelLangaugeServerTerminal';
+import { getBazelProjectFile } from './bazelprojectparser';
 import { BazelTaskManager } from './bazelTaskManager';
 import { registerBuildifierFormatter } from './buildifier';
 import { Commands, executeJavaLanguageServerCommand } from './commands';
+import { BazelVscodeExtensionAPI } from './extension.api';
 import { registerLSClient } from './loggingTCPServer';
 import { ProjectViewManager } from './projectViewManager';
 import { BazelRunTargetProvider } from './provider/bazelRunTargetProvider';
@@ -29,7 +31,9 @@ import {
 
 const workspaceRoot = getWorkspaceRoot();
 
-export async function activate(context: ExtensionContext) {
+export async function activate(
+	context: ExtensionContext
+): Promise<BazelVscodeExtensionAPI> {
 	// activates
 	// LS processes current .eclipse/.bazelproject file
 	// if it DNE create one
@@ -137,9 +141,13 @@ export async function activate(context: ExtensionContext) {
 
 	// always update the project view after the initial project load
 	registerLSClient();
+
+	return Promise.resolve({
+		parseProjectFile: await getBazelProjectFile(),
+	});
 }
 
-export function deactivate() { }
+export function deactivate() {}
 
 function syncProjectView(): void {
 	if (!isRedhatJavaReady()) {

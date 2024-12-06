@@ -2,10 +2,24 @@ import * as assert from 'assert';
 import { setTimeout } from 'node:timers/promises';
 import { env } from 'process';
 import * as vscode from 'vscode';
+import { extensions } from 'vscode';
 import { Commands } from '../../src/commands';
+import { BazelVscodeExtensionAPI } from '../../src/extension.api';
 import { Jdtls } from './Jdtls';
 
 suite('Java Language Extension - Standard', () => {
+	suiteSetup(async function () {
+		await extensions.getExtension('sfdc.bazel-vscode-java')?.activate();
+	});
+
+	test('version should be correct', async function () {
+		const api: BazelVscodeExtensionAPI = extensions.getExtension(
+			'sfdc.bazel-vscode-java'
+		)?.exports;
+
+		assert.ok(api.parseProjectFile !== null);
+	});
+
 	test('RedHat Java Extension should be present', () => {
 		assert.ok(vscode.extensions.getExtension('redhat.java'));
 	});
