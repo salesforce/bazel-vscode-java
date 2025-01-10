@@ -37,14 +37,10 @@ async function main() {
 			resolveCliArgsFromVSCodeExecutablePath(vscodeExecutablePath);
 
 		// span vs code process for custom setup
-		cp.spawnSync(
-			cliPath,
-			[...args, '--install-extension', 'redhat.java@prerelease'],
-			{
-				encoding: 'utf-8',
-				stdio: 'inherit',
-			}
-		);
+		cp.spawnSync(cliPath, [...args, '--install-extension', 'redhat.java'], {
+			encoding: 'utf-8',
+			stdio: 'inherit',
+		});
 
 		// ensrue the user data area is empty
 		if (fs.existsSync(testUserDataPath)) {
