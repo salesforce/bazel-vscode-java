@@ -77,7 +77,7 @@ jobs:
       - name: Setup Node version
         uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 22
           cache: 'npm'
 
       - name: 📦 Install dependencies
@@ -91,7 +91,7 @@ jobs:
         run: npm run build
 
       - name: 🧪 Run tests
-        uses: GabrielBB/xvfb-action@v1
+        uses: GabrielBB/xvfb-action@v1.7
         env:
           PRINT_JDTLS_LOGS: true
         with:
