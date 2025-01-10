@@ -4,7 +4,7 @@
 	"description": "Bazel support for Java Linting, Intellisense, formatting, refactoring and more...",
 	"author": "Salesforce Engineering",
 	"license": "BSD-3-Clause",
-	"version": "1.4.0",
+	"version": "1.4.1",
 	"publisher": "sfdc",
 	"bugs": "https://github.com/salesforce/bazel-vscode-java/issues",
 	"preview": true,
@@ -165,7 +165,10 @@
 					"scope": "window"
 				},
 				"bazel.buildifier.binary": {
-					"type": ["string", "null"],
+					"type": [
+						"string",
+						"null"
+					],
 					"default": null,
 					"description": "path to buildifier binary. If not set buildifier from your PATH will be used",
 					"scope": "window"
