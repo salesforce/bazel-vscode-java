@@ -333,7 +333,7 @@
 		"@vscode/test-cli": "^0.0.10",
 		"@vscode/test-electron": "^2.4.1",
 		"@vscode/vsce": "^3.2.1",
-		"esbuild": "0.19.8",
+		"esbuild": "0.25.0",
 		"esbuild-plugin-eslint": "^0.3.7",
 		"esbuild-visualizer": "^0.4.1",
 		"eslint": "^8.45.0",
