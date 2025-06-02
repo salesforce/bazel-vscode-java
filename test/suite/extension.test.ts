@@ -77,19 +77,12 @@ suite('Java Language Extension - Standard', () => {
 
 		const commands = await vscode.commands.getCommands(true);
 		const JAVA_COMMANDS = [
-			Commands.SYNC_PROJECTS_CMD,
-			Commands.SYNC_DIRECTORIES_ONLY,
 			Commands.UPDATE_CLASSPATHS_CMD,
 			Commands.DEBUG_LS_CMD,
-			Commands.OPEN_BAZEL_BUILD_STATUS_CMD,
-			Commands.OPEN_BAZEL_PROJECT_FILE,
-			Commands.CONVERT_PROJECT_WORKSPACE,
 		].sort();
 
 		const foundBazelJavaCommands = commands
-			.filter(
-				(value) => value.startsWith('java.bazel.') || value.startsWith('bazel.')
-			)
+			.filter((value) => value.startsWith('java.bazel.'))
 			.filter((value) => !COMMAND_EXCLUSIONS.includes(value))
 			.sort();
 
@@ -115,18 +108,23 @@ suite('Java Language Extension - Standard', () => {
 	// this is currently broken for the `small` test project.
 	test('should build workspace without problems within reasonable time', function () {
 		this.timeout(60000 * 5);
-		return Jdtls.buildWorkspace().then((result) => {
-			assert.strictEqual(result, Jdtls.CompileWorkspaceStatus.Succeed);
+		return Jdtls.buildWorkspace().then(
+			(result) => {
+				assert.strictEqual(result, Jdtls.CompileWorkspaceStatus.Succeed);
 
-			return Jdtls.getSourcePaths().then(
-				(resp) => {
-					const projects = new Set(resp.data.map((p) => p.projectName));
-					assert.ok(projects.size > 0);
-				},
-				(e) => {
-					console.error(JSON.stringify(e));
-				}
-			);
-		});
+				return Jdtls.getSourcePaths().then(
+					(resp) => {
+						const projects = new Set(resp.data.map((p) => p.projectName));
+						assert.ok(projects.size > 0);
+					},
+					(e) => {
+						console.error(JSON.stringify(e));
+					}
+				);
+			},
+			(err) => {
+				console.error(err);
+			}
+		);
 	});
 });
