@@ -73,19 +73,12 @@ suite('Java Language Extension - Standard', () => {
 
 		const commands = await vscode.commands.getCommands(true);
 		const JAVA_COMMANDS = [
-			Commands.SYNC_PROJECTS_CMD,
-			Commands.SYNC_DIRECTORIES_ONLY,
 			Commands.UPDATE_CLASSPATHS_CMD,
 			Commands.DEBUG_LS_CMD,
-			Commands.OPEN_BAZEL_BUILD_STATUS_CMD,
-			Commands.OPEN_BAZEL_PROJECT_FILE,
-			Commands.CONVERT_PROJECT_WORKSPACE,
 		].sort();
 
 		const foundBazelJavaCommands = commands
-			.filter(
-				(value) => value.startsWith('java.bazel.') || value.startsWith('bazel.')
-			)
+			.filter((value) => value.startsWith('java.bazel.'))
 			.filter((value) => !COMMAND_EXCLUSIONS.includes(value))
 			.sort();
 
