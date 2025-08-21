@@ -1,3 +1,4 @@
+import { Span } from '@opentelemetry/api';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { format } from 'util';
@@ -23,6 +24,7 @@ import { registerLSClient } from './loggingTCPServer';
 import { ProjectViewManager } from './projectViewManager';
 import { BazelRunTargetProvider } from './provider/bazelRunTargetProvider';
 import { BazelTaskProvider } from './provider/bazelTaskProvider';
+import { ExtensionOtel, registerMetrics } from './tracing/otelUtils';
 import {
 	getWorkspaceRoot,
 	initBazelProjectFile,
@@ -43,6 +45,8 @@ export async function activate(
 	// fetch all projects loaded into LS and display those as well
 	// show .eclipse folder
 	//
+
+	registerMetrics(context);
 
 	window.registerTreeDataProvider(
 		'bazelTaskOutline',
@@ -141,6 +145,14 @@ export async function activate(
 
 	// always update the project view after the initial project load
 	registerLSClient();
+
+	ExtensionOtel.getInstance(context).tracer.startActiveSpan(
+		'extension.activation',
+		(span: Span) => {
+			span.addEvent('activation success');
+			span.end();
+		}
+	);
 
 	return Promise.resolve({
 		parseProjectFile: await getBazelProjectFile(),
