@@ -4,6 +4,7 @@ import { join } from 'path';
 import { format } from 'util';
 import {
 	ExtensionContext,
+	RelativePattern,
 	TextDocument,
 	commands,
 	extensions,
@@ -138,6 +139,15 @@ export async function activate(
 	);
 
 	registerBuildifierFormatter();
+
+	// if this is a multi-root project, create a listener to refresh the symlinked project root directory on file add/remove
+	if (ProjectViewManager.isMultiRoot()) {
+		const w = workspace.createFileSystemWatcher(
+			new RelativePattern(workspaceRoot, '*')
+		);
+		w.onDidCreate((_e) => ProjectViewManager.syncWorkspaceRoot());
+		w.onDidDelete((_e) => ProjectViewManager.syncWorkspaceRoot());
+	}
 
 	// trigger a refresh of the tree view when any task get executed
 	tasks.onDidStartTask((_) => BazelRunTargetProvider.instance.refresh());
