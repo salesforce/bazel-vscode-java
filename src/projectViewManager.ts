@@ -1,4 +1,14 @@
-import { writeFileSync } from 'fs';
+import {
+	existsSync,
+	mkdirSync,
+	readdirSync,
+	rmSync,
+	statSync,
+	symlinkSync,
+	writeFileSync,
+} from 'fs';
+import { homedir } from 'os';
+import { sep } from 'path';
 import {
 	commands,
 	ConfigurationTarget,
@@ -15,8 +25,9 @@ import { getVscodeConfig, getWorkspaceRoot } from './util';
 export namespace ProjectViewManager {
 	const workspaceRoot = getWorkspaceRoot();
 	const workspaceRootName = workspaceRoot.split('/').reverse()[0];
+	const projectRootSymlinks = `${homedir}${sep}${workspaceRootName}`;
 
-	function isMultiRoot(): boolean {
+	export function isMultiRoot(): boolean {
 		return !!workspace.workspaceFile;
 	}
 
@@ -42,7 +53,7 @@ export namespace ProjectViewManager {
 						};
 						writeFileSync(
 							`${workspaceRoot}/workspace.code-workspace`,
-							Buffer.from(JSON.stringify(workspaceFile, null, 2))
+							JSON.stringify(workspaceFile, null, 2)
 						);
 
 						// cleanup all old single root workspace files
@@ -83,7 +94,8 @@ export namespace ProjectViewManager {
 	async function getDisplayFolders(): Promise<string[]> {
 		let displayFolders = new Set<string>(['.eclipse']); // TODO bubble this out to a setting
 		if (isMultiRoot()) {
-			displayFolders.add('.');
+			syncWorkspaceRoot();
+			displayFolders.add(projectRootSymlinks);
 		}
 		try {
 			const bazelProjectFile = await getBazelProjectFile();
@@ -141,18 +153,17 @@ export namespace ProjectViewManager {
 			0,
 			workspace.workspaceFolders?.length,
 			...displayFolders.map((f) => {
-				const moduleUri = Uri.file(`${workspaceRoot}/${f}`);
-				let moduleName = f;
-				if (moduleName === '.') {
-					moduleName = workspaceRootName;
+				if (f === projectRootSymlinks) {
+					return {
+						uri: Uri.file(projectRootSymlinks),
+						name: workspaceRootName,
+					};
+				} else {
+					return {
+						uri: Uri.file(`${workspaceRoot}/${f}`),
+						name: f.replaceAll(sep, ' ⇾ '),
+					};
 				}
-				if (f.includes('/')) {
-					moduleName = f.replaceAll('/', ' ⇾ ');
-				}
-				return {
-					uri: moduleUri,
-					name: moduleName,
-				};
 			})
 		);
 		return Promise.resolve(displayFolders);
@@ -176,7 +187,12 @@ export namespace ProjectViewManager {
 
 		const fileWatcherExcludePattern = viewAll
 			? ''
-			: `**/!(${Array.from(displayFolders.filter((s) => s !== '.').sort()).join('|')})/**`;
+			: `**/!(${Array.from(
+					displayFolders
+						.filter((e) => e !== '')
+						.filter((s) => s !== '.')
+						.sort()
+				).join('|')})/**`;
 
 		if (viewAll) {
 			// if viewAll and existing config doesn't contain .eclipse return
@@ -241,5 +257,25 @@ export namespace ProjectViewManager {
 
 	function rootDirOnly(dirs: string[]): string[] {
 		return dirs.map((d) => d.split('/')[0]);
+	}
+
+	export function syncWorkspaceRoot() {
+		if (existsSync(projectRootSymlinks)) {
+			rmSync(projectRootSymlinks, { recursive: true }); // delete
+		}
+
+		mkdirSync(projectRootSymlinks);
+
+		readdirSync(workspaceRoot).forEach((f) => {
+			const fpath = `${workspaceRoot}${sep}${f}`;
+			if (existsSync(fpath)) {
+				const stats = statSync(fpath);
+				if (stats.isFile()) {
+					symlinkSync(fpath, `${projectRootSymlinks}${sep}${f}`);
+				}
+			}
+		});
+
+		commands.executeCommand('workbench.files.action.refreshFilesExplorer');
 	}
 }

@@ -2,10 +2,28 @@ import * as assert from 'assert';
 import { setTimeout } from 'node:timers/promises';
 import { env } from 'process';
 import * as vscode from 'vscode';
+import { extensions } from 'vscode';
 import { Commands } from '../../src/commands';
+import { BazelVscodeExtensionAPI } from '../../src/extension.api';
 import { Jdtls } from './Jdtls';
 
 suite('Java Language Extension - Standard', () => {
+	suiteSetup(async function () {
+		try {
+			await extensions.getExtension('sfdc.bazel-vscode-java')?.activate();
+		} catch (e) {
+			console.error(e);
+		}
+	});
+
+	test('version should be correct', async function () {
+		const api: BazelVscodeExtensionAPI = extensions.getExtension(
+			'sfdc.bazel-vscode-java'
+		)?.exports;
+
+		assert.ok(api.parseProjectFile !== null);
+	});
+
 	test('RedHat Java Extension should be present', () => {
 		assert.ok(vscode.extensions.getExtension('redhat.java'));
 	});
@@ -100,10 +118,15 @@ suite('Java Language Extension - Standard', () => {
 		return Jdtls.buildWorkspace().then((result) => {
 			assert.strictEqual(result, Jdtls.CompileWorkspaceStatus.Succeed);
 
-			return Jdtls.getSourcePaths().then((resp) => {
-				const projects = new Set(resp.data.map((p) => p.projectName));
-				assert.ok(projects.size > 0);
-			});
+			return Jdtls.getSourcePaths().then(
+				(resp) => {
+					const projects = new Set(resp.data.map((p) => p.projectName));
+					assert.ok(projects.size > 0);
+				},
+				(e) => {
+					console.error(JSON.stringify(e));
+				}
+			);
 		});
 	});
 });

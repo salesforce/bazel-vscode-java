@@ -1,8 +1,10 @@
+import { Span } from '@opentelemetry/api';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { format } from 'util';
 import {
 	ExtensionContext,
+	RelativePattern,
 	TextDocument,
 	commands,
 	extensions,
@@ -14,13 +16,16 @@ import {
 	BazelLanguageServerTerminal,
 	getBazelTerminal,
 } from './bazelLangaugeServerTerminal';
+import { getBazelProjectFile } from './bazelprojectparser';
 import { BazelTaskManager } from './bazelTaskManager';
 import { registerBuildifierFormatter } from './buildifier';
 import { Commands, executeJavaLanguageServerCommand } from './commands';
+import { BazelVscodeExtensionAPI } from './extension.api';
 import { registerLSClient } from './loggingTCPServer';
 import { ProjectViewManager } from './projectViewManager';
 import { BazelRunTargetProvider } from './provider/bazelRunTargetProvider';
 import { BazelTaskProvider } from './provider/bazelTaskProvider';
+import { ExtensionOtel, registerMetrics } from './tracing/otelUtils';
 import {
 	getWorkspaceRoot,
 	initBazelProjectFile,
@@ -29,7 +34,9 @@ import {
 
 const workspaceRoot = getWorkspaceRoot();
 
-export async function activate(context: ExtensionContext) {
+export async function activate(
+	context: ExtensionContext
+): Promise<BazelVscodeExtensionAPI> {
 	// activates
 	// LS processes current .eclipse/.bazelproject file
 	// if it DNE create one
@@ -39,6 +46,8 @@ export async function activate(context: ExtensionContext) {
 	// fetch all projects loaded into LS and display those as well
 	// show .eclipse folder
 	//
+
+	registerMetrics(context);
 
 	window.registerTreeDataProvider(
 		'bazelTaskOutline',
@@ -131,15 +140,36 @@ export async function activate(context: ExtensionContext) {
 
 	registerBuildifierFormatter();
 
+	// if this is a multi-root project, create a listener to refresh the symlinked project root directory on file add/remove
+	if (ProjectViewManager.isMultiRoot()) {
+		const w = workspace.createFileSystemWatcher(
+			new RelativePattern(workspaceRoot, '*')
+		);
+		w.onDidCreate((_e) => ProjectViewManager.syncWorkspaceRoot());
+		w.onDidDelete((_e) => ProjectViewManager.syncWorkspaceRoot());
+	}
+
 	// trigger a refresh of the tree view when any task get executed
 	tasks.onDidStartTask((_) => BazelRunTargetProvider.instance.refresh());
 	tasks.onDidEndTask((_) => BazelRunTargetProvider.instance.refresh());
 
 	// always update the project view after the initial project load
 	registerLSClient();
+
+	ExtensionOtel.getInstance(context).tracer.startActiveSpan(
+		'extension.activation',
+		(span: Span) => {
+			span.addEvent('activation success');
+			span.end();
+		}
+	);
+
+	return Promise.resolve({
+		parseProjectFile: await getBazelProjectFile(),
+	});
 }
 
-export function deactivate() { }
+export function deactivate() {}
 
 function syncProjectView(): void {
 	if (!isRedhatJavaReady()) {

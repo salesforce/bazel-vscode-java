@@ -172,6 +172,24 @@
 					"default": null,
 					"description": "path to buildifier binary. If not set buildifier from your PATH will be used",
 					"scope": "window"
+				},
+				"bazel.telemetry.endpoint": {
+					"type": [
+						"string",
+						"null"
+					],
+					"default": null,
+					"description": "OTEL endpoint to send telemetry",
+					"scope": "window"
+				},
+				"bazel.telemetry.headers": {
+					"type": [
+						"object",
+						"null"
+					],
+					"default": null,
+					"description": "OTEL headers",
+					"scope": "window"
 				}
 			}
 		},
@@ -332,7 +350,7 @@
 		"@typescript-eslint/parser": "^6.0.0",
 		"@vscode/test-cli": "^0.0.10",
 		"@vscode/test-electron": "^2.4.1",
-		"@vscode/vsce": "^3.2.1",
+		"@vscode/vsce": "^3.6.0",
 		"esbuild": "0.19.8",
 		"esbuild-plugin-eslint": "^0.3.7",
 		"esbuild-visualizer": "^0.4.1",
@@ -356,6 +374,13 @@
 		"vscode-languageclient": "^9.0.1"
 	},
 	"dependencies": {
+		"@opentelemetry/api": "^1.9.0",
+		"@opentelemetry/exporter-metrics-otlp-proto": "^0.203.0",
+		"@opentelemetry/exporter-trace-otlp-proto": "^0.203.0",
+		"@opentelemetry/resources": "^2.0.1",
+		"@opentelemetry/sdk-metrics": "^2.0.1",
+		"@opentelemetry/sdk-trace-web": "^2.0.1",
+		"@opentelemetry/semantic-conventions": "^1.36.0",
 		"fast-xml-parser": "^4.4.1"
 	}
 }
