@@ -41,7 +41,7 @@ jobs:
         run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
 
       - name: Setup Node version
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 16
           cache: 'npm'
