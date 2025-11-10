@@ -144,13 +144,33 @@ function downloadServerImpl() {
 
 function buildServerImpl() {
 	fs.rmSync('./server', { recursive: true, force: true });
-	cp.execSync(mvnw() + ' clean package -DskipTests=true', {
-		cwd: BAZEL_ECLIPSE_DIR,
-		stdio: [0, 1, 2],
-	});
+	const jdtlsJar = fs
+		.readdirSync(
+			BAZEL_ECLIPSE_DIR + '/releng/p2repository/target/repository/plugins/'
+		)
+		.find(
+			(file) =>
+				file.startsWith('com.salesforce.bazel.eclipse.jdtls') &&
+				file.endsWith('.jar')
+		);
+
+	if (jdtlsJar) {
+		console.log(
+			'NOTE: skipping build and re-using existing "' +
+				jdtlsJar +
+				'" from ../bazel-eclipse/releng/p2repository/target/repository/plugins'
+		);
+	} else {
+		cp.execSync(mvnw() + ' clean package -DskipTests=true', {
+			cwd: BAZEL_ECLIPSE_DIR,
+			stdio: [0, 1, 2],
+		});
+	}
 	gulp
 		.src(
-			BAZEL_ECLIPSE_DIR + '/releng/p2repository/target/repository/plugins/*.jar'
+			BAZEL_ECLIPSE_DIR +
+				'/releng/p2repository/target/repository/plugins/*.jar',
+			{ encoding: false } // prevent gulp from reading the content as it's not needed
 		)
 		.pipe(DROP_JAR_VERSION)
 		.pipe(jarIsIncludedInPackageJson)
