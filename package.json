@@ -39,6 +39,7 @@
 		"javaExtensions": [
 			"./server/org.eclipse.equinox.event.jar",
 			"./server/com.github.ben-manes.caffeine.jar",
+			"./server/org.apache.velocity.engine-core.jar",
 			"./server/org.jsr-305.jar",
 			"./server/org.fusesource.jansi.jar",
 			"./server/com.google.protobuf.jar",
