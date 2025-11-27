@@ -110,7 +110,7 @@ async function buildServer() {
 
 async function buildOrDownload() {
     if (!fs.existsSync(serverDir)) {
-        console.log('NOTE: eclipse.jdt.ls is not found as a sibling directory, downloading the latest snapshot of the Bazel JDT Language Server extension...');
+        console.log('NOTE: bazel-eclipse is not found as a sibling directory, downloading the latest snapshot of the Bazel JDT Language Server extension...');
         await downloadServer();
     } else {
         await buildServer();
