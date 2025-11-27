@@ -1,11 +1,11 @@
 {
-	"name": "bazel-vscode-java",
-	"displayName": "Bazel extension for Java(TM) Language Support by Salesforce Engineering",
+	"name": "bazel-java",
+	"displayName": "Bazel extension for Java(TM) Language Support by Salesforce OSS",
 	"description": "Bazel support for Java Linting, Intellisense, formatting, refactoring and more...",
-	"author": "Salesforce Engineering",
+	"author": "Salesforce OSS",
 	"license": "BSD-3-Clause",
 	"version": "1.4.1",
-	"publisher": "sfdc",
+	"publisher": "sfdc-eng",
 	"bugs": "https://github.com/salesforce/bazel-vscode-java/issues",
 	"preview": true,
 	"engines": {
@@ -173,6 +173,24 @@
 					"default": null,
 					"description": "path to buildifier binary. If not set buildifier from your PATH will be used",
 					"scope": "window"
+				},
+				"bazel.telemetry.endpoint": {
+					"type": [
+						"string",
+						"null"
+					],
+					"default": null,
+					"description": "OTEL endpoint to send telemetry",
+					"scope": "window"
+				},
+				"bazel.telemetry.headers": {
+					"type": [
+						"object",
+						"null"
+					],
+					"default": null,
+					"description": "OTEL headers",
+					"scope": "window"
 				}
 			}
 		},
@@ -334,16 +352,16 @@
 		"@typescript-eslint/parser": "^6.0.0",
 		"@vscode/test-cli": "^0.0.10",
 		"@vscode/test-electron": "^2.4.1",
-		"@vscode/vsce": "^3.2.1",
-		"esbuild": "0.19.8",
+		"@vscode/vsce": "^3.6.0",
+		"esbuild": "0.25.0",
 		"esbuild-plugin-eslint": "^0.3.7",
 		"esbuild-visualizer": "^0.4.1",
 		"eslint": "^8.45.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-prettier": "^5.1.2",
 		"fs-extra": "^11.3.2",
-		"glob": "^10.3.4",
-		"mocha": "^10.2.0",
+		"glob": "^10.5.0",
+		"mocha": "^10.8.2",
 		"npm-run-all": "^4.1.5",
 		"prettier": "^3.1.1",
 		"rimraf": "^5.0.5",
@@ -354,6 +372,13 @@
 		"vscode-languageclient": "^9.0.1"
 	},
 	"dependencies": {
+		"@opentelemetry/api": "^1.9.0",
+		"@opentelemetry/exporter-metrics-otlp-proto": "^0.203.0",
+		"@opentelemetry/exporter-trace-otlp-proto": "^0.203.0",
+		"@opentelemetry/resources": "^2.0.1",
+		"@opentelemetry/sdk-metrics": "^2.0.1",
+		"@opentelemetry/sdk-trace-web": "^2.0.1",
+		"@opentelemetry/semantic-conventions": "^1.36.0",
 		"fast-xml-parser": "^4.4.1"
 	}
 }

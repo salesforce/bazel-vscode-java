@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Get Time for BUILD_ID
         id: time
@@ -35,7 +35,7 @@ jobs:
         run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
 
       - name: Setup Node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: 'npm'
@@ -60,7 +60,7 @@ jobs:
         run: npx gulp prepare_pre_release
 
       - name: 🚀 Publish to Visual Studio Marketplace
-        uses: HaaLeo/publish-vscode-extension@v1
+        uses: HaaLeo/publish-vscode-extension@v2
         id: publishToVscMktp
         with:
             preRelease: ${{ github.event.inputs.releaseChannel == 'edge' && true || false }}
@@ -68,7 +68,7 @@ jobs:
             registryUrl: https://marketplace.visualstudio.com
 
       - name: 🚀 Publish to Open VSX Registry
-        uses: HaaLeo/publish-vscode-extension@v1
+        uses: HaaLeo/publish-vscode-extension@v2
         with:
           preRelease: ${{ github.event.inputs.releaseChannel == 'edge' && true || false }}
           pat: ${{ secrets.OPEN_VSX_TOKEN }}

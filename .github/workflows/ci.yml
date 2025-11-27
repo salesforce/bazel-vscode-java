@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Get Time for BUILD_ID
         id: time
@@ -40,7 +40,7 @@ jobs:
         run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
 
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -75,7 +75,7 @@ jobs:
         run: cat ~/.m2/toolchains.xml
 
       - name: Setup Node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: 'npm'
@@ -99,7 +99,7 @@ jobs:
           options: "-screen 0 1600x1200x24"
 
       - name: Upload Test Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: test-results-${{ matrix.os }}
@@ -111,7 +111,7 @@ jobs:
             !test/projects/**/*
 
       - name: Upload screenshots on failure
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: screenshots-${{ matrix.os }}
@@ -120,7 +120,7 @@ jobs:
             test/logs
 
       - name: Upload Bazel JDT Language Server extension
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: success() && matrix.os == 'ubuntu-latest'
         with:
           name: server
@@ -134,7 +134,7 @@ jobs:
     # needed for publishing test results from forks
     steps:
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ci-event-file
           path: ${{ github.event_path }}

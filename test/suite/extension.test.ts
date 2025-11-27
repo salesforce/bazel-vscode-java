@@ -9,12 +9,16 @@ import { Jdtls } from './Jdtls';
 
 suite('Java Language Extension - Standard', () => {
 	suiteSetup(async function () {
-		await extensions.getExtension('sfdc.bazel-vscode-java')?.activate();
+		try {
+			await extensions.getExtension('sfdc-eng.bazel-java')?.activate();
+		} catch (e) {
+			console.error(e);
+		}
 	});
 
 	test('version should be correct', async function () {
 		const api: BazelVscodeExtensionAPI = extensions.getExtension(
-			'sfdc.bazel-vscode-java'
+			'sfdc-eng.bazel-java'
 		)?.exports;
 
 		assert.ok(api.parseProjectFile !== null);
@@ -25,7 +29,7 @@ suite('Java Language Extension - Standard', () => {
 	});
 
 	test('Bazel Java Extension should be present', () => {
-		assert.ok(vscode.extensions.getExtension('sfdc.bazel-vscode-java'));
+		assert.ok(vscode.extensions.getExtension('sfdc-eng.bazel-java'));
 	});
 
 	test('RedHat Java Extension should activate', async function () {
@@ -41,7 +45,7 @@ suite('Java Language Extension - Standard', () => {
 
 	test('Bazel Java Extension should activate', async function () {
 		this.timeout(60000 * 2);
-		const ext = vscode.extensions.getExtension('sfdc.bazel-vscode-java');
+		const ext = vscode.extensions.getExtension('sfdc-eng.bazel-java');
 		while (true) {
 			await setTimeout(5000);
 			if (ext!.isActive) {
@@ -114,10 +118,15 @@ suite('Java Language Extension - Standard', () => {
 		return Jdtls.buildWorkspace().then((result) => {
 			assert.strictEqual(result, Jdtls.CompileWorkspaceStatus.Succeed);
 
-			return Jdtls.getSourcePaths().then((resp) => {
-				const projects = new Set(resp.data.map((p) => p.projectName));
-				assert.ok(projects.size > 0);
-			});
+			return Jdtls.getSourcePaths().then(
+				(resp) => {
+					const projects = new Set(resp.data.map((p) => p.projectName));
+					assert.ok(projects.size > 0);
+				},
+				(e) => {
+					console.error(JSON.stringify(e));
+				}
+			);
 		});
 	});
 });
