@@ -16,8 +16,6 @@ export namespace Commands {
 	 * Synchronize all projects of a Bazel workspace
 	 */
 	export const SYNC_PROJECTS = 'java.bazel.syncProjects';
-	export const SYNC_PROJECTS_CMD = 'java.bazel.syncProjects.command';
-	export const SYNC_DIRECTORIES_ONLY = 'java.bazel.syncDirectoriesOnly.command';
 
 	/**
 	 * Connect our output window
@@ -36,16 +34,6 @@ export namespace Commands {
 	export const GET_ALL_JAVA_PROJECTS = 'java.project.getAll';
 
 	export const DEBUG_LS_CMD = 'java.bazel.debug.command';
-
-	export const OPEN_BAZEL_BUILD_STATUS_CMD = 'java.bazel.showStatus';
-
-	export const BAZEL_TARGET_REFRESH = 'bazelTaskOutline.refresh';
-	export const BAZEL_TARGET_RUN = 'bazelTaskOutline.run';
-	export const BAZEL_TARGET_KILL = 'bazelTaskOutline.kill';
-
-	export const OPEN_BAZEL_PROJECT_FILE = 'bazel.projectview.open';
-
-	export const CONVERT_PROJECT_WORKSPACE = 'bazel.convert.workspace';
 }
 
 export function executeJavaLanguageServerCommand<T = unknown>(

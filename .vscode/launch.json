@@ -74,6 +74,7 @@
 			"runtimeExecutable": "${execPath}",
 			"debugWebviews": true,
 			"args": [
+				"--disable-extensions",
 				"--extensionDevelopmentPath=${workspaceRoot}",
 				"--extensionDevelopmentPath=${workspaceRoot}/../vscode-java"
 			],
@@ -96,6 +97,7 @@
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"args": [
+				"--disable-extensions",
 				"--disable-workspace-trust",
 				"--extensionDevelopmentPath=${workspaceFolder}",
 				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index",

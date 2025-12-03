@@ -1,8 +1,8 @@
 import { AddressInfo, Server, Socket, createServer } from 'net';
 import { setTimeout } from 'timers/promises';
 import { commands, workspace } from 'vscode';
-import { BazelLanguageServerTerminal } from './bazelLangaugeServerTerminal';
 import { Commands } from './commands';
+import { BazelServerTerminal } from './extension.api';
 
 const SERVER_START_RETRIES = 10;
 const PORT_REGISTRATION_RETRIES = 10;
@@ -10,7 +10,10 @@ const RETRY_INTERVAL = 5000; // ms
 
 let server: Server | undefined;
 
-function startTCPServer(attempts = 0): Promise<number> {
+function startTCPServer(
+	bazelTerminal: BazelServerTerminal,
+	attempts = 0
+): Promise<number> {
 	let port = 0;
 	if (workspace.getConfiguration('java').has('jdt.ls.vmargs')) {
 		const vmargs = workspace
@@ -31,13 +34,13 @@ function startTCPServer(attempts = 0): Promise<number> {
 			server = createServer((sock: Socket) => {
 				attempts = 0;
 
-				sock.pipe(BazelLanguageServerTerminal.stream());
+				sock.pipe(bazelTerminal.stream());
 
 				sock.on('end', () => {
-					sock.unpipe(BazelLanguageServerTerminal.stream());
+					sock.unpipe(bazelTerminal.stream());
 				});
 				sock.on('error', (err: Error) => {
-					BazelLanguageServerTerminal.error(err.message);
+					bazelTerminal.error(err.message);
 					sock.end();
 				});
 			});
@@ -47,38 +50,38 @@ function startTCPServer(attempts = 0): Promise<number> {
 				const address = server.address();
 				if (address) {
 					const port = (address as AddressInfo).port;
-					BazelLanguageServerTerminal.debug(
-						`Bazel log server listening on port ${port}`
-					);
+					bazelTerminal.debug(`Bazel log server listening on port ${port}`);
 					resolve(port);
 				}
 			} else {
-				BazelLanguageServerTerminal.error(`Failed to start bazel TCP server`);
+				bazelTerminal.error(`Failed to start bazel TCP server`);
 				setTimeout<number>(1000 * attempts).then(() =>
-					startTCPServer(attempts + 1)
+					startTCPServer(bazelTerminal, attempts + 1)
 				);
 			}
 		});
 
 		server.on('error', (err: Error) => {
 			console.error(err.message);
-			BazelLanguageServerTerminal.error(err.message);
+			bazelTerminal.error(err.message);
 		});
 	});
 }
 
-export function registerLSClient(): Promise<void> {
-	return startTCPServer()
-		.then((port) => registerPortWithLanguageServer(port))
+export function registerLSClient(
+	bazelTerminal: BazelServerTerminal
+): Promise<void> {
+	bazelTerminal.info('java LS registering');
+	return startTCPServer(bazelTerminal)
+		.then((port) => registerPortWithLanguageServer(port, bazelTerminal))
 		.catch((err) =>
-			BazelLanguageServerTerminal.error(
-				`Failed to register port with BLS: ${err.message}`
-			)
+			bazelTerminal.error(`Failed to register port with BLS: ${err.message}`)
 		);
 }
 
 async function registerPortWithLanguageServer(
 	port: number,
+	bazelTerminal: BazelServerTerminal,
 	attempts = 0,
 	maxRetries = 50
 ): Promise<void> {
@@ -91,9 +94,7 @@ async function registerPortWithLanguageServer(
 					Commands.REGISTER_BAZEL_TCP_SERVER_PORT,
 					port
 				)
-				.then(() =>
-					BazelLanguageServerTerminal.trace(`port ${port} registered with BLS`)
-				);
+				.then(() => bazelTerminal.trace(`port ${port} registered with BLS`));
 		} catch (err) {
 			error = err;
 			console.error(`register port failed ${attempts} : ${err}`);
