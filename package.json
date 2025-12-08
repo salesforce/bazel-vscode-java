@@ -1,19 +1,19 @@
 {
-	"name": "bazel-java",
-	"displayName": "Bazel extension for Java(TM) Language Support by Salesforce OSS",
+	"name": "java-bazel-extension",
+	"displayName": "Bazel extension for Java(TM) Language Support by Compass",
 	"description": "Bazel support for Java Linting, Intellisense, formatting, refactoring and more...",
-	"author": "Salesforce OSS",
+	"author": "Compass",
 	"license": "BSD-3-Clause",
-	"version": "1.5.0",
-	"publisher": "sfdc-eng",
-	"bugs": "https://github.com/salesforce/bazel-vscode-java/issues",
+	"version": "0.0.2",
+	"publisher": "COMP",
+	"bugs": "https://github.com/zhirui1994/bazel-vscode-java/issues",
 	"preview": true,
 	"engines": {
 		"vscode": "^1.100.0"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/salesforce/bazel-vscode-java"
+		"url": "https://github.com/zhirui1994/bazel-vscode-java"
 	},
 	"categories": [
 		"Programming Languages",
@@ -39,6 +39,7 @@
 		"javaExtensions": [
 			"./server/org.eclipse.equinox.event.jar",
 			"./server/com.github.ben-manes.caffeine.jar",
+			"./server/org.apache.velocity.engine-core.jar",
 			"./server/org.jsr-305.jar",
 			"./server/org.fusesource.jansi.jar",
 			"./server/com.google.protobuf.jar",
