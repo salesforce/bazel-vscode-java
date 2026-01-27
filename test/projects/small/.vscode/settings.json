@@ -3,25 +3,22 @@
 		"**/.git": true,
 		"**/.svn": true,
 		"**/.hg": true,
+		"**/CVS": true,
 		"**/.DS_Store": true,
 		"**/Thumbs.db": true,
-		"**/CVS": true,
 		".eclipse": false,
-		".vscode": true,
+		".vscode": false,
 		"module1": false,
 		"module2": false,
-		"module3": true,
-		"third_party": true,
-		"bazel-bin": true,
-		"bazel-out": true,
-		"bazel-small": true,
-		"bazel-testlogs": true,
+		"module3": false,
+		"third_party": false,
+		"bazel-bin": false,
+		"bazel-out": false,
+		"bazel-small": false,
+		"bazel-testlogs": false,
 		".settings": true,
-		"tools": true,
-		"bin": true,
-		".ijwb": true,
-		".bazelbsp": true,
-		".idea": true
+		"tools": false,
+		"bin": false
 	},
 	"java.bazel.log.level": "trace",
 	"java.showBuildStatusOnStart.enabled": "terminal",
@@ -35,11 +32,9 @@
 	"files.watcherExclude": {
 		"**/.git/objects/**": true,
 		"**/.git/subtree-cache/**": true,
-		"**/.hg/store/**": true,
 		"**/node_modules/*/**": true,
-		"**/!(.eclipse|module1|module2)/**": true
+		"**/.hg/store/**": true
 	},
 	"editor.formatOnSave": true,
-	"bazel.buildifier.enable": true,
-	"bazel.projectview.updateFileWatcherExclusion": false
+	"bazel.buildifier.enable": true
 }
