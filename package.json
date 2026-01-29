@@ -4,7 +4,7 @@
 	"description": "Bazel support for Java Linting, Intellisense, formatting, refactoring and more...",
 	"author": "Compass",
 	"license": "BSD-3-Clause",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"publisher": "COMP",
 	"bugs": "https://github.com/zhirui1994/bazel-vscode-java/issues",
 	"preview": true,
@@ -122,6 +122,12 @@
 		"configuration": {
 			"title": "Bazel Java",
 			"properties": {
+				"java.bazel-vscode.enabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "Enable Bazel support for Java Language Server.",
+					"scope": "window"
+				},
 				"java.import.bazel.disabled": {
 					"type": "boolean",
 					"default": false,

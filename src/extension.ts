@@ -46,6 +46,15 @@ export async function activate(
 	// fetch all projects loaded into LS and display those as well
 	// show .eclipse folder
 	//
+	const enabled = workspace.getConfiguration('java.bazel-vscode').get('enabled');
+	if (!enabled) {
+		BazelLanguageServerTerminal.info(
+			'Bazel VSCode extension for Java is disabled. To enable it, set "java.bazel-vscode.enabled" to true in your settings.'
+		);
+		return Promise.resolve({
+			parseProjectFile: await getBazelProjectFile(),
+		});
+	}
 
 	registerMetrics(context);
 
